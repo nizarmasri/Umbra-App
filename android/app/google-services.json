@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "819815486016",
+    "project_id": "events-43ebe",
+    "storage_bucket": "events-43ebe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819815486016:android:5baf2c145ecbf37a6f85a5",
+        "android_client_info": {
+          "package_name": "com.nizarmasri.events"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819815486016-f1j637jtn9gk8dbjardkqirsnfei1hlp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQPIIO0Abo1airyQCqSvvjneLySqkGSz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819815486016-f1j637jtn9gk8dbjardkqirsnfei1hlp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
