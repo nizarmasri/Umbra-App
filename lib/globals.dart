@@ -7,3 +7,6 @@ TextStyle style = TextStyle(
     fontFamily: 'Montserrat',
     fontWeight: FontWeight.w300,
     color: Colors.white);
+
+String montserrat = "Montserrat";
+FontWeight fontWeight = FontWeight.w300;
