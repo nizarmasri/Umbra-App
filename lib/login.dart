@@ -65,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.black,
                         )),
                     Expanded(
+                      // this is where the logo goes
                       flex: 4,
                       child: Container(
                           alignment: Alignment.bottomCenter,
@@ -98,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           children: [
                             Expanded(
+                              // Text fields
                               child: Column(
                                 children: [
                                   Expanded(
@@ -152,7 +154,8 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   Expanded(
                                       child: Container(
-                                    margin: EdgeInsets.only(top: 20, bottom: 20),
+                                    margin:
+                                        EdgeInsets.only(top: 20, bottom: 20),
                                     decoration: BoxDecoration(
                                         color: Colors.white24,
                                         borderRadius:
@@ -191,6 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             Expanded(
+                              // Buttons
                               child: Column(
                                 children: [
                                   Expanded(
@@ -253,7 +257,8 @@ class _LoginPageState extends State<LoginPage> {
                                                 .signInWithGoogle();
                                           },
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               FaIcon(
                                                 FontAwesomeIcons.google,
@@ -264,9 +269,9 @@ class _LoginPageState extends State<LoginPage> {
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight:
-                                                    globals.fontWeight,
+                                                        globals.fontWeight,
                                                     fontFamily:
-                                                    globals.montserrat,
+                                                        globals.montserrat,
                                                     fontSize: googleSize),
                                               ),
                                             ],

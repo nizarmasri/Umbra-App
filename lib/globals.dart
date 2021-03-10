@@ -10,3 +10,13 @@ TextStyle style = TextStyle(
 
 String montserrat = "Montserrat";
 FontWeight fontWeight = FontWeight.w300;
+
+Size size(BuildContext c) => MediaQuery.of(c).size;
+double width(BuildContext c) => size(c).width;
+double height(BuildContext c) => size(c).height;
+
+void Tester(){
+  print("width: " + width.toString());
+  print("height: " + height.toString());
+}
+
