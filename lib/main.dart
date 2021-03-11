@@ -7,6 +7,7 @@ import 'package:events/authentication_service.dart';
 //import 'package:events/login.dart';
 
 import 'login.dart';
+import 'outerLogin.dart';
 import 'navigator.dart';
 
 Future<void> main() async {
@@ -48,6 +49,6 @@ class AuthenticationWrapper extends StatelessWidget {
       final uid = user.uid;
       return NavigatorPage(uid: uid);
     }
-    return LoginPage();
+    return outerLogin();
   }
 }
