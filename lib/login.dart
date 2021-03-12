@@ -57,145 +57,165 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Scaffold(
         backgroundColor: Colors.black,
-        resizeToAvoidBottomInset: false,
-        body: Center(
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(
-                  top: height*0.25,
-                  bottom: height*0.05
-                ),
-                child: Text(
-                  "myEvents",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: schedulerSize,
-                      fontFamily: globals.montserrat,
-                      fontWeight: globals.fontWeight
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      margin:EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius:
-                        BorderRadius.circular(10)
-                      ),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.email_outlined,
+        resizeToAvoidBottomInset: true,
+        body: SingleChildScrollView(
+          child: Container(
+            height: height,
+            child:Center(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(
+                      top: height*0.25,
+                      bottom: height*0.05
+                    ),
+                    child: Text(
+                      "myEvents",
+                      style: TextStyle(
                           color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller: emailController,
-                          cursorColor: Colors.white,
-                          style: TextStyle(
+                          fontSize: schedulerSize,
+                          fontFamily: globals.montserrat,
+                          fontWeight: globals.fontWeight
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Container(
+                          margin:EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius:
+                            BorderRadius.circular(10)
+                          ),
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.email_outlined,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Email",
-                              hintStyle: TextStyle(
+                            ),
+                            title: TextField(
+                              controller: emailController,
+                              cursorColor: Colors.white,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: inputSize,
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Email",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily:
+                                          globals.montserrat,
+                                      fontWeight:
+                                          globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.only(left: 20, right: 10),
+                          child: Text(
+                            msg,
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                        ),
+                        
+                        Container(
+                          margin:EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius:
+                            BorderRadius.circular(10)
+                          ),
+                          child:ListTile(
+                            leading: Icon(
+                              Icons.lock_outline,
+                              color: Colors.white,
+                            ),
+                            title: TextField(
+                              controller: passwordController,
+                              cursorColor: Colors.white,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: inputSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "Password",
+                                hintStyle: TextStyle(
                                   color: Colors.white38,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    Container(
-                      margin:EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius:
-                        BorderRadius.circular(10)
-                      ),
-                      child:ListTile(
-                        leading: Icon(
-                          Icons.lock_outline,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller: passwordController,
-                          cursorColor: Colors.white,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: inputSize,
-                            fontFamily: globals.montserrat,
-                            fontWeight: globals.fontWeight
-                          ),
-                          decoration: InputDecoration(
-                            hintText: "Password",
-                            hintStyle: TextStyle(
-                              color: Colors.white38,
-                              fontSize: inputSize,
-                              fontFamily:globals.montserrat,
-                              fontWeight:globals.fontWeight
+                                  fontFamily:globals.montserrat,
+                                  fontWeight:globals.fontWeight
+                                ),
+                                border: InputBorder.none,
+                                focusColor: Colors.black,
+                                fillColor: Colors.black
+                              ),
                             ),
-                            border: InputBorder.none,
-                            focusColor: Colors.black,
-                            fillColor: Colors.black
                           ),
                         ),
-                      ),
-                    ),
-                    // login button
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blue[900],
-                        borderRadius:BorderRadius.circular(10)
-                      ),
-                      margin: EdgeInsets.all(20),
-                      child: ProgressButton(
-                        buttonState: ButtonState.normal,
-                        progressColor: Colors.white12,
-                        backgroundColor: Colors.blue[700],
-                        onPressed: () {
-                          Future<String> temp = context.read<AuthenticationService>().signIn(
-                            email: emailController.text.trim(),
-                            password:passwordController.text.trim()
-                          );
+                        
+                        // login button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue[900],
+                            borderRadius:BorderRadius.circular(10)
+                          ),
+                          margin: EdgeInsets.all(20),
+                          child: ProgressButton(
+                            buttonState: ButtonState.normal,
+                            progressColor: Colors.white12,
+                            backgroundColor: Colors.blue[700],
+                            onPressed: () {
+                              Future<String> temp = context.read<AuthenticationService>().signIn(
+                                email: emailController.text.trim(),
+                                password:passwordController.text.trim()
+                              );
 
-                          temp.then((String result) {
-                            if(result=="Signed in"){
-                              Navigator.pop(context);
-                            }
-                            setState(() {
-                              msg = result;
-                            });
-                            print(msg);
-                          });
-                        },
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: loginSize,
-                            fontFamily:globals.montserrat,
-                            fontWeight:globals.fontWeight
-                          ),
+                              temp.then((String result) {
+                                if(result=="Signed in"){
+                                  Navigator.pop(context);
+                                }
+                                setState(() {
+                                  msg = result;
+                                });
+                                print(msg);
+                              });
+                            },
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: loginSize,
+                                fontFamily:globals.montserrat,
+                                fontWeight:globals.fontWeight
+                              ),
+                            ),
+                          )
                         ),
-                      )
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        )
+        
+        
       )
     );
   /*  return GestureDetector(
