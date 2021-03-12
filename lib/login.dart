@@ -170,6 +170,9 @@ class _LoginPageState extends State<LoginPage> {
                           );
 
                           temp.then((String result) {
+                            if(result=="Signed in"){
+                              Navigator.pop(context);
+                            }
                             setState(() {
                               msg = result;
                             });
