@@ -33,7 +33,8 @@ dependencies:
   provider: ^5.0.0
   progress_button: ^0.0.2
   font_awesome_flutter: ^8.11.0
-
+  carousel_slider: ^3.0.0
+  getwidget: ^1.2.4
 
 
   # The following adds the Cupertino Icons font to your application.
