@@ -57,27 +57,27 @@ class _LoginPageState extends State<LoginPage> {
         },
         child: Scaffold(
           backgroundColor: Colors.black,
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           appBar: AppBar(
             backgroundColor: Colors.black,
           ),
           body: Center(
-            child: Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(
-                      top: height * 0.25, bottom: height * 0.05),
-                  child: Text(
-                    "myEvents",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: schedulerSize,
-                        fontFamily: globals.montserrat,
-                        fontWeight: globals.fontWeight),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: height * 0.25, bottom: height * 0.05),
+                    child: Text(
+                      "myEvents",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: schedulerSize,
+                          fontFamily: globals.montserrat,
+                          fontWeight: globals.fontWeight),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
+                  Column(
                     children: [
                       // email field
                       Container(
@@ -208,8 +208,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ));
