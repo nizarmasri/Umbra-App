@@ -13,29 +13,25 @@ class AuthenticationService {
 
   Future<String> signInWithGoogle() async {
     googleUser = await GoogleSignIn().signIn();
-      try {
-        //final googleAuth = await user.authentication;
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken,
-            idToken: googleAuth.idToken
-        );
-        await _firebaseAuth.signInWithCredential(credential);
-        print("Signed in");
-        return "Signed in";
-      }
-      catch (e){
-        print("Error signing in: " + e.message);
-        return "Error signing in";
-      }
+    try {
+      //final googleAuth = await user.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      await _firebaseAuth.signInWithCredential(credential);
+      print("Signed in");
+      return "Signed in";
+    } catch (e) {
+      print("Error signing in: " + e.message);
+      return "Error signing in";
+    }
   }
 
   Future<void> signOut() async {
-    try{
+    try {
       await _firebaseAuth.signOut();
-
-    }
-    catch(e){
+    } catch (e) {
       await _googleSignIn.disconnect();
     }
   }
@@ -53,14 +49,17 @@ class AuthenticationService {
 
   Future<String> signUp({String email, String password}) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential result = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      String user = result.user.uid;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user)
+          .set({'email': email});
       return "Signed up";
     } on FirebaseAuthException catch (e) {
-      e.message;
+      print(e.message);
       return "Invalid email";
     }
   }
 }
-
-
