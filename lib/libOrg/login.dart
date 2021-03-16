@@ -25,7 +25,7 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
 
   //AssetImage icon = AssetImage('assets/icon/logo.png');
 
-  navigateToSignUpPage() {
+  navigateToSignUpOrgPage() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => SignUpOrgPage()));
   }
@@ -48,7 +48,6 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.height;
     double btnWidth = width * 0.9;
-    print(width);
 
     return GestureDetector(
         onTap: () {
@@ -56,27 +55,42 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
         },
         child: Scaffold(
           backgroundColor: Colors.black,
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           appBar: AppBar(
             backgroundColor: Colors.black,
           ),
           body: Center(
-            child: Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(
-                      top: height * 0.25, bottom: height * 0.05),
-                  child: Text(
-                    "myEvents",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: schedulerSize,
-                        fontFamily: globals.montserrat,
-                        fontWeight: globals.fontWeight),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: height * 0.05, bottom: height * 0.05),
+                    child: RichText(
+                      text: TextSpan(children: <TextSpan>[
+                        TextSpan(
+                          text: "myEvents\n",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: globals.montserrat,
+                              fontWeight: globals.fontWeight,
+                              fontSize: 35
+                          ),
+                        ),
+                        TextSpan(
+                          text: "Organizer",
+
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontFamily: globals.montserrat,
+                              fontWeight: globals.fontWeight,
+                              fontSize: 20
+                          ),
+                        )
+                      ]),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
+                  Column(
                     children: [
                       // email field
                       Container(
@@ -216,7 +230,7 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
                                   Colors.black),
                             ),
                             onPressed: () {
-                              //navigateToSignInPage();
+                              navigateToSignUpOrgPage();
                             },
                             child: RichText(
                               text: TextSpan(children: <TextSpan>[
@@ -239,8 +253,8 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
                           )),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ));

@@ -38,31 +38,42 @@ class _SignUpOrgPageState extends State<SignUpOrgPage> {
       },
       child: Scaffold(
         backgroundColor: Colors.black,
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           backgroundColor: Colors.black,
         ),
         body: Center(
-          child: Column(
-            children: [
-              Expanded(
-                  child: Container(
-                color: Colors.black,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "myEvents",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: schedulerSize,
-                        fontFamily: globals.montserrat,
-                        fontWeight: globals.fontWeight),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(
+                      top: height * 0.05, bottom: height * 0.05),
+                  child: RichText(
+                    text: TextSpan(children: <TextSpan>[
+                      TextSpan(
+                        text: "myEvents\n",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: globals.montserrat,
+                            fontWeight: globals.fontWeight,
+                            fontSize: 35
+                        ),
+                      ),
+                      TextSpan(
+                        text: "Organizer",
+
+                        style: TextStyle(
+                            color: Colors.blueGrey,
+                            fontFamily: globals.montserrat,
+                            fontWeight: globals.fontWeight,
+                            fontSize: 20
+                        ),
+                      )
+                    ]),
                   ),
                 ),
-              )),
-              Expanded(
-                flex: 2,
-                child: Container(
+                Container(
                   color: Colors.black,
                   //margin: EdgeInsets.only(bottom: 20),
                   child: Column(
@@ -280,8 +291,8 @@ class _SignUpOrgPageState extends State<SignUpOrgPage> {
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
