@@ -142,6 +142,12 @@ class _outerLoginState extends State<outerLogin> {
                               Future<String> temp = context
                                   .read<AuthenticationService>()
                                   .signInWithGoogle();
+
+
+                              temp.then((String result){
+                                if(result == "Signed in")
+                                  globals.isOrg = false;
+                              });
                             },
                             label: Text(
                               "Sign in with Google",

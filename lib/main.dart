@@ -4,11 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:events/authentication_service.dart';
-//import 'package:events/login.dart';
-
-import 'login.dart';
-import 'outerLogin.dart';
-import 'navigator.dart';
+import 'package:events/globals.dart' as globals;
+import 'package:events/outerLogin.dart';
+import 'package:events/navigator.dart';
+import 'package:events/libOrg/navigator.dart';
 
 Future<void> main() async {
   SystemChrome.setPreferredOrientations(
@@ -47,7 +46,10 @@ class AuthenticationWrapper extends StatelessWidget {
       final FirebaseAuth auth = FirebaseAuth.instance;
       final User user = auth.currentUser;
       final uid = user.uid;
-      return NavigatorPage(uid: uid);
+      if(globals.isOrg)
+        return NavigatorOrgPage(uid: uid);
+      else
+        return NavigatorPage(uid: uid);
     }
     return outerLogin();
   }

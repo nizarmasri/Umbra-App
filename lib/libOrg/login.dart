@@ -47,8 +47,8 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.height;
-    double btnWidth = width * 0.9;
-
+    double btnWidth = width * 0.415;
+    print(width);
     return GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(new FocusNode());
@@ -192,6 +192,7 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
 
                                 if (msg == "Signed in") {
                                   msg = " ";
+                                  globals.isOrg = true;
                                   Navigator.pop(context);
                                 }
                               });
