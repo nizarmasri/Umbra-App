@@ -51,6 +51,7 @@ class _outerLoginState extends State<outerLogin> {
                 ),
               ),
               Expanded(
+                flex: 3,
                 child: Container(
                   margin: EdgeInsets.only(bottom: 20),
                   child: Column(
