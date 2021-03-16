@@ -118,6 +118,7 @@ class _HomePageState extends State<HomePage> {
     double featureCarouselHeight = height * 0.5;
     double foryouCarouselHeight = height * 0.25;
     double nearyouCarouselHeight = height * 0.33;
+    double nearyouItemHeight = height * 0.14;
     double infoHeight = height * 0.22;
 
     return Scaffold(
@@ -235,12 +236,14 @@ class _HomePageState extends State<HomePage> {
                   viewportFraction: 1.0,
                   activeIndicator: Colors.white,
                   aspectRatio: 1,
+
                   items: tiles.map(
                     (con) {
                       return Column(
                         children: [
                           Container(
                             margin: EdgeInsets.all(3.0),
+                            height: nearyouItemHeight,
                             child: ClipRRect(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5.0)),
@@ -248,6 +251,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Container(
                             margin: EdgeInsets.all(3.0),
+                            height: nearyouItemHeight,
                             child: ClipRRect(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5.0)),
@@ -277,6 +281,7 @@ class _HomePageState extends State<HomePage> {
                 height: infoHeight,
                 child: Column(
                   children: [
+                    // Stay informed text
                     Container(
                       margin: EdgeInsets.only(top: 6, left: 10),
                       child: Align(
@@ -290,6 +295,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
+                    // Text grid of infos
                     Expanded(
                       child: GridView.count(
                         primary: false,
