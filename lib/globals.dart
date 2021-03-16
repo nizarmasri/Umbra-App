@@ -15,8 +15,9 @@ Size size(BuildContext c) => MediaQuery.of(c).size;
 double width(BuildContext c) => size(c).width;
 double height(BuildContext c) => size(c).height;
 
-void Tester(){
-  print("width: " + width.toString());
-  print("height: " + height.toString());
-}
+TextStyle infoSectionStyle = TextStyle(
+    fontSize: 17,
+    fontFamily: montserrat,
+    fontWeight: fontWeight,
+    color: Colors.white);
 
