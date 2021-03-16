@@ -38,31 +38,30 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       child: Scaffold(
         backgroundColor: Colors.black,
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           backgroundColor: Colors.black,
         ),
         body: Center(
-          child: Column(
-            children: [
-              Expanded(
-                  child: Container(
-                color: Colors.black,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "myEvents",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: schedulerSize,
-                        fontFamily: globals.montserrat,
-                        fontWeight: globals.fontWeight),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(bottom: 50),
+                  color: Colors.black,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "myEvents",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: schedulerSize,
+                          fontFamily: globals.montserrat,
+                          fontWeight: globals.fontWeight),
+                    ),
                   ),
                 ),
-              )),
-              Expanded(
-                flex: 2,
-                child: Container(
+                Container(
                   color: Colors.black,
                   //margin: EdgeInsets.only(bottom: 20),
                   child: Column(
@@ -72,164 +71,141 @@ class _SignUpPageState extends State<SignUpPage> {
                         height: btnHeight,
                         width: btnWidth,
                         decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius:
-                            BorderRadius.circular(10)),
-                        margin:
-                        EdgeInsets.only(bottom: 15),
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.email_outlined,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller: emailController,
-                          cursorColor: Colors.white,
-                          style: TextStyle(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.email_outlined,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Email",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
+                            ),
+                            title: TextField(
+                              controller: emailController,
+                              cursorColor: Colors.white,
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
-                      ),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Email",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
                         height: btnHeight,
                         width: btnWidth,
                         decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius:
-                            BorderRadius.circular(10)),
-                        margin:
-                        EdgeInsets.only(bottom: 15),
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.lock_outline,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller: passwordController,
-                          cursorColor: Colors.white,
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          style: TextStyle(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.lock_outline,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Password",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
+                            ),
+                            title: TextField(
+                              controller: passwordController,
+                              cursorColor: Colors.white,
+                              obscureText: true,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
-                      ),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Password",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
                         height: btnHeight,
                         width: btnWidth,
                         decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius:
-                            BorderRadius.circular(10)),
-                        margin:
-                        EdgeInsets.only(bottom: 15),
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.lock_outline,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller:
-                              confirmPasswordController,
-                          cursorColor: Colors.white,
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          style: TextStyle(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.lock_outline,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Confirm password",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
+                            ),
+                            title: TextField(
+                              controller: confirmPasswordController,
+                              cursorColor: Colors.white,
+                              obscureText: true,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
-                      ),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Confirm password",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
                           height: btnHeight,
                           width: btnWidth,
-                          margin: EdgeInsets.only(
-                              bottom: 15),
+                          margin: EdgeInsets.only(bottom: 15),
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.white12),
                               color: Colors.black,
-                              borderRadius:
-                                  BorderRadius.circular(10)),
+                              borderRadius: BorderRadius.circular(10)),
                           child: ProgressButton(
                             buttonState: ButtonState.normal,
                             progressColor: Colors.white12,
                             backgroundColor: Colors.black,
                             onPressed: () {
                               if (passwordController.text !=
-                                  confirmPasswordController
-                                      .text)
+                                  confirmPasswordController.text)
                                 setState(() {
-                                  msgPassword =
-                                      "Passwords don't match";
+                                  msgPassword = "Passwords don't match";
                                 });
                               else {
                                 Future<String> temp = context
-                                    .read<
-                                        AuthenticationService>()
+                                    .read<AuthenticationService>()
                                     .signUp(
-                                        email: emailController
-                                            .text
-                                            .trim(),
+                                        email: emailController.text.trim(),
                                         password:
-                                            passwordController
-                                                .text
-                                                .trim());
+                                            passwordController.text.trim());
 
                                 temp.then((String result) {
-                                  if (result ==
-                                      "Invalid email")
+                                  if (result == "Invalid email")
                                     setState(() {
                                       msg = result;
                                     });
@@ -243,10 +219,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: loginSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
                             ),
                           )),
                       Container(
@@ -280,8 +254,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
