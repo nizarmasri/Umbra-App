@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                                 });
                                 print(msg);
 
-                                if(msg == "Signed in") {
+                                if (msg == "Signed in") {
                                   msg = " ";
                                   Navigator.pop(context);
                                 }
