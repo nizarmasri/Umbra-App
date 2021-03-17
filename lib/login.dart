@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.height;
-    double btnWidth = width * 0.9;
+    double btnWidth = width * 0.415;
 
     return GestureDetector(
         onTap: () {
@@ -178,6 +178,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                 if (msg == "Signed in") {
                                   msg = " ";
+                                  globals.isOrg = false;
                                   Navigator.pop(context);
                                 }
                               });

@@ -5,12 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:events/authentication_service.dart';
-//import 'package:events/login.dart';
-
+import 'package:events/globals.dart' as globals;
+import 'package:events/outerLogin.dart';
+import 'package:events/navigator.dart';
+import 'package:events/libOrg/navigator.dart';
 import 'newUserForm.dart';
-import 'login.dart';
-import 'outerLogin.dart';
-import 'navigator.dart';
 
 Future<void> main() async {
   SystemChrome.setPreferredOrientations(
@@ -51,19 +50,26 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     final firebaseUser = context.watch<User>();
 
     if (firebaseUser != null) {
-      return StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection("users")
-              .doc(firebaseUser.uid)
-              .snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-            if (snapshot.data.data()["new"]) {
-              return NewUserForm();
-            } else {
-              return NavigatorPage(uid: firebaseUser.uid);
-            }
-          });
+      if (globals.isOrg) {
+        return NavigatorOrgPage(uid: firebaseUser.uid);
+      } else {
+        return StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(firebaseUser.uid)
+                .snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Text("Loading");
+              }
+              if (snapshot.data.data()["new"]) {
+                return NewUserForm();
+              } else {
+                return NavigatorPage(uid: firebaseUser.uid);
+              }
+            });
+      }
     }
 
     return outerLogin();

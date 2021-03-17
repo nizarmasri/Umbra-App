@@ -21,3 +21,5 @@ TextStyle infoSectionStyle = TextStyle(
     fontWeight: fontWeight,
     color: Colors.white);
 
+bool isOrg = false;
+
