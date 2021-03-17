@@ -74,18 +74,15 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
                               color: Colors.white,
                               fontFamily: globals.montserrat,
                               fontWeight: globals.fontWeight,
-                              fontSize: 35
-                          ),
+                              fontSize: 35),
                         ),
                         TextSpan(
                           text: "Organizer",
-
                           style: TextStyle(
                               color: Colors.blueGrey,
                               fontFamily: globals.montserrat,
                               fontWeight: globals.fontWeight,
-                              fontSize: 20
-                          ),
+                              fontSize: 20),
                         )
                       ]),
                     ),
