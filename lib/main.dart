@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:events/authentication_service.dart';
 //import 'package:events/login.dart';
 
+import 'newUserForm.dart';
 import 'login.dart';
 import 'outerLogin.dart';
 import 'navigator.dart';
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
         ),
         StreamProvider(
             create: (context) =>
-            context.read<AuthenticationService>().authStateChanges)
+                context.read<AuthenticationService>().authStateChanges)
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -38,17 +40,50 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AuthenticationWrapper extends StatelessWidget {
+class AuthenticationWrapper extends StatefulWidget {
+  @override
+  _AuthenticationWrapperState createState() => _AuthenticationWrapperState();
+}
+
+class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User>();
 
     if (firebaseUser != null) {
-      final FirebaseAuth auth = FirebaseAuth.instance;
-      final User user = auth.currentUser;
-      final uid = user.uid;
-      return NavigatorPage(uid: uid);
+      return StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection("users")
+              .doc(firebaseUser.uid)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.data.data()["new"]) {
+              return NewUserForm();
+            } else {
+              return NavigatorPage(uid: firebaseUser.uid);
+            }
+          });
     }
+
     return outerLogin();
   }
 }
+
+/*     final FirebaseAuth auth = FirebaseAuth.instance;
+      final User user = auth.currentUser;
+      final uid = user.uid;
+      bool newUser = true;
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .get()
+          .then((query) {
+        newUser = query.data()["new"];
+      });
+      if (newUser) {
+        return NewUserForm(function: increment);
+      } else {
+        return NavigatorPage(uid: uid);
+      }
+    }*/

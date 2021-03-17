@@ -52,10 +52,10 @@ class AuthenticationService {
       UserCredential result = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
       String user = result.user.uid;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user)
-          .set({'email': email});
+      await FirebaseFirestore.instance.collection('users').doc(user).set({
+        'email': email,
+        'new': true,
+      });
       return "Signed up";
     } on FirebaseAuthException catch (e) {
       print(e.message);
