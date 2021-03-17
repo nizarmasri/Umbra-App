@@ -25,9 +25,11 @@ dependencies:
     sdk: flutter
   firebase_core: ^1.0.0
   firebase_auth: ^1.0.0
+  page_view_indicators: ^2.0.0
   #firebase: ^7.3.0
   #firebase_analytics_web: ^1.0.0
   #firebase_analytics: ^7.1.0
+  mask_text_input_formatter: ^1.2.1
   cloud_firestore: ^1.0.0
   google_sign_in: ^5.0.0
   provider: ^5.0.0

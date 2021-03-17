@@ -22,4 +22,3 @@ TextStyle infoSectionStyle = TextStyle(
     color: Colors.white);
 
 bool isOrg = false;
-

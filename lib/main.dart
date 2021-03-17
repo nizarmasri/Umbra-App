@@ -48,7 +48,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User>();
-
     if (firebaseUser != null) {
       if (globals.isOrg) {
         return NavigatorOrgPage(uid: firebaseUser.uid);
@@ -64,7 +63,7 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
                 return Text("Loading");
               }
               if (snapshot.data.data()["new"]) {
-                return NewUserForm();
+                return NewUserForm(uid: firebaseUser.uid);
               } else {
                 return NavigatorPage(uid: firebaseUser.uid);
               }
