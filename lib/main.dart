@@ -10,6 +10,7 @@ import 'package:events/outerLogin.dart';
 import 'package:events/navigator.dart';
 import 'package:events/libOrg/navigator.dart';
 import 'newUserForm.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 Future<void> main() async {
   SystemChrome.setPreferredOrientations(
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'Montserrat',
+          canvasColor: Colors.black,
+        ),
         home: AuthenticationWrapper(),
       ),
     );
@@ -60,7 +65,10 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Text("Loading");
+                return SpinKitFadingCircle(
+                  color: Colors.white,
+                  size: 50.0,
+                );
               }
               if (snapshot.data.data()["new"]) {
                 return NewUserForm(uid: firebaseUser.uid);
