@@ -57,18 +57,15 @@ class _SignUpOrgPageState extends State<SignUpOrgPage> {
                             color: Colors.white,
                             fontFamily: globals.montserrat,
                             fontWeight: globals.fontWeight,
-                            fontSize: 35
-                        ),
+                            fontSize: 35),
                       ),
                       TextSpan(
                         text: "Organizer",
-
                         style: TextStyle(
                             color: Colors.blueGrey,
                             fontFamily: globals.montserrat,
                             fontWeight: globals.fontWeight,
-                            fontSize: 20
-                        ),
+                            fontSize: 20),
                       )
                     ]),
                   ),
@@ -83,164 +80,142 @@ class _SignUpOrgPageState extends State<SignUpOrgPage> {
                         height: btnHeight,
                         width: btnWidth,
                         decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius:
-                            BorderRadius.circular(10)),
-                        margin:
-                        EdgeInsets.only(bottom: 15),
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.email_outlined,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller: emailController,
-                          cursorColor: Colors.white,
-                          style: TextStyle(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.email_outlined,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Email",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
+                            ),
+                            title: TextField(
+                              controller: emailController,
+                              cursorColor: Colors.white,
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
-                      ),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Email",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
                         height: btnHeight,
                         width: btnWidth,
                         decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius:
-                            BorderRadius.circular(10)),
-                        margin:
-                        EdgeInsets.only(bottom: 15),
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.lock_outline,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller: passwordController,
-                          cursorColor: Colors.white,
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          style: TextStyle(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.lock_outline,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Password",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
+                            ),
+                            title: TextField(
+                              controller: passwordController,
+                              cursorColor: Colors.white,
+                              obscureText: true,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
-                      ),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Password",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
                         height: btnHeight,
                         width: btnWidth,
                         decoration: BoxDecoration(
-                        color: Colors.white12,
-                        borderRadius:
-                            BorderRadius.circular(10)),
-                        margin:
-                        EdgeInsets.only(bottom: 15),
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.lock_outline,
-                          color: Colors.white,
-                        ),
-                        title: TextField(
-                          controller:
-                              confirmPasswordController,
-                          cursorColor: Colors.white,
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          style: TextStyle(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.lock_outline,
                               color: Colors.white,
-                              fontSize: inputSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Confirm password",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
+                            ),
+                            title: TextField(
+                              controller: confirmPasswordController,
+                              cursorColor: Colors.white,
+                              obscureText: true,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: inputSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
-                      ),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              decoration: InputDecoration(
+                                  hintText: "Confirm password",
+                                  hintStyle: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  border: InputBorder.none,
+                                  focusColor: Colors.black,
+                                  fillColor: Colors.black),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
                           height: btnHeight,
                           width: btnWidth,
-                          margin: EdgeInsets.only(
-                              bottom: 15),
+                          margin: EdgeInsets.only(bottom: 15),
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.white12),
                               color: Colors.black,
-                              borderRadius:
-                                  BorderRadius.circular(10)),
+                              borderRadius: BorderRadius.circular(10)),
                           child: ProgressButton(
                             buttonState: ButtonState.normal,
                             progressColor: Colors.white12,
                             backgroundColor: Colors.black,
                             onPressed: () {
                               if (passwordController.text !=
-                                  confirmPasswordController
-                                      .text)
+                                  confirmPasswordController.text)
                                 setState(() {
-                                  msgPassword =
-                                      "Passwords don't match";
+                                  msgPassword = "Passwords don't match";
                                 });
                               else {
                                 Future<String> temp = context
-                                    .read<
-                                        AuthenticationService>()
+                                    .read<AuthenticationService>()
                                     .signUp(
-                                        email: emailController
-                                            .text
-                                            .trim(),
+                                        email: emailController.text.trim(),
                                         password:
-                                            passwordController
-                                                .text
-                                                .trim());
+                                            passwordController.text.trim(),
+                                        organizer: true);
 
                                 temp.then((String result) {
-                                  if (result ==
-                                      "Invalid email")
+                                  if (result == "Invalid email")
                                     setState(() {
                                       msg = result;
                                     });
@@ -254,10 +229,8 @@ class _SignUpOrgPageState extends State<SignUpOrgPage> {
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: loginSize,
-                                  fontFamily:
-                                      globals.montserrat,
-                                  fontWeight:
-                                      globals.fontWeight),
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
                             ),
                           )),
                       Container(

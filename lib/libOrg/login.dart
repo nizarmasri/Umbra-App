@@ -175,19 +175,19 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
                             progressColor: Colors.white12,
                             backgroundColor: Colors.blue[700],
                             onPressed: () {
-                              Future<String> temp = context
+                              Future<List<String>> temp = context
                                   .read<AuthenticationService>()
                                   .signIn(
                                       email: emailController.text.trim(),
                                       password: passwordController.text.trim());
 
-                              temp.then((String result) {
+                              temp.then((List<String> result) {
                                 setState(() {
-                                  msg = result;
+                                  msg = result[1];
                                 });
                                 print(msg);
 
-                                if (msg == "Signed in") {
+                                if (result[0] == "Signed in") {
                                   msg = " ";
                                   globals.isOrg = true;
                                   Navigator.pop(context);

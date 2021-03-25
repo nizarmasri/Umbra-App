@@ -14,6 +14,7 @@ class AuthenticationService {
   Future<String> signInWithGoogle() async {
     googleUser = await GoogleSignIn().signIn();
     try {
+      print("Charbel");
       //final googleAuth = await user.authentication;
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -36,18 +37,17 @@ class AuthenticationService {
     }
   }
 
-  Future<String> signIn({String email, String password}) async {
+  Future<List<String>> signIn({String email, String password}) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      return "Signed in";
+      return ["Signed in", "NO"];
     } on FirebaseAuthException catch (e) {
-      e.message;
-      return "Invalid email";
+      return ["Invalid email", e.message];
     }
   }
 
-  Future<String> signUp({String email, String password}) async {
+  Future<String> signUp({String email, String password, bool organizer}) async {
     try {
       UserCredential result = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -55,6 +55,7 @@ class AuthenticationService {
       await FirebaseFirestore.instance.collection('users').doc(user).set({
         'email': email,
         'new': true,
+        'organizer': organizer,
       });
       return "Signed up";
     } on FirebaseAuthException catch (e) {

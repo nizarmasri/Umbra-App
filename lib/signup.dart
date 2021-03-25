@@ -202,7 +202,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                     .signUp(
                                         email: emailController.text.trim(),
                                         password:
-                                            passwordController.text.trim());
+                                            passwordController.text.trim(),
+                                        organizer: false);
 
                                 temp.then((String result) {
                                   if (result == "Invalid email")

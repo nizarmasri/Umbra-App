@@ -292,7 +292,7 @@ class _NewUserFormState extends State<NewUserForm> {
                   .doc(uid)
                   .set({
                 'gender': gender1,
-                'name': name1,
+                'name': name1.trim(),
                 'birthday': selectedDate,
                 'number': phonenumber1,
                 'new': false,

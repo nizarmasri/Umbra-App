@@ -73,7 +73,11 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
               if (snapshot.data.data()["new"]) {
                 return NewUserForm(uid: firebaseUser.uid);
               } else {
-                return NavigatorPage(uid: firebaseUser.uid);
+                if (snapshot.data.data()["organizer"]) {
+                  return NavigatorOrgPage(uid: firebaseUser.uid);
+                } else {
+                  return NavigatorPage(uid: firebaseUser.uid);
+                }
               }
             });
       }

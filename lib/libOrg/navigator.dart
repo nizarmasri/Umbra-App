@@ -72,5 +72,3 @@ class _NavigatorOrgPageState extends State<NavigatorOrgPage> {
     );
   }
 }
-
-
