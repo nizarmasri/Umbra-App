@@ -16,11 +16,49 @@ class AccountOrgPage extends StatefulWidget {
 class _AccountOrgPageState extends State<AccountOrgPage> {
   double btnHeight = 60;
 
+  Container NameAvatar({String name, String email}) {
+    return Container(
+      margin: EdgeInsets.only(top: 40, left: 10, right: 10),
+      decoration: BoxDecoration(),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.only(right: 10),
+            child: CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.brown.shade800,
+              child: Text(
+                name[0].toString().toUpperCase(),
+                style: TextStyle(fontSize: 50),
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(fontSize: 23, color: Colors.white),
+                ),
+                Text(
+                  email,
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Container LogoutButton({double width, double height}) {
     return Container(
         height: height,
         width: width,
-        margin: EdgeInsets.only(top: 15, bottom: 15),
+        margin: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
         decoration: BoxDecoration(
             border: Border.all(color: Colors.white12),
             color: Colors.black,
@@ -55,54 +93,21 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           return Scaffold(
             backgroundColor: Colors.black,
-            body: Container(
-              child: Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 10, right: 10),
-                    decoration: BoxDecoration(),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: 10),
-                          child: CircleAvatar(
-                            radius: 40,
-                            backgroundColor: Colors.brown.shade800,
-                            child: Text(snapshot.data
-                                .data()["name"][0]
-                                .toString()
-                                .toUpperCase()),
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                snapshot.data.data()["name"],
-                                style: TextStyle(
-                                    fontSize: 23, color: Colors.white),
-                              ),
-                              Text(
-                                snapshot.data.data()["email"],
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    "Account Page",
-                    style: globals.style,
-                  ),
-                  LogoutButton(width: btnWidth, height: btnHeight)
-                ],
+            body: SafeArea(
+              child: Container(
+                decoration: BoxDecoration(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    NameAvatar(
+                        name: snapshot.data.data()["name"],
+                        email: snapshot.data.data()["email"]),
+                  ],
+                ),
               ),
             ),
+            bottomNavigationBar:
+                LogoutButton(width: btnWidth, height: btnHeight),
           );
         });
   }
