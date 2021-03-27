@@ -101,6 +101,18 @@ class _AccountPageState extends State<AccountPage> {
                     NameAvatar(
                         name: snapshot.data.data()["name"],
                         email: snapshot.data.data()["email"]),
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "qrw",
+                              style: TextStyle(color: Colors.red),
+                            )
+                          ],
+                        )
+                      ],
+                    )
                   ],
                 ),
               ),
