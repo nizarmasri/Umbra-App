@@ -290,13 +290,12 @@ class _NewUserFormState extends State<NewUserForm> {
               await FirebaseFirestore.instance
                   .collection('users')
                   .doc(uid)
-                  .set({
+                  .update({
                 'gender': gender1,
                 'name': name1.trim(),
                 'birthday': selectedDate,
                 'number': phonenumber1,
                 'new': false,
-                'organizer': false,
               });
             },
             child: Text(
