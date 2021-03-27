@@ -14,7 +14,6 @@ class AuthenticationService {
   Future<String> signInWithGoogle() async {
     googleUser = await GoogleSignIn().signIn();
     try {
-      print("Charbel");
       //final googleAuth = await user.authentication;
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -49,6 +48,7 @@ class AuthenticationService {
 
   Future<String> signUp({String email, String password, bool organizer}) async {
     try {
+      print(organizer);
       UserCredential result = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
       String user = result.user.uid;

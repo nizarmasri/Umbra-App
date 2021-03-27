@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:events/authentication_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:events/libOrg/login.dart';
+import 'package:events/libOrg/signup.dart';
 
 import 'package:events/signup.dart';
 import 'login.dart';
@@ -28,9 +28,9 @@ class _outerLoginState extends State<outerLogin> {
         context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
-  navigateToOrgLoginPage() {
+  navigateToOrgSignupPage() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginOrgPage()));
+        context, MaterialPageRoute(builder: (context) => SignUpOrgPage()));
   }
 
   @override
@@ -143,9 +143,8 @@ class _outerLoginState extends State<outerLogin> {
                                   .read<AuthenticationService>()
                                   .signInWithGoogle();
 
-
-                              temp.then((String result){
-                                if(result == "Signed in")
+                              temp.then((String result) {
+                                if (result == "Signed in")
                                   globals.isOrg = false;
                               });
                             },
@@ -209,12 +208,12 @@ class _outerLoginState extends State<outerLogin> {
                                   Colors.black),
                             ),
                             onPressed: () {
-                              navigateToOrgLoginPage();
+                              navigateToOrgSignupPage();
                             },
                             child: RichText(
                               text: TextSpan(children: <TextSpan>[
                                 TextSpan(
-                                  text: "Log in as ",
+                                  text: "Sign up as ",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontFamily: globals.montserrat,

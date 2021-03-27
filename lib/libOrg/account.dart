@@ -55,60 +55,55 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           return Scaffold(
             backgroundColor: Colors.black,
-            body: Center(
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(color: Colors.red),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(right: 10),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.brown.shade800,
-                              child: Text(snapshot.data
-                                  .data()["name"][0]
-                                  .toString()
-                                  .toUpperCase()),
-                            ),
+            body: Container(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(left: 10, right: 10),
+                    decoration: BoxDecoration(),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(right: 10),
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.brown.shade800,
+                            child: Text(snapshot.data
+                                .data()["name"][0]
+                                .toString()
+                                .toUpperCase()),
                           ),
-                          Text(
-                            snapshot.data.data()["name"],
-                            style: TextStyle(fontSize: 23, color: Colors.white),
-                          )
-                        ],
-                      ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                snapshot.data.data()["name"],
+                                style: TextStyle(
+                                    fontSize: 23, color: Colors.white),
+                              ),
+                              Text(
+                                snapshot.data.data()["email"],
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "Account Page",
-                      style: globals.style,
-                    ),
-                    LogoutButton(width: btnWidth, height: btnHeight)
-                  ],
-                ),
+                  ),
+                  Text(
+                    "Account Page",
+                    style: globals.style,
+                  ),
+                  LogoutButton(width: btnWidth, height: btnHeight)
+                ],
               ),
             ),
           );
-        }
-        /*    child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Account Page",
-                  style: globals.style,
-                ),
-                LogoutButton(width: btnWidth, height: btnHeight)
-              ],
-            ),
-          ),
-        ),
-      ),*/
-        );
+        });
   }
 }
