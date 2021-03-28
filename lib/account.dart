@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'accountinfo.dart';
 import 'authentication_service.dart';
 import 'globals.dart' as globals;
+import 'bookmarks.dart';
 
 class AccountPage extends StatefulWidget {
   @override
@@ -17,7 +19,7 @@ class _AccountPageState extends State<AccountPage> {
   double btnHeight = 60;
   Container NameAvatar({String name, String email}) {
     return Container(
-      margin: EdgeInsets.only(top: 40, left: 10, right: 10),
+      margin: EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 20),
       decoration: BoxDecoration(),
       child: Row(
         children: [
@@ -80,6 +82,40 @@ class _AccountPageState extends State<AccountPage> {
         ));
   }
 
+  navigateToBookmark() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => Bookmarks()));
+  }
+
+  navigateToAccountInfo() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AccountInfo()));
+  }
+
+  InkWell Setting({String title, IconData icon, Color color, Function page}) {
+    return InkWell(
+      onTap: () {
+        page();
+      },
+      child: Container(
+        decoration: BoxDecoration(color: color),
+        child: Row(
+          children: [
+            Container(
+              margin: EdgeInsets.fromLTRB(15, 15, 25, 15),
+              child: Icon(
+                icon,
+                size: 40,
+                color: Colors.white,
+              ),
+            ),
+            Text(title, style: TextStyle(color: Colors.white))
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String uid = FirebaseAuth.instance.currentUser.uid;
@@ -91,31 +127,47 @@ class _AccountPageState extends State<AccountPage> {
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           return Scaffold(
+            resizeToAvoidBottomInset: true,
             backgroundColor: Colors.black,
-            body: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    NameAvatar(
-                        name: snapshot.data.data()["name"],
-                        email: snapshot.data.data()["email"]),
-                    Column(
+            body: RefreshIndicator(
+              onRefresh: () {
+                return Future.delayed(
+                    Duration(
+                      seconds: 1,
+                    ), () {
+                  setState(() {});
+                });
+              },
+              child: ListView(children: [
+                SafeArea(
+                  child: Container(
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "qrw",
-                              style: TextStyle(color: Colors.red),
-                            )
-                          ],
+                        NameAvatar(
+                            name: snapshot.data.data()["name"],
+                            email: snapshot.data.data()["email"]),
+                        Container(
+                          child: Column(
+                            children: [
+                              Setting(
+                                title: "Bookmarks",
+                                icon: Icons.bookmark_outline,
+                                page: navigateToBookmark,
+                              ),
+                              Setting(
+                                  title: "Account Information",
+                                  icon: Icons.account_circle_rounded,
+                                  page: navigateToAccountInfo)
+                            ],
+                          ),
                         )
                       ],
-                    )
-                  ],
+                    ),
+                  ),
                 ),
-              ),
+              ]),
             ),
             bottomNavigationBar:
                 LogoutButton(width: btnWidth, height: btnHeight),

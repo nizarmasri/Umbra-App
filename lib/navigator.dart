@@ -34,10 +34,15 @@ class _NavigatorPageState extends State<NavigatorPage> {
     });
   }
 
+  Widget currentScreen;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
+      //   body: _widgetOptions.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.black,
@@ -64,10 +69,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
                 Icons.search,
                 color: Colors.white,
               ),
-              icon: Icon(
-                  Icons.search,
-                  color: Colors.white
-              ),
+              icon: Icon(Icons.search, color: Colors.white),
               title: Text("")),
           BottomNavigationBarItem(
               activeIcon: Icon(

@@ -17,7 +17,7 @@ class _NavigatorOrgPageState extends State<NavigatorOrgPage> {
 
   _NavigatorOrgPageState(this.uid);
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
   static List<Widget> _widgetOptions = <Widget>[
     CurrentEventsPage(),
