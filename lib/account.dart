@@ -89,7 +89,8 @@ class _AccountPageState extends State<AccountPage> {
 
   navigateToAccountInfo() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AccountInfo()));
+            context, MaterialPageRoute(builder: (context) => AccountInfo()))
+        .then((value) => setState(() {}));
   }
 
   InkWell Setting({String title, IconData icon, Color color, Function page}) {

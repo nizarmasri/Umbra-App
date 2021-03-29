@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'globals.dart' as globals;
 
 class AccountInfo extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _AccountInfoState extends State<AccountInfo> {
     super.initState();
   }
 
+  bool loading = false;
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "## ### ###", filter: {"#": RegExp(r'[0-9]')});
   var maskTextInputFormatter2 = MaskTextInputFormatter();
@@ -77,19 +79,20 @@ class _AccountInfoState extends State<AccountInfo> {
     );
   }
 
-  Container button() {
+  Container button({String uid}) {
     return Container(
       child: InkWell(
         focusColor: Colors.white,
         onTap: () async {
-          print(_namecontroller.text);
-          /*   await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(uid)
-                          .update({
-                        'name': _namecontroller,
-                        'number': _numbercontroller,
-                      });*/
+          setState(() {
+            loading = true;
+          });
+          await FirebaseFirestore.instance.collection('users').doc(uid).update({
+            'name': _namecontroller.text,
+            'number': _numbercontroller.text,
+          }).then((value) {
+            Navigator.pop(context);
+          });
         },
         child: Container(
           width: 300,
@@ -106,50 +109,54 @@ class _AccountInfoState extends State<AccountInfo> {
   @override
   Widget build(BuildContext context) {
     String uid = FirebaseAuth.instance.currentUser.uid;
-    return FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          _namecontroller =
-              TextEditingController(text: snapshot.data.data()["name"]);
-          _numbercontroller =
-              TextEditingController(text: snapshot.data.data()["number"]);
-          return Scaffold(
-            backgroundColor: Colors.black,
-            appBar: AppBar(
-              title: Text(
-                "Account Information",
-              ),
-              backgroundColor: Colors.black,
-            ),
-            body: Container(
-              margin: EdgeInsets.all(10),
-              // decoration: BoxDecoration(color: Colors.green),
-              child: Column(
-                children: [
-                  avatar(
-                      letter: snapshot.data
-                          .data()["name"][0]
-                          .toString()
-                          .toUpperCase()),
-                  newInput(
-                      hint: "Name",
-                      icon: Icons.person,
-                      defvalue: snapshot.data.data()["name"],
-                      controller: _namecontroller,
-                      mask: maskTextInputFormatter2),
-                  newInput(
-                      hint: "Number",
-                      icon: Icons.phone,
-                      defvalue: snapshot.data.data()["number"],
-                      controller: _numbercontroller,
-                      type: TextInputType.phone,
-                      mask: maskTextInputFormatter),
-                  button(),
-                ],
-              ),
-            ),
-          );
-        });
+    return !loading
+        ? FutureBuilder<DocumentSnapshot>(
+            future:
+                FirebaseFirestore.instance.collection('users').doc(uid).get(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              _namecontroller =
+                  TextEditingController(text: snapshot.data.data()["name"]);
+              _numbercontroller =
+                  TextEditingController(text: snapshot.data.data()["number"]);
+              return Scaffold(
+                backgroundColor: Colors.black,
+                appBar: AppBar(
+                  title: Text(
+                    "Account Information",
+                  ),
+                  backgroundColor: Colors.black,
+                ),
+                body: SingleChildScrollView(
+                  child: Container(
+                    margin: EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        avatar(
+                            letter: snapshot.data
+                                .data()["name"][0]
+                                .toString()
+                                .toUpperCase()),
+                        newInput(
+                            hint: "Name",
+                            icon: Icons.person,
+                            defvalue: snapshot.data.data()["name"],
+                            controller: _namecontroller,
+                            mask: maskTextInputFormatter2),
+                        newInput(
+                            hint: "Number",
+                            icon: Icons.phone,
+                            defvalue: snapshot.data.data()["number"],
+                            controller: _numbercontroller,
+                            type: TextInputType.phone,
+                            mask: maskTextInputFormatter),
+                        button(uid: uid),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            })
+        : globals.spinner;
   }
 }

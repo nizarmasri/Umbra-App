@@ -1,6 +1,7 @@
 library events.globals;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 TextStyle style = TextStyle(
     fontSize: 35,
@@ -24,3 +25,7 @@ TextStyle infoSectionStyle = TextStyle(
 bool isOrg = false;
 
 String uid;
+SpinKitFadingCircle spinner = SpinKitFadingCircle(
+  color: Colors.white,
+  size: 50.0,
+);
