@@ -17,6 +17,7 @@ class _AccountInfoState extends State<AccountInfo> {
 
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "## ### ###", filter: {"#": RegExp(r'[0-9]')});
+  var maskTextInputFormatter2 = MaskTextInputFormatter();
   TextEditingController _namecontroller;
   TextEditingController _numbercontroller;
 
@@ -41,14 +42,13 @@ class _AccountInfoState extends State<AccountInfo> {
       IconData icon,
       String defvalue,
       TextEditingController controller,
-      MaskTextInputFormatter number,
+      MaskTextInputFormatter mask,
       TextInputType type}) {
-    controller = new TextEditingController(text: defvalue);
     return Container(
       margin: EdgeInsets.only(bottom: 25),
       child: TextField(
           inputFormatters: [
-            number,
+            mask,
           ],
           keyboardType: type,
           controller: controller,
@@ -77,6 +77,32 @@ class _AccountInfoState extends State<AccountInfo> {
     );
   }
 
+  Container button() {
+    return Container(
+      child: InkWell(
+        focusColor: Colors.white,
+        onTap: () async {
+          print(_namecontroller.text);
+          /*   await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(uid)
+                          .update({
+                        'name': _namecontroller,
+                        'number': _numbercontroller,
+                      });*/
+        },
+        child: Container(
+          width: 300,
+          height: 50,
+          decoration: BoxDecoration(border: Border.all(color: Colors.white)),
+          child: Center(
+            child: Text("SUBMIT", style: TextStyle(color: Colors.white)),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String uid = FirebaseAuth.instance.currentUser.uid;
@@ -84,6 +110,10 @@ class _AccountInfoState extends State<AccountInfo> {
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          _namecontroller =
+              TextEditingController(text: snapshot.data.data()["name"]);
+          _numbercontroller =
+              TextEditingController(text: snapshot.data.data()["number"]);
           return Scaffold(
             backgroundColor: Colors.black,
             appBar: AppBar(
@@ -106,32 +136,16 @@ class _AccountInfoState extends State<AccountInfo> {
                       hint: "Name",
                       icon: Icons.person,
                       defvalue: snapshot.data.data()["name"],
-                      controller: _namecontroller),
+                      controller: _namecontroller,
+                      mask: maskTextInputFormatter2),
                   newInput(
                       hint: "Number",
                       icon: Icons.phone,
                       defvalue: snapshot.data.data()["number"],
                       controller: _numbercontroller,
                       type: TextInputType.phone,
-                      number: maskTextInputFormatter),
-                  Container(
-                    child: InkWell(
-                      focusColor: Colors.white,
-                      onTap: () {
-                        print("Submit");
-                      },
-                      child: Container(
-                        width: 300,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white)),
-                        child: Center(
-                          child: Text("SUBMIT",
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                    ),
-                  ),
+                      mask: maskTextInputFormatter),
+                  button(),
                 ],
               ),
             ),
