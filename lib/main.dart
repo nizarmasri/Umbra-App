@@ -9,6 +9,7 @@ import 'package:events/globals.dart' as globals;
 import 'package:events/outerLogin.dart';
 import 'package:events/navigator.dart';
 import 'package:events/libOrg/navigator.dart';
+import 'libOrg/application_bloc.dart';
 import 'newUserForm.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -32,13 +33,16 @@ class MyApp extends StatelessWidget {
             create: (context) =>
                 context.read<AuthenticationService>().authStateChanges)
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          fontFamily: 'Montserrat',
-          canvasColor: Colors.black,
+      child: ChangeNotifierProvider(
+        create: (context) => ApplicationBloc(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            fontFamily: 'Montserrat',
+            canvasColor: Colors.black,
+          ),
+          home: AuthenticationWrapper(),
         ),
-        home: AuthenticationWrapper(),
       ),
     );
   }
