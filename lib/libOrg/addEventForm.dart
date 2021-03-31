@@ -1,4 +1,3 @@
-
 import 'package:events/libOrg/application_bloc.dart';
 import 'package:events/libOrg/eventLocation.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +105,9 @@ class _AddEventFormState extends State<AddEventForm> {
                   child: Center(
                     child: ListTile(
                       title: TextField(
+                        textAlignVertical: TextAlignVertical.top,
+                        expands: true,
+                        maxLines: null,
                         controller: descController,
                         cursorColor: Colors.white,
                         style: TextStyle(
@@ -228,7 +230,7 @@ class _AddEventFormState extends State<AddEventForm> {
                     ),
                     // Location button
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         navigateToLocationPage();
                       },
                       child: Container(
@@ -240,10 +242,10 @@ class _AddEventFormState extends State<AddEventForm> {
                         margin: EdgeInsets.only(bottom: 15),
                         child: Center(
                             child: Icon(
-                              Icons.pin_drop,
-                              color: Colors.blue,
-                              size: 30,
-                            )),
+                          Icons.pin_drop,
+                          color: Colors.blue,
+                          size: 30,
+                        )),
                       ),
                     ),
                   ],
@@ -256,4 +258,3 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 }
-

@@ -40,6 +40,7 @@ class _EventLocationState extends State<EventLocation> {
     double textFieldWidth = width * 0.9;
     double textFieldHeight = height * 0.07;
     double mapHeight = height * 0.8;
+    double mapWidth = width;
 
     final applicationBloc = Provider.of<ApplicationBloc>(context);
 
@@ -81,7 +82,10 @@ class _EventLocationState extends State<EventLocation> {
                         decoration: InputDecoration(
                             hintText: "Search Location",
                             //suffixIcon: Icon(Icons.search, color: Colors.white,),
-                            icon: Icon(Icons.search, color: Colors.white,),
+                            icon: Icon(
+                              Icons.search,
+                              color: Colors.white,
+                            ),
                             hintStyle: TextStyle(
                                 color: Colors.white38,
                                 fontSize: inputSize,
@@ -90,18 +94,18 @@ class _EventLocationState extends State<EventLocation> {
                             border: InputBorder.none,
                             focusColor: Colors.black,
                             fillColor: Colors.black),
-                        onChanged: (value) => applicationBloc.searchPlaces(value),
+                        onChanged: (value) =>
+                            applicationBloc.searchPlaces(value),
                       ),
                     ),
                   ),
                 ),
                 // Map
-                Stack(
-                  children: [
-                    // Map
-                  Container(
-                      height: mapHeight,
-                      child: GoogleMap(
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // Map
+                      GoogleMap(
                           //onMapCreated: _onMapCreated,
                           onTap: _updateLocation,
                           myLocationButtonEnabled: true,
@@ -110,43 +114,41 @@ class _EventLocationState extends State<EventLocation> {
                           mapType: MapType.normal,
                           markers: Set.from(location),
                           initialCameraPosition: CameraPosition(
-                            target: LatLng(applicationBloc.currentLocation.latitude,
+                            target: LatLng(
+                                applicationBloc.currentLocation.latitude,
                                 applicationBloc.currentLocation.longitude),
                             zoom: 14.0,
                           )),
-                    ),
-                    // Darken result area
-                    if(applicationBloc.searchResults != null &&
-                        applicationBloc.searchResults.length != 0)
-                    Container(
-                      height: mapHeight,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        backgroundBlendMode: BlendMode.darken
-                      ),
-                    ),
-                    // List of results
-                    if(applicationBloc.searchResults != null)
-                      Container(
-                        height: mapHeight,
-                        child: ListView.builder(
-                          itemCount: applicationBloc.searchResults.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(
-                                applicationBloc.searchResults[index].description,
-                                style: TextStyle(
-                                  fontFamily: globals.montserrat,
-                                  fontWeight: globals.fontWeight,
-                                  fontSize: inputSize,
-                                  color: Colors.white
-                                ),
-                              )
-                            );
-                          },
+                      // Darken result area
+                      if (applicationBloc.searchResults != null &&
+                          applicationBloc.searchResults.length != 0)
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              backgroundBlendMode: BlendMode.darken),
                         ),
-                      )
-                  ],
+                      // List of results
+                      if (applicationBloc.searchResults != null &&
+                          applicationBloc.searchResults.length != 0)
+                        Container(
+                          child: ListView.builder(
+                            itemCount: applicationBloc.searchResults.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                  title: Text(
+                                applicationBloc
+                                    .searchResults[index].description,
+                                style: TextStyle(
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight,
+                                    fontSize: inputSize,
+                                    color: Colors.white),
+                              ));
+                            },
+                          ),
+                        )
+                    ],
+                  ),
                 )
               ],
             ),
