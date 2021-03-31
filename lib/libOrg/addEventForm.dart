@@ -106,6 +106,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   child: Center(
                     child: ListTile(
                       title: TextField(
+
                         controller: descController,
                         cursorColor: Colors.white,
                         style: TextStyle(
