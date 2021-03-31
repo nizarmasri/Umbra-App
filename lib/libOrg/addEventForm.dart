@@ -1,5 +1,5 @@
 
-import 'file:///C:/Users/Nizar/AndroidStudioProjects/events/lib/libOrg/blocs/application_bloc.dart';
+import 'package:events/libOrg/blocs/application_bloc.dart';
 import 'package:events/libOrg/eventLocation.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
