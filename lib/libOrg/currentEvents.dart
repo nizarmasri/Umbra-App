@@ -11,7 +11,6 @@ class CurrentEventsPage extends StatefulWidget {
 }
 
 class _CurrentEventsPageState extends State<CurrentEventsPage> {
-
   navigateToAddEventForm() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => AddEventForm()));
@@ -101,72 +100,67 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     double height = MediaQuery.of(context).size.height;
     double nearyouCarouselHeight = height * 0.8;
     double nearyouItemHeight = height * 0.17;
-
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Container(
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 15, top: 15),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Current Events",
-                  style: TextStyle(
+            child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.only(left: 15, top: 15),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Current Events",
+                style: TextStyle(
                     fontFamily: globals.montserrat,
                     fontSize: 30,
-                    color: Colors.white
-                  ),
-                ),
+                    color: Colors.white),
               ),
-              Container(
-                child: GFCarousel(
-                  height: nearyouCarouselHeight,
-                  enableInfiniteScroll: true,
-                  viewportFraction: 1.0,
-                  activeIndicator: Colors.white,
-                  aspectRatio: 1,
-
-                  items: tiles.map(
-                        (con) {
-                      return Column(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.all(3.0),
-                            height: nearyouItemHeight,
-                            child: ClipRRect(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(5.0)),
-                                child: con),
-                          ),
-                          Container(
-                            margin: EdgeInsets.all(3.0),
-                            height: nearyouItemHeight,
-                            child: ClipRRect(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(5.0)),
-                                child: con),
-                          ),
-                        ],
-                      );
-                    },
-                  ).toList(),
-                  onPageChanged: (index) {
-                    setState(() {
-                      index;
-                    });
+            ),
+            Container(
+              child: GFCarousel(
+                height: nearyouCarouselHeight,
+                enableInfiniteScroll: true,
+                viewportFraction: 1.0,
+                activeIndicator: Colors.white,
+                aspectRatio: 1,
+                items: tiles.map(
+                  (con) {
+                    return Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(3.0),
+                          height: nearyouItemHeight,
+                          child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                              child: con),
+                        ),
+                        Container(
+                          margin: EdgeInsets.all(3.0),
+                          height: nearyouItemHeight,
+                          child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                              child: con),
+                        ),
+                      ],
+                    );
                   },
-                ),
+                ).toList(),
+                onPageChanged: (index) {
+                  setState(() {
+                    index;
+                  });
+                },
               ),
-            ],
-          )
-        ),
+            ),
+          ],
+        )),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -174,7 +168,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
           color: Colors.white,
         ),
         backgroundColor: Colors.white10,
-        onPressed: (){
+        onPressed: () {
           navigateToAddEventForm();
         },
       ),

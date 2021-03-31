@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:events/libOrg/blocs/application_bloc.dart';
 import 'package:events/libOrg/models/place.dart';
+import 'services/places_service.dart';
 
 class EventLocation extends StatefulWidget {
   @override
@@ -15,7 +16,7 @@ class EventLocation extends StatefulWidget {
 
 class _EventLocationState extends State<EventLocation> {
   GoogleMapController mapController;
-
+  final placesService = PlaceService();
   List<Marker> location = [];
 
   _updateLocation(LatLng chosenLoc) {
@@ -37,26 +38,27 @@ class _EventLocationState extends State<EventLocation> {
 
   Future<void> _goToPlace(Place place) async {
     final GoogleMapController controller = await _mapController.future;
-    controller.animateCamera((
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: LatLng(place.geometry.location.lat, place.geometry.location.lng), zoom: 14)
-      )
-    ));
+    controller.animateCamera((CameraUpdate.newCameraPosition(CameraPosition(
+        target:
+            LatLng(place.geometry.location.lat, place.geometry.location.lng),
+        zoom: 14))));
   }
 
   @override
   void initState() {
-    final applicationBloc = Provider.of<ApplicationBloc>(context, listen: false);
-    locationSubscription = applicationBloc.selectedLocation.stream.listen((place) {
-      if(place != null)
-        _goToPlace(place);
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
+    locationSubscription =
+        applicationBloc.selectedLocation.stream.listen((place) {
+      if (place != null) _goToPlace(place);
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    final applicationBloc = Provider.of<ApplicationBloc>(context, listen: false);
+    final applicationBloc =
+        Provider.of<ApplicationBloc>(context, listen: false);
     applicationBloc.dispose();
     locationSubscription.cancel();
     super.dispose();
@@ -108,7 +110,10 @@ class _EventLocationState extends State<EventLocation> {
                             fontWeight: globals.fontWeight),
                         decoration: InputDecoration(
                             hintText: "Search Location",
-                            icon: Icon(Icons.search, color: Colors.white,),
+                            icon: Icon(
+                              Icons.search,
+                              color: Colors.white,
+                            ),
                             hintStyle: TextStyle(
                                 color: Colors.white38,
                                 fontSize: inputSize,
@@ -117,7 +122,8 @@ class _EventLocationState extends State<EventLocation> {
                             border: InputBorder.none,
                             focusColor: Colors.black,
                             fillColor: Colors.black),
-                        onChanged: (value) => applicationBloc.searchPlaces(value),
+                        onChanged: (value) =>
+                            applicationBloc.searchPlaces(value),
                       ),
                     ),
                   ),
@@ -127,10 +133,10 @@ class _EventLocationState extends State<EventLocation> {
                   child: Stack(
                     children: [
                       // Map
-                    Container(
+                      Container(
                         height: mapHeight,
                         child: GoogleMap(
-                            onMapCreated: (GoogleMapController controller){
+                            onMapCreated: (GoogleMapController controller) {
                               _mapController.complete(controller);
                             },
                             onTap: _updateLocation,
@@ -140,23 +146,23 @@ class _EventLocationState extends State<EventLocation> {
                             mapType: MapType.normal,
                             markers: Set.from(location),
                             initialCameraPosition: CameraPosition(
-                              target: LatLng(applicationBloc.currentLocation.latitude,
+                              target: LatLng(
+                                  applicationBloc.currentLocation.latitude,
                                   applicationBloc.currentLocation.longitude),
                               zoom: 14.0,
                             )),
                       ),
                       // Darken result area
-                      if(applicationBloc.searchResults != null &&
+                      if (applicationBloc.searchResults != null &&
                           applicationBloc.searchResults.length != 0)
-                      Container(
-                        height: mapHeight,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          backgroundBlendMode: BlendMode.darken
+                        Container(
+                          height: mapHeight,
+                          decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              backgroundBlendMode: BlendMode.darken),
                         ),
-                      ),
                       // List of results
-                      if(applicationBloc.searchResults != null &&
+                      if (applicationBloc.searchResults != null &&
                           applicationBloc.searchResults.length != 0)
                         Container(
                           height: mapHeight,
@@ -165,18 +171,24 @@ class _EventLocationState extends State<EventLocation> {
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text(
-                                  applicationBloc.searchResults[index].description,
+                                  applicationBloc
+                                      .searchResults[index].description,
                                   style: TextStyle(
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight,
-                                    fontSize: inputSize,
-                                    color: Colors.white
-                                  ),
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight,
+                                      fontSize: inputSize,
+                                      color: Colors.white),
                                 ),
-                                onTap: () {
+                                onTap: () async {
                                   applicationBloc.setSeletedLocation(
-                                    applicationBloc.searchResults[index].placeId
-                                  );
+                                      applicationBloc
+                                          .searchResults[index].placeId);
+                                  Place ll = await placesService.getPlace(
+                                      applicationBloc
+                                          .searchResults[index].placeId);
+                                  _updateLocation(LatLng(
+                                      ll.geometry.location.lat,
+                                      ll.geometry.location.lng));
                                 },
                               );
                             },

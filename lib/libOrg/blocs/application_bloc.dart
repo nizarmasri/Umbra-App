@@ -20,8 +20,8 @@ class ApplicationBloc with ChangeNotifier {
   }
 
   setCurrentLocation() async {
-      currentLocation = await geoLocatorService.getCurrentLocation();
-      notifyListeners();
+    currentLocation = await geoLocatorService.getCurrentLocation();
+    notifyListeners();
   }
 
   searchPlaces(String searchTerm) async {
