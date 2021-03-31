@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:events/libOrg/application_bloc.dart';
+import 'package:events/libOrg/blocs/application_bloc.dart';
+import 'package:events/libOrg/models/place.dart';
 
 class EventLocation extends StatefulWidget {
   @override
@@ -12,10 +15,6 @@ class EventLocation extends StatefulWidget {
 
 class _EventLocationState extends State<EventLocation> {
   GoogleMapController mapController;
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
 
   List<Marker> location = [];
 
@@ -33,6 +32,36 @@ class _EventLocationState extends State<EventLocation> {
   final TextEditingController searchController = TextEditingController();
   double inputSize = 17;
 
+  Completer<GoogleMapController> _mapController = Completer();
+  StreamSubscription locationSubscription;
+
+  Future<void> _goToPlace(Place place) async {
+    final GoogleMapController controller = await _mapController.future;
+    controller.animateCamera((
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: LatLng(place.geometry.location.lat, place.geometry.location.lng), zoom: 14)
+      )
+    ));
+  }
+
+  @override
+  void initState() {
+    final applicationBloc = Provider.of<ApplicationBloc>(context, listen: false);
+    locationSubscription = applicationBloc.selectedLocation.stream.listen((place) {
+      if(place != null)
+        _goToPlace(place);
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    final applicationBloc = Provider.of<ApplicationBloc>(context, listen: false);
+    applicationBloc.dispose();
+    locationSubscription.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -40,7 +69,6 @@ class _EventLocationState extends State<EventLocation> {
     double textFieldWidth = width * 0.9;
     double textFieldHeight = height * 0.07;
     double mapHeight = height * 0.8;
-
     final applicationBloc = Provider.of<ApplicationBloc>(context);
 
     return Scaffold(
@@ -80,7 +108,6 @@ class _EventLocationState extends State<EventLocation> {
                             fontWeight: globals.fontWeight),
                         decoration: InputDecoration(
                             hintText: "Search Location",
-                            //suffixIcon: Icon(Icons.search, color: Colors.white,),
                             icon: Icon(Icons.search, color: Colors.white,),
                             hintStyle: TextStyle(
                                 color: Colors.white38,
@@ -96,57 +123,67 @@ class _EventLocationState extends State<EventLocation> {
                   ),
                 ),
                 // Map
-                Stack(
-                  children: [
-                    // Map
-                  Container(
-                      height: mapHeight,
-                      child: GoogleMap(
-                          //onMapCreated: _onMapCreated,
-                          onTap: _updateLocation,
-                          myLocationButtonEnabled: true,
-                          myLocationEnabled: true,
-                          //mapToolbarEnabled: true,
-                          mapType: MapType.normal,
-                          markers: Set.from(location),
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(applicationBloc.currentLocation.latitude,
-                                applicationBloc.currentLocation.longitude),
-                            zoom: 14.0,
-                          )),
-                    ),
-                    // Darken result area
-                    if(applicationBloc.searchResults != null &&
-                        applicationBloc.searchResults.length != 0)
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // Map
                     Container(
-                      height: mapHeight,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        backgroundBlendMode: BlendMode.darken
+                        height: mapHeight,
+                        child: GoogleMap(
+                            onMapCreated: (GoogleMapController controller){
+                              _mapController.complete(controller);
+                            },
+                            onTap: _updateLocation,
+                            myLocationButtonEnabled: true,
+                            myLocationEnabled: true,
+                            //mapToolbarEnabled: true,
+                            mapType: MapType.normal,
+                            markers: Set.from(location),
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(applicationBloc.currentLocation.latitude,
+                                  applicationBloc.currentLocation.longitude),
+                              zoom: 14.0,
+                            )),
                       ),
-                    ),
-                    // List of results
-                    if(applicationBloc.searchResults != null)
+                      // Darken result area
+                      if(applicationBloc.searchResults != null &&
+                          applicationBloc.searchResults.length != 0)
                       Container(
                         height: mapHeight,
-                        child: ListView.builder(
-                          itemCount: applicationBloc.searchResults.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(
-                                applicationBloc.searchResults[index].description,
-                                style: TextStyle(
-                                  fontFamily: globals.montserrat,
-                                  fontWeight: globals.fontWeight,
-                                  fontSize: inputSize,
-                                  color: Colors.white
-                                ),
-                              )
-                            );
-                          },
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          backgroundBlendMode: BlendMode.darken
                         ),
-                      )
-                  ],
+                      ),
+                      // List of results
+                      if(applicationBloc.searchResults != null &&
+                          applicationBloc.searchResults.length != 0)
+                        Container(
+                          height: mapHeight,
+                          child: ListView.builder(
+                            itemCount: applicationBloc.searchResults.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text(
+                                  applicationBloc.searchResults[index].description,
+                                  style: TextStyle(
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight,
+                                    fontSize: inputSize,
+                                    color: Colors.white
+                                  ),
+                                ),
+                                onTap: () {
+                                  applicationBloc.setSeletedLocation(
+                                    applicationBloc.searchResults[index].placeId
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        )
+                    ],
+                  ),
                 )
               ],
             ),

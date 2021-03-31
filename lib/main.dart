@@ -9,8 +9,8 @@ import 'package:events/globals.dart' as globals;
 import 'package:events/outerLogin.dart';
 import 'package:events/navigator.dart';
 import 'package:events/libOrg/navigator.dart';
-import 'libOrg/application_bloc.dart';
-import 'newUserForm.dart';
+import 'package:events/libOrg/blocs/application_bloc.dart';
+import 'package:events/newUserForm.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 Future<void> main() async {
