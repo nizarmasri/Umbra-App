@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_button/progress_button.dart';
 import 'package:provider/provider.dart';
+import 'accountInfoOrg.dart';
 
 import 'package:events/authentication_service.dart';
 import 'package:events/globals.dart' as globals;
@@ -15,10 +16,9 @@ class AccountOrgPage extends StatefulWidget {
 
 class _AccountOrgPageState extends State<AccountOrgPage> {
   double btnHeight = 60;
-
   Container NameAvatar({String name, String email}) {
     return Container(
-      margin: EdgeInsets.only(top: 40, left: 10, right: 10),
+      margin: EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 20),
       decoration: BoxDecoration(),
       child: Row(
         children: [
@@ -81,6 +81,36 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
         ));
   }
 
+  navigateToAccountInfoOrg() {
+    Navigator.push(
+            context, MaterialPageRoute(builder: (context) => AccountInfoOrg()))
+        .then((value) => setState(() {}));
+  }
+
+  InkWell Setting({String title, IconData icon, Color color, Function page}) {
+    return InkWell(
+      onTap: () {
+        page();
+      },
+      child: Container(
+        decoration: BoxDecoration(color: color),
+        child: Row(
+          children: [
+            Container(
+              margin: EdgeInsets.fromLTRB(15, 15, 25, 15),
+              child: Icon(
+                icon,
+                size: 40,
+                color: Colors.white,
+              ),
+            ),
+            Text(title, style: TextStyle(color: Colors.white))
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String uid = FirebaseAuth.instance.currentUser.uid;
@@ -92,19 +122,42 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           return Scaffold(
+            resizeToAvoidBottomInset: true,
             backgroundColor: Colors.black,
-            body: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    NameAvatar(
-                        name: snapshot.data.data()["name"],
-                        email: snapshot.data.data()["email"]),
-                  ],
+            body: RefreshIndicator(
+              onRefresh: () {
+                return Future.delayed(
+                    Duration(
+                      seconds: 1,
+                    ), () {
+                  setState(() {});
+                });
+              },
+              child: ListView(children: [
+                SafeArea(
+                  child: Container(
+                    decoration: BoxDecoration(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        NameAvatar(
+                            name: snapshot.data.data()["name"],
+                            email: snapshot.data.data()["email"]),
+                        Container(
+                          child: Column(
+                            children: [
+                              Setting(
+                                  title: "Account Information",
+                                  icon: Icons.account_circle_rounded,
+                                  page: navigateToAccountInfoOrg)
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ]),
             ),
             bottomNavigationBar:
                 LogoutButton(width: btnWidth, height: btnHeight),
