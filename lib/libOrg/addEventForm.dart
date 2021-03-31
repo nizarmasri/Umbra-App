@@ -24,17 +24,48 @@ class _AddEventFormState extends State<AddEventForm> {
         context, MaterialPageRoute(builder: (context) => EventLocation()));
   }
 
+  DateTime selectedDate = DateTime.now();
+  DateTime dateLimit = DateTime.now();
+  bool changedDate = false;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2030));
+    if (picked != null)
+      setState(() {
+        selectedDate = picked;
+        changedDate = true;
+      });
+  }
+
+  TimeOfDay selectedTime = TimeOfDay.now();
+  bool changedTime = false;
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+    );
+    if (picked != null)
+      setState(() {
+        selectedTime = picked;
+        changedTime = true;
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double textFieldWidth = width * 0.9;
-    double textFieldHeight = height * 0.1;
+    double titleFieldHeight = height * 0.1;
     double descTextFieldHeight = height * 0.2;
-    double ageTextWidth = width * 0.3;
-    double ageFieldWidth = width * 0.5;
-    double locTextWidth = width * 0.3;
-    double locButtonWidth = width * 0.5;
+    double btnsHeight = height * 0.07;
+    double btnsTextWidth = width * 0.3;
+    double btnsWidth = width * 0.5;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -50,7 +81,7 @@ class _AddEventFormState extends State<AddEventForm> {
           child: Container(
             child: Column(
               children: [
-                // Add event
+                // Add event text
                 Container(
                   padding: EdgeInsets.only(left: 15, top: 15, bottom: 20),
                   alignment: Alignment.centerLeft,
@@ -62,9 +93,9 @@ class _AddEventFormState extends State<AddEventForm> {
                         color: Colors.white),
                   ),
                 ),
-                // Title
+                // Title field
                 Container(
-                  height: textFieldHeight,
+                  height: titleFieldHeight,
                   width: textFieldWidth,
                   decoration: BoxDecoration(
                       color: Colors.white12,
@@ -129,13 +160,124 @@ class _AddEventFormState extends State<AddEventForm> {
                     ),
                   ),
                 ),
+                // Date
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Date Text
+                    Container(
+                      height: btnsHeight,
+                      width: btnsTextWidth,
+                      decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10)),
+                      margin: EdgeInsets.only(bottom: 15),
+                      child: Center(
+                        child: ListTile(
+                          title: Text(
+                            "Date:",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: inputSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Calendar button
+                    GestureDetector(
+                      onTap: () => _selectDate(context),
+                      child: Container(
+                        height: btnsHeight,
+                        width: btnsWidth,
+                        decoration: BoxDecoration(
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
+                        child: Center(
+                          child: !changedDate
+                              ? Icon(
+                                  Icons.calendar_today_outlined,
+                                  color: Colors.white,
+                                  size: 25,
+                                )
+                              : Text(
+                                  selectedDate.toString().substring(0, 10),
+                                  style: TextStyle(
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight,
+                                      fontSize: inputSize,
+                                      color: Colors.white),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Time
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Date Text
+                    Container(
+                      height: btnsHeight,
+                      width: btnsTextWidth,
+                      decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10)),
+                      margin: EdgeInsets.only(bottom: 15),
+                      child: Center(
+                        child: ListTile(
+                          title: Text(
+                            "Time:",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: inputSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Calendar button
+                    GestureDetector(
+                      onTap: () => _selectTime(context),
+                      child: Container(
+                        height: btnsHeight,
+                        width: btnsWidth,
+                        decoration: BoxDecoration(
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(10)),
+                        margin: EdgeInsets.only(bottom: 15),
+                        child: Center(
+                            child: !changedTime
+                                ? Icon(
+                                    Icons.access_time,
+                                    color: Colors.white,
+                                    size: 25,
+                                  )
+                                : Text(
+                                    selectedTime.toString().substring(10, 15),
+                                    style: TextStyle(
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight,
+                                        fontSize: inputSize,
+                                        color: Colors.white),
+                                  )),
+                      ),
+                    ),
+                  ],
+                ),
                 // Age
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
-                      height: textFieldHeight,
-                      width: ageTextWidth,
+                      height: btnsHeight,
+                      width: btnsTextWidth,
                       decoration: BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.circular(10)),
@@ -155,8 +297,8 @@ class _AddEventFormState extends State<AddEventForm> {
                       ),
                     ),
                     Container(
-                      height: textFieldHeight,
-                      width: ageFieldWidth,
+                      height: btnsHeight,
+                      width: btnsWidth,
                       decoration: BoxDecoration(
                           color: Colors.white12,
                           borderRadius: BorderRadius.circular(10)),
@@ -166,10 +308,11 @@ class _AddEventFormState extends State<AddEventForm> {
                         child: DropdownButton<String>(
                           value: _age,
                           style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontSize: 16,
-                              fontWeight: globals.fontWeight,
-                              color: Colors.white),
+                            fontFamily: globals.montserrat,
+                            fontSize: 16,
+                            fontWeight: globals.fontWeight,
+                            color: Colors.white,
+                          ),
                           //elevation: 5,
                           items: <String>[
                             'All ages',
@@ -208,8 +351,8 @@ class _AddEventFormState extends State<AddEventForm> {
                   children: [
                     // Location Text
                     Container(
-                      height: textFieldHeight,
-                      width: locTextWidth,
+                      height: btnsHeight,
+                      width: btnsTextWidth,
                       decoration: BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.circular(10)),
@@ -234,8 +377,8 @@ class _AddEventFormState extends State<AddEventForm> {
                         navigateToLocationPage();
                       },
                       child: Container(
-                        height: textFieldHeight,
-                        width: locButtonWidth,
+                        height: btnsHeight,
+                        width: btnsWidth,
                         decoration: BoxDecoration(
                             color: Colors.white12,
                             borderRadius: BorderRadius.circular(10)),
