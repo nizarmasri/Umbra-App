@@ -22,13 +22,20 @@ class _AddEventFormState extends State<AddEventForm> {
   String uid = FirebaseAuth.instance.currentUser.uid;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descController = TextEditingController();
+  List<Marker> location;
+
   String _age;
 
   bool loading = false;
 
-  navigateToLocationPage() {
-    Navigator.push(
+  navigateToLocationPage() async {
+    final chosenLocation = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => EventLocation()));
+    setState(() {
+      location = chosenLocation;
+      if(location != null)
+        print(location[0].position);
+    });
   }
 
   String _error = 'No Error Dectected';
@@ -352,7 +359,7 @@ class _AddEventFormState extends State<AddEventForm> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          // Date Text
+                          // Time Text
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
@@ -374,7 +381,7 @@ class _AddEventFormState extends State<AddEventForm> {
                               ),
                             ),
                           ),
-                          // Calendar button
+                          // Time button
                           GestureDetector(
                             onTap: () => _selectTime(context),
                             child: Container(

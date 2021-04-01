@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:flutter/services.dart';
+import 'package:getwidget/components/toast/gf_toast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:events/libOrg/blocs/application_bloc.dart';
@@ -35,6 +36,7 @@ class _EventLocationState extends State<EventLocation> {
 
   Completer<GoogleMapController> _mapController = Completer();
   StreamSubscription locationSubscription;
+  StreamController<Place> controller = StreamController<Place>.broadcast();
 
   Future<void> _goToPlace(Place place) async {
     final GoogleMapController controller = await _mapController.future;
@@ -48,10 +50,13 @@ class _EventLocationState extends State<EventLocation> {
   void initState() {
     final applicationBloc =
         Provider.of<ApplicationBloc>(context, listen: false);
-    locationSubscription =
-        applicationBloc.selectedLocation.stream.listen((place) {
-      if (place != null) _goToPlace(place);
+    locationSubscription = controller.stream.listen((event) {
+      locationSubscription =
+          applicationBloc.selectedLocation.stream.listen((place) {
+        if (place != null) _goToPlace(place);
+      });
     });
+
     super.initState();
   }
 
@@ -64,6 +69,17 @@ class _EventLocationState extends State<EventLocation> {
     super.dispose();
   }
 
+  GFToast toast = GFToast(
+    text: "Select location",
+    textStyle: TextStyle(
+        fontFamily: globals.montserrat,
+        fontWeight: globals.fontWeight,
+        color: Colors.white,
+        fontSize: 15
+    ),
+    duration: Duration(seconds: 3),
+  );
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -74,14 +90,23 @@ class _EventLocationState extends State<EventLocation> {
     final applicationBloc = Provider.of<ApplicationBloc>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          "Event Location",
-          style: TextStyle(
-              fontFamily: globals.montserrat,
-              fontSize: 20,
-              color: Colors.white),
+      appBar: CustomAppBar(
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text(
+            "Event Location",
+            style: TextStyle(
+                fontFamily: globals.montserrat,
+                fontSize: 20,
+                color: Colors.white),
+          ),
+          leading: GestureDetector(
+              child: Icon(Icons.check, color: Colors.green,),
+            onTap: () {
+              Navigator.pop(context, location);
+            },
+          ),
+
         ),
       ),
       body: (applicationBloc.currentLocation == null)
@@ -201,4 +226,20 @@ class _EventLocationState extends State<EventLocation> {
             ),
     );
   }
+}
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onTap;
+  final AppBar appBar;
+
+  const CustomAppBar({Key key, this.onTap, this.appBar}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(onTap: onTap, child: appBar);
+  }
+
+  // TODO: implement preferredSize
+  @override
+  Size get preferredSize => new Size.fromHeight(kToolbarHeight);
 }
