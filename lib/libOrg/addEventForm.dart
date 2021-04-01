@@ -25,6 +25,7 @@ class _AddEventFormState extends State<AddEventForm> {
   List<Marker> location;
 
   String _age;
+  String _type;
 
   bool loading = false;
 
@@ -299,6 +300,78 @@ class _AddEventFormState extends State<AddEventForm> {
                             ),
                           ),
                         ),
+                      ),
+                      // Event Type
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            height: btnsHeight,
+                            width: btnsTextWidth,
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Center(
+                              child: ListTile(
+                                title: Text(
+                                  "Type:",
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: btnsHeight,
+                            width: btnsWidth,
+                            decoration: BoxDecoration(
+                                color: Colors.white12,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Center(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: _type,
+                                    style: TextStyle(
+                                      fontFamily: globals.montserrat,
+                                      fontSize: 16,
+                                      fontWeight: globals.fontWeight,
+                                      color: Colors.white,
+                                    ),
+                                    //elevation: 5,
+                                    items: <String>[
+                                      'Club',
+                                      'Pub',
+                                      'Gig',
+                                      'House Party',
+                                    ].map<DropdownMenuItem<String>>((String type) {
+                                      return DropdownMenuItem<String>(
+                                        value: type,
+                                        child: Text(type),
+                                      );
+                                    }).toList(),
+                                    hint: Text(
+                                      "Choose a type",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: globals.fontWeight,
+                                          fontFamily: globals.montserrat),
+                                    ),
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        _type = value;
+                                      });
+                                    },
+                                  ),
+                                )),
+                          ),
+                        ],
                       ),
                       // Date
                       Row(
