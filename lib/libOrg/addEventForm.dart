@@ -74,16 +74,12 @@ class _AddEventFormState extends State<AddEventForm> {
       child: InkWell(
         focusColor: Colors.white,
         onTap: () async {
-          print(titleController.text);
-          print(descController.text);
-          print(_age);
-          print(selectedDate);
-          print(selectedTime.toString().substring(10, 15));
           setState(() {
             loading = true;
           });
+          FirebaseFirestore fb = FirebaseFirestore.instance;
 
-          await FirebaseFirestore.instance.collection('events').add({
+          await fb.collection('events').add({
             'title': titleController.text,
             //   'description': descController.text,
             //   'age': _age,
@@ -92,23 +88,20 @@ class _AddEventFormState extends State<AddEventForm> {
             //   'poster': uid,
             //  'location': GeoPoint(
             //      location[0].position.latitude, location[0].position.longitude),
-          }).then((value) {
+          }).then((value) async {
             final id = value.id;
             images.asMap().forEach((index, value) async {
               final firebaseStorageRef =
                   FirebaseStorage.instance.ref().child('$id/$index');
               final upload = firebaseStorageRef
                   .putData((await value.getByteData()).buffer.asUint8List())
-                  .then((value) {
-                //    urls.add(firebaseStorageRef.getDownloadURL());
-
-                firebaseStorageRef.getDownloadURL().then((value) {
-                  print(value);
+                  .then((value) async {
+                String url = await firebaseStorageRef.getDownloadURL();
+                print(url);
+                await fb.collection('events').doc(id).update({
+                  'urls': FieldValue.arrayUnion([url]),
                 });
               });
-              print("WE");
-              print(urls);
-              print(index);
             });
           }).then((value) {
             Navigator.pop(context);
@@ -338,41 +331,41 @@ class _AddEventFormState extends State<AddEventForm> {
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
                                 child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: _type,
-                                    style: TextStyle(
-                                      fontFamily: globals.montserrat,
-                                      fontSize: 16,
-                                      fontWeight: globals.fontWeight,
+                              child: DropdownButton<String>(
+                                value: _type,
+                                style: TextStyle(
+                                  fontFamily: globals.montserrat,
+                                  fontSize: 16,
+                                  fontWeight: globals.fontWeight,
+                                  color: Colors.white,
+                                ),
+                                //elevation: 5,
+                                items: <String>[
+                                  'Club',
+                                  'Pub',
+                                  'Gig',
+                                  'House Party',
+                                ].map<DropdownMenuItem<String>>((String type) {
+                                  return DropdownMenuItem<String>(
+                                    value: type,
+                                    child: Text(type),
+                                  );
+                                }).toList(),
+                                hint: Text(
+                                  "Choose a type",
+                                  style: TextStyle(
                                       color: Colors.white,
-                                    ),
-                                    //elevation: 5,
-                                    items: <String>[
-                                      'Club',
-                                      'Pub',
-                                      'Gig',
-                                      'House Party',
-                                    ].map<DropdownMenuItem<String>>((String type) {
-                                      return DropdownMenuItem<String>(
-                                        value: type,
-                                        child: Text(type),
-                                      );
-                                    }).toList(),
-                                    hint: Text(
-                                      "Choose a type",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontWeight: globals.fontWeight,
-                                          fontFamily: globals.montserrat),
-                                    ),
-                                    onChanged: (String value) {
-                                      setState(() {
-                                        _type = value;
-                                      });
-                                    },
-                                  ),
-                                )),
+                                      fontSize: 14,
+                                      fontWeight: globals.fontWeight,
+                                      fontFamily: globals.montserrat),
+                                ),
+                                onChanged: (String value) {
+                                  setState(() {
+                                    _type = value;
+                                  });
+                                },
+                              ),
+                            )),
                           ),
                         ],
                       ),
