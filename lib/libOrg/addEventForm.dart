@@ -33,8 +33,7 @@ class _AddEventFormState extends State<AddEventForm> {
         context, MaterialPageRoute(builder: (context) => EventLocation()));
     setState(() {
       location = chosenLocation;
-      if(location != null)
-        print(location[0].position);
+      if (location != null) print(location[0].position);
     });
   }
 
@@ -63,6 +62,8 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
+  String urls;
+
   Container button({String uid}) {
     return Container(
       margin: EdgeInsets.only(top: 30, bottom: 30),
@@ -77,7 +78,6 @@ class _AddEventFormState extends State<AddEventForm> {
           setState(() {
             loading = true;
           });
-          List<String> urls;
 
           await FirebaseFirestore.instance.collection('events').add({
             'title': titleController.text,
@@ -85,7 +85,9 @@ class _AddEventFormState extends State<AddEventForm> {
             //   'age': _age,
             //   'date': selectedDate,
             //   'time': selectedTime.toString().substring(10, 15),
-            //   'poster': uid
+            //   'poster': uid,
+            //  'location': GeoPoint(
+            //      location[0].position.latitude, location[0].position.longitude),
           }).then((value) {
             final id = value.id;
             images.asMap().forEach((index, value) async {
@@ -95,6 +97,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   .putData((await value.getByteData()).buffer.asUint8List())
                   .then((value) {
                 //    urls.add(firebaseStorageRef.getDownloadURL());
+
                 firebaseStorageRef.getDownloadURL().then((value) {
                   print(value);
                 });
@@ -103,7 +106,7 @@ class _AddEventFormState extends State<AddEventForm> {
               print(urls);
               print(index);
             });
-
+          }).then((value) {
             Navigator.pop(context);
           });
         },
