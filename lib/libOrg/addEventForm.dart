@@ -19,9 +19,12 @@ class AddEventForm extends StatefulWidget {
 
 class _AddEventFormState extends State<AddEventForm> {
   double inputSize = 17;
+  double feeText = 14.5;
   String uid = FirebaseAuth.instance.currentUser.uid;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descController = TextEditingController();
+  final TextEditingController feeController = TextEditingController();
+
   List<Marker> location;
 
   String _age;
@@ -484,6 +487,71 @@ class _AddEventFormState extends State<AddEventForm> {
                                               fontSize: inputSize,
                                               color: Colors.white),
                                         )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Entrance fee
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Entrance Text
+                          Container(
+                            height: btnsHeight,
+                            width: btnsTextWidth,
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Center(
+                              child: ListTile(
+                                title: Text(
+                                  "Entrance:",
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Fee Text Field
+                          Container(
+                            height: btnsHeight,
+                            width: btnsWidth,
+                            decoration: BoxDecoration(
+                                color: Colors.white12,
+                                borderRadius: BorderRadius.circular(10)),
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Center(
+                              child: ListTile(
+                                title: TextField(
+                                  controller: feeController,
+                                  cursorColor: Colors.white,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: inputSize,
+                                      fontFamily: globals.montserrat,
+                                      fontWeight: globals.fontWeight),
+                                  decoration: InputDecoration(
+                                      hintText: "Fee (optional)",
+                                      icon: Icon(
+                                        Icons.attach_money,
+                                        color: Colors.white,
+                                        size: 22,
+                                      ),
+                                      hintStyle: TextStyle(
+                                          color: Colors.white38,
+                                          fontSize: feeText,
+                                          fontFamily: globals.montserrat,
+                                          fontWeight: globals.fontWeight),
+                                      border: InputBorder.none,
+                                      focusColor: Colors.black,
+                                      fillColor: Colors.black),
+                                ),
+                              ),
                             ),
                           ),
                         ],

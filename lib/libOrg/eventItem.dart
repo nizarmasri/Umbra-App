@@ -56,7 +56,7 @@ class _EventItemState extends State<EventItem> {
                   fontFamily: globals.montserrat, fontSize: 17, color: Colors.white),
             ),
             subtitle: Text(
-              type,
+              type + "\n" + location,
               style: TextStyle(
                   fontFamily: globals.montserrat,
                   fontSize: 15,

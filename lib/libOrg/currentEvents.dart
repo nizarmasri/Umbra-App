@@ -1,4 +1,5 @@
 import 'package:events/libOrg/addEventForm.dart';
+import 'package:events/libOrg/eventItem.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:getwidget/components/carousel/gf_carousel.dart';
@@ -16,87 +17,38 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         context, MaterialPageRoute(builder: (context) => AddEventForm()));
   }
 
-  List<GFListTile> tiles = [
-    GFListTile(
-      avatar: GFImageOverlay(
-        height: 100,
-        width: 100,
-        image: NetworkImage(
-            'https://st2.depositphotos.com/7867872/10618/i/950/depositphotos_106182598-stock-photo-night-club-party-event-concert.jpg'),
-      ),
-      title: Text(
-        "The One",
-        style: TextStyle(
-            fontFamily: globals.montserrat, fontSize: 17, color: Colors.white),
-      ),
-      subtitle: Text(
-        "Club\nBeirut",
-        style: TextStyle(
-            fontFamily: globals.montserrat,
-            fontSize: 15,
-            fontWeight: globals.fontWeight,
-            color: Colors.white),
-      ),
-      color: Colors.white12,
-    ),
-    GFListTile(
-      avatar: Container(
-        color: Colors.green,
-      ),
-      title: Text(
-        "Pub",
-        style: TextStyle(
-            fontFamily: globals.montserrat, fontSize: 14, color: Colors.white),
-      ),
-      subtitle: Text(
-        "Mar Mikhael",
-        style: TextStyle(
-            fontFamily: globals.montserrat,
-            fontSize: 13,
-            fontWeight: globals.fontWeight,
-            color: Colors.white),
-      ),
-      color: Colors.white12,
-    ),
-    GFListTile(
-      avatar: Container(
-        color: Colors.red,
-      ),
-      title: Text(
-        "Gig",
-        style: TextStyle(
-            fontFamily: globals.montserrat, fontSize: 14, color: Colors.white),
-      ),
-      subtitle: Text(
-        "Hazmieh",
-        style: TextStyle(
-            fontFamily: globals.montserrat,
-            fontSize: 13,
-            fontWeight: globals.fontWeight,
-            color: Colors.white),
-      ),
-      color: Colors.white12,
-    ),
-    GFListTile(
-      avatar: Container(
-        color: Colors.white,
-      ),
-      title: Text(
-        "Pub",
-        style: TextStyle(
-            fontFamily: globals.montserrat, fontSize: 14, color: Colors.white),
-      ),
-      subtitle: Text(
-        "Badaro",
-        style: TextStyle(
-            fontFamily: globals.montserrat,
-            fontSize: 13,
-            fontWeight: globals.fontWeight,
-            color: Colors.white),
-      ),
-      color: Colors.white12,
-    )
-  ];
+  List<EventItem> eventItems;
+
+  EventItem event1 = EventItem(
+    title: "Bodo Pub",
+    description: "Special night at Bodo pub today! Happy hour from 9 till 12 am with guest artists. Hope to see you there!",
+    age: "18 +",
+    type: "Pub",
+    date: "April 14",
+    time: "8:00 PM",
+    location: "Mar Mikhael",
+  );
+
+  EventItem event2 = EventItem(
+    title: "BO18",
+    description: "Techno night at BO18!! Open drinks until 10 pm and special performance by DJ Dawg!",
+    age: "21 +",
+    type: "Club",
+    date: "April 17",
+    time: "9:00 PM",
+    location: "Manara",
+  );
+
+  EventItem event3 = EventItem(
+    title: "Party at Sayegh's",
+    description: "Crazy house party at the Sayegh villa, everyone is welcome",
+    age: "21 +",
+    type: "Club",
+    date: "April 17",
+    time: "9:00 PM",
+    location: "Manara",
+  );
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,44 +73,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                     color: Colors.white),
               ),
             ),
-            Container(
-              child: GFCarousel(
-                height: nearyouCarouselHeight,
-                enableInfiniteScroll: true,
-                viewportFraction: 1.0,
-                activeIndicator: Colors.white,
-                aspectRatio: 1,
-                items: tiles.map(
-                  (con) {
-                    return Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.all(3.0),
-                          height: nearyouItemHeight,
-                          child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                              child: con),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(3.0),
-                          height: nearyouItemHeight,
-                          child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
-                              child: con),
-                        ),
-                      ],
-                    );
-                  },
-                ).toList(),
-                onPageChanged: (index) {
-                  setState(() {
-                    index;
-                  });
-                },
-              ),
-            ),
+
           ],
         )),
       ),
