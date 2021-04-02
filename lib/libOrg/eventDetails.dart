@@ -47,6 +47,10 @@ class _EventDetailsState extends State<EventDetails> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double detailsHeight = height * 0.5;
+    double infoSquaresSize = height * 0.114;
+    double infoRectsHeight = height * 0.114;
+    double infoRectsWidth = height * 0.171;
+
 
     return Scaffold(
       appBar: AppBar(
@@ -105,8 +109,8 @@ class _EventDetailsState extends State<EventDetails> {
                         children: [
                           // Age
                           Container(
-                            height: 100,
-                            width: 100,
+                            height: infoSquaresSize,
+                            width: infoSquaresSize,
                             child: AspectRatio(
                               aspectRatio: 1/1,
                               child: Container(
@@ -129,8 +133,8 @@ class _EventDetailsState extends State<EventDetails> {
                           ),
                           // Type
                           Container(
-                            height: 100,
-                            width: 100,
+                            height: infoSquaresSize,
+                            width: infoSquaresSize,
                             child: AspectRatio(
                               aspectRatio: 1/1,
                               child: Container(
@@ -154,8 +158,8 @@ class _EventDetailsState extends State<EventDetails> {
                           ),
                           // Fee
                           Container(
-                            height: 100,
-                            width: 100,
+                            height: infoSquaresSize,
+                            width: infoSquaresSize,
                             child: AspectRatio(
                               aspectRatio: 1/1,
                               child: Container(
@@ -204,8 +208,8 @@ class _EventDetailsState extends State<EventDetails> {
                           children: [
                             // Date
                             Container(
-                              height: 100,
-                              width: 150,
+                              height: infoRectsHeight,
+                              width: infoRectsWidth,
                               child: AspectRatio(
                                 aspectRatio: 1/1,
                                 child: Container(
@@ -228,8 +232,8 @@ class _EventDetailsState extends State<EventDetails> {
                             ),
                             // Time
                             Container(
-                              height: 100,
-                              width: 150,
+                              height: infoRectsHeight,
+                              width: infoRectsWidth,
                               child: AspectRatio(
                                 aspectRatio: 1/1,
                                 child: Container(
