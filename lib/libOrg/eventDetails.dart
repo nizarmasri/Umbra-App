@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetails extends StatefulWidget {
   final String title;
@@ -51,14 +54,42 @@ class _EventDetailsState extends State<EventDetails> {
   double dateTextSize = 20;
   double timeTextSize = 22.5;
 
+  GeoPoint testLoc = GeoPoint(33.9008, 35.4807);
+  LatLng markerPos;
+  Marker marker;
+  List<Marker> setMarker = [];
+
+  void setMarkerPos() {
+    markerPos = LatLng(testLoc.latitude, testLoc.longitude);
+    marker =
+        Marker(markerId: MarkerId(markerPos.toString()), position: markerPos);
+    setMarker = [];
+    setMarker.add(marker);
+  }
+
+  static Future<void> openMaps (double lat, double lng) async {
+    String mapsUrl = "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
+    if (await canLaunch(mapsUrl)) {
+      await launch(mapsUrl);
+    } else {
+      throw 'Could not open maps.';
+    }
+}
+
+  @override
+  void initState() {
+    setMarkerPos();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    double detailsHeight = height * 0.5;
     double infoSquaresSize = height * 0.114;
     double infoRectsHeight = height * 0.114;
     double infoRectsWidth = height * 0.171;
+    double mapHeight = height * 0.2;
 
     return Scaffold(
       appBar: AppBar(
@@ -70,7 +101,7 @@ class _EventDetailsState extends State<EventDetails> {
           children: [
             // Details
             Container(
-              padding: EdgeInsets.only(bottom: 10, top: 10),
+              padding: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                   color: Colors.white12,
                   borderRadius: BorderRadius.only(
@@ -255,8 +286,41 @@ class _EventDetailsState extends State<EventDetails> {
                 ],
               ),
             ),
-            // Images
-            Container()
+            // Location
+            Container(
+              child: Column(
+                children: [
+                  // Location Text
+                  Container(
+                    margin: EdgeInsets.all(20),
+                    width: width,
+                    child: Text(
+                      "Location",
+                      style: TextStyle(
+                          fontFamily: globals.montserrat,
+                          fontSize: titleTextSize,
+                          color: Colors.white),
+                    ),
+                  ),
+                  // Map
+                  Container(
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    height: mapHeight,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: GoogleMap(
+                        zoomControlsEnabled: false,
+                        zoomGesturesEnabled: false,
+                        markers: Set.from(setMarker),
+                        initialCameraPosition: CameraPosition(
+                            target: LatLng(testLoc.latitude, testLoc.longitude),
+                            zoom: 15.3),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
           ],
         )),
       ),
