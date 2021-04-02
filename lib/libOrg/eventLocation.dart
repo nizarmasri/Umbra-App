@@ -20,8 +20,10 @@ class _EventLocationState extends State<EventLocation> {
   final placesService = PlaceService();
   List<Marker> location = [];
 
+  String locationName = "";
   _updateLocation(LatLng chosenLoc) {
     setState(() {
+      locationName = "";
       location = [];
       location.add(Marker(
           markerId: MarkerId(chosenLoc.toString()),
@@ -75,8 +77,7 @@ class _EventLocationState extends State<EventLocation> {
         fontFamily: globals.montserrat,
         fontWeight: globals.fontWeight,
         color: Colors.white,
-        fontSize: 15
-    ),
+        fontSize: 15),
     duration: Duration(seconds: 3),
   );
 
@@ -101,12 +102,14 @@ class _EventLocationState extends State<EventLocation> {
                 color: Colors.white),
           ),
           leading: GestureDetector(
-              child: Icon(Icons.check, color: Colors.green,),
+            child: Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
             onTap: () {
-              Navigator.pop(context, location);
+              Navigator.pop(context, [location, locationName]);
             },
           ),
-
         ),
       ),
       body: (applicationBloc.currentLocation == null)
@@ -211,9 +214,14 @@ class _EventLocationState extends State<EventLocation> {
                                   Place ll = await placesService.getPlace(
                                       applicationBloc
                                           .searchResults[index].placeId);
+                                  _goToPlace(ll);
                                   _updateLocation(LatLng(
                                       ll.geometry.location.lat,
                                       ll.geometry.location.lng));
+                                  setState(() {
+                                    locationName = ll.name;
+                                  });
+                                  print(locationName);
                                 },
                               );
                             },

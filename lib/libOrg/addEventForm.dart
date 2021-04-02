@@ -26,6 +26,7 @@ class _AddEventFormState extends State<AddEventForm> {
   final TextEditingController feeController = TextEditingController();
 
   List<Marker> location;
+  String locationName;
 
   String _age;
   String _type;
@@ -36,8 +37,10 @@ class _AddEventFormState extends State<AddEventForm> {
     final chosenLocation = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => EventLocation()));
     setState(() {
-      location = chosenLocation;
+      location = chosenLocation[0];
+      locationName = chosenLocation[1];
       if (location != null) print(location[0].position);
+      print(locationName.split(",")[0]);
     });
   }
 
@@ -88,6 +91,7 @@ class _AddEventFormState extends State<AddEventForm> {
             //   'poster': uid,
             //  'location': GeoPoint(
             //      location[0].position.latitude, location[0].position.longitude),
+            // 'locationName' : locationName
           }).then((value) async {
             final id = value.id;
             images.asMap().forEach((index, value) async {
