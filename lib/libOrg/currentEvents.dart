@@ -10,15 +10,26 @@ class CurrentEventsPage extends StatefulWidget {
 }
 
 class _CurrentEventsPageState extends State<CurrentEventsPage> {
-
   navigateToAddEventForm() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => AddEventForm()));
   }
 
-  navigateToEventDetailsPage() {
+  navigateToEventDetailsPage(String title, String description, String age,
+      String type, String fee, String date, String time, String location) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => EventDetails()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventDetails(
+                  title: title,
+                  description: description,
+                  age: age,
+                  type: type,
+                  fee: fee,
+                  date: date,
+                  time: time,
+                  location: location,
+                )));
   }
 
   List<EventItem> eventItems = [];
@@ -29,6 +40,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         "Special night at Bodo pub today! Happy hour from 9 till 12 am with guest artists. Hope to see you there!",
     age: "18 +",
     type: "Pub",
+    fee: "-",
     date: "April 14",
     time: "8:00 PM",
     location: "Mar Mikhael",
@@ -40,6 +52,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         "Techno night at BO18!! Open drinks until 10 pm and special performance by DJ Dawg!",
     age: "21 +",
     type: "Club",
+    fee: "100k",
     date: "April 17",
     time: "9:00 PM",
     location: "Manara",
@@ -47,9 +60,11 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
   EventItem event3 = EventItem(
     title: "Party at Sayegh's",
-    description: "Crazy house party at the Sayegh villa, everyone is welcome",
+    description: "Crazy house party at the Sayegh villa, open drinks all night! "
+        "There's also a swimming pool and we'll be playing RNB and techno. Everyone is welcome!",
     age: "21 +",
     type: "House Party",
+    fee: "50k",
     date: "April 23",
     time: "10:00 PM",
     location: "Rabieh",
@@ -89,7 +104,18 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     child: eventItems[index],
-                    onTap: () {},
+                    onTap: () {
+                      navigateToEventDetailsPage(
+                          eventItems[index].title,
+                          eventItems[index].description,
+                          eventItems[index].age,
+                          eventItems[index].type,
+                          eventItems[index].fee,
+                          eventItems[index].date,
+                          eventItems[index].time,
+                          eventItems[index].location
+                      );
+                    },
                   );
                 },
               ),

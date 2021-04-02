@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:getwidget/components/image/gf_image_overlay.dart';
-import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 
 class EventItem extends StatefulWidget {
   final String title;
@@ -27,7 +26,7 @@ class EventItem extends StatefulWidget {
 
   @override
   _EventItemState createState() => _EventItemState(
-      title, description, type, fee, age, date, title, location);
+      title, description, type, fee, age, date, time, location);
 }
 
 class _EventItemState extends State<EventItem> {
@@ -58,6 +57,7 @@ class _EventItemState extends State<EventItem> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Image
           Container(
             height: imageHeight,
             width: imageWidth,
@@ -73,6 +73,7 @@ class _EventItemState extends State<EventItem> {
                   'https://i.pinimg.com/originals/7c/cb/01/7ccb010d8fddc4bcd84587ef3c34d100.jpg'),
             ),
           ),
+          // Info List Tile
           Container(
             height: tileHeight,
             width: tileWidth,
