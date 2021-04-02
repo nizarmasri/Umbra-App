@@ -60,7 +60,8 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
   EventItem event3 = EventItem(
     title: "Party at Sayegh's",
-    description: "Crazy house party at the Sayegh villa, open drinks all night! "
+    description:
+        "Crazy house party at the Sayegh villa, open drinks all night! "
         "There's also a swimming pool and we'll be playing RNB and techno. Everyone is welcome!",
     age: "21 +",
     type: "House Party",
@@ -82,46 +83,47 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Container(
-            child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(left: 15, top: 15),
-              margin: EdgeInsets.only(bottom: 10),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Current Events",
-                style: TextStyle(
-                    fontFamily: globals.montserrat,
-                    fontSize: 30,
-                    color: Colors.white),
+        child: SingleChildScrollView(
+          child: Container(
+              child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.only(left: 15, top: 15),
+                margin: EdgeInsets.only(bottom: 10),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Current Events",
+                  style: TextStyle(
+                      fontFamily: globals.montserrat,
+                      fontSize: 30,
+                      color: Colors.white),
+                ),
               ),
-            ),
-            Container(
-              height: listHeight,
-              child: ListView.builder(
-                itemCount: eventItems.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    child: eventItems[index],
-                    onTap: () {
-                      navigateToEventDetailsPage(
-                          eventItems[index].title,
-                          eventItems[index].description,
-                          eventItems[index].age,
-                          eventItems[index].type,
-                          eventItems[index].fee,
-                          eventItems[index].date,
-                          eventItems[index].time,
-                          eventItems[index].location
-                      );
-                    },
-                  );
-                },
-              ),
-            )
-          ],
-        )),
+              Container(
+                height: listHeight,
+                child: ListView.builder(
+                  itemCount: eventItems.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      child: eventItems[index],
+                      onTap: () {
+                        navigateToEventDetailsPage(
+                            eventItems[index].title,
+                            eventItems[index].description,
+                            eventItems[index].age,
+                            eventItems[index].type,
+                            eventItems[index].fee,
+                            eventItems[index].date,
+                            eventItems[index].time,
+                            eventItems[index].location);
+                      },
+                    );
+                  },
+                ),
+              )
+            ],
+          )),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
