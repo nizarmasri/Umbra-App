@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 
 class AddEventForm extends StatefulWidget {
   @override
@@ -18,6 +19,7 @@ class AddEventForm extends StatefulWidget {
 }
 
 class _AddEventFormState extends State<AddEventForm> {
+  final geo = Geoflutterfire();
   double inputSize = 17;
   double feeText = 14.5;
   String uid = FirebaseAuth.instance.currentUser.uid;
@@ -84,16 +86,18 @@ class _AddEventFormState extends State<AddEventForm> {
             loading = true;
           });
           FirebaseFirestore fb = FirebaseFirestore.instance;
+          GeoFirePoint myLocation = geo.point(
+              latitude: location[0].position.latitude,
+              longitude: location[0].position.longitude);
 
           await fb.collection('events').add({
             'title': titleController.text,
-            'description': descController.text,
+            /* 'description': descController.text,
             'age': _age,
             'date': selectedDate,
             'time': selectedTime.toString().substring(10, 15),
-            'poster': uid,
-            'location': GeoPoint(
-                location[0].position.latitude, location[0].position.longitude),
+            'poster': uid,*/
+            'location': myLocation.data,
             'locationName': locationName
           }).then((value) async {
             final id = value.id;
