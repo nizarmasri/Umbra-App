@@ -69,7 +69,10 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
-  String urls;
+  List<String> urls = [];
+/*  addToArray(String url) {
+    urls.add(url);
+  }*/
 
   Container button({String uid}) {
     return Container(
@@ -84,30 +87,34 @@ class _AddEventFormState extends State<AddEventForm> {
 
           await fb.collection('events').add({
             'title': titleController.text,
-            //   'description': descController.text,
-            //   'age': _age,
-            //   'date': selectedDate,
-            //   'time': selectedTime.toString().substring(10, 15),
-            //   'poster': uid,
-            //  'location': GeoPoint(
-            //      location[0].position.latitude, location[0].position.longitude),
-            // 'locationName' : locationName
+            'description': descController.text,
+            'age': _age,
+            'date': selectedDate,
+            'time': selectedTime.toString().substring(10, 15),
+            'poster': uid,
+            'location': GeoPoint(
+                location[0].position.latitude, location[0].position.longitude),
+            'locationName': locationName
           }).then((value) async {
             final id = value.id;
-            images.asMap().forEach((index, value) async {
+            for (var entry in images.asMap().entries) {
+              int entryIndex = entry.key;
               final firebaseStorageRef =
-                  FirebaseStorage.instance.ref().child('$id/$index');
-              final upload = firebaseStorageRef
-                  .putData((await value.getByteData()).buffer.asUint8List())
+                  FirebaseStorage.instance.ref().child('$id/$entryIndex');
+              final upload = await firebaseStorageRef
+                  .putData((await entry.value.getByteData(quality: 50))
+                      .buffer
+                      .asUint8List())
                   .then((value) async {
-                String url = await firebaseStorageRef.getDownloadURL();
-                print(url);
-                await fb.collection('events').doc(id).update({
-                  'urls': FieldValue.arrayUnion([url]),
-                });
+                urls.add(await firebaseStorageRef.getDownloadURL());
               });
+            }
+            print(urls);
+            return {"urls": urls, "id": id};
+          }).then((value) async {
+            await fb.collection('events').doc(value["id"]).update({
+              'urls': FieldValue.arrayUnion(value["urls"]),
             });
-          }).then((value) {
             Navigator.pop(context);
           });
         },
