@@ -245,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                                 ads.add(
                                   Container(
                                       decoration: BoxDecoration(
-                                          color: Colors.red,
+                                          color: Colors.white10,
                                           image: DecorationImage(
                                               image: NetworkImage(
                                                   snapshot.data[i]["urls"][0]),
@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                                         alignment: Alignment.bottomCenter,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: Colors.white30,
+                                            color: Colors.black38,
                                           ),
                                           padding: EdgeInsets.all(7),
                                           child: Row(
@@ -277,10 +277,36 @@ class _HomePageState extends State<HomePage> {
                                 );
                               } else {
                                 ads.add(Container(
-                                  color: Colors.red,
-                                  child: Center(
-                                      child: Text(snapshot.data[i]["title"])),
-                                ));
+                                    decoration: BoxDecoration(
+                                        color: Colors.white10,
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'),
+                                            fit: BoxFit.fill)),
+                                    child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black38,
+                                        ),
+                                        padding: EdgeInsets.all(7),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              snapshot.data[i]["title"] +
+                                                  "\n" +
+                                                  snapshot.data[i]
+                                                  ["locationName"],
+                                              style: TextStyle(
+                                                fontFamily:
+                                                globals.montserrat,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )));
                               }
                             }
                             print(snapshot.data);
