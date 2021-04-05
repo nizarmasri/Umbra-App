@@ -16,6 +16,8 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
     super.initState();
   }
 
+  double inputSize = 17;
+
   bool loading = false;
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "## ### ###", filter: {"#": RegExp(r'[0-9]')});
@@ -108,6 +110,12 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
 
   @override
   Widget build(BuildContext context) {
+
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double textFieldWidth = width * 0.9;
+    double titleFieldHeight = height * 0.1;
+
     String uid = FirebaseAuth.instance.currentUser.uid;
     return !loading
         ? FutureBuilder<DocumentSnapshot>(
@@ -124,6 +132,9 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                 appBar: AppBar(
                   title: Text(
                     "Account Information",
+                    style: TextStyle(
+                      fontFamily: globals.montserrat
+                    ),
                   ),
                   backgroundColor: Colors.black,
                 ),
@@ -137,6 +148,74 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                                 .data()["name"][0]
                                 .toString()
                                 .toUpperCase()),
+                        Container(
+                          height: titleFieldHeight,
+                          width: textFieldWidth,
+                          decoration: BoxDecoration(
+                              color: Colors.white12,
+                              borderRadius: BorderRadius.circular(10)),
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: Center(
+                            child: ListTile(
+                              leading: Icon(Icons.person, color: Colors.white,),
+                              title: TextField(
+                                controller: _namecontroller,
+                                cursorColor: Colors.white,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                                decoration: InputDecoration(
+                                    hintText: "Full Name",
+                                    hintStyle: TextStyle(
+                                        color: Colors.white38,
+                                        fontSize: inputSize,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                    border: InputBorder.none,
+                                    focusColor: Colors.black,
+                                    fillColor: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: titleFieldHeight,
+                          width: textFieldWidth,
+                          decoration: BoxDecoration(
+                              color: Colors.white12,
+                              borderRadius: BorderRadius.circular(10)),
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: Center(
+                            child: ListTile(
+                              leading: Icon(Icons.phone, color: Colors.white,),
+                              title: TextField(
+                                inputFormatters: [
+                                  maskTextInputFormatter,
+                                ],
+                                controller: _numbercontroller,
+                                cursorColor: Colors.white,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                                decoration: InputDecoration(
+                                    hintText: "Phone Number",
+                                    hintStyle: TextStyle(
+                                        color: Colors.white38,
+                                        fontSize: inputSize,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                    border: InputBorder.none,
+                                    focusColor: Colors.black,
+                                    fillColor: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ),
+                        /*
                         newInput(
                             hint: "Name",
                             icon: Icons.person,
@@ -150,6 +229,9 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                             controller: _numbercontroller,
                             type: TextInputType.phone,
                             mask: maskTextInputFormatter),
+                            */
+
+
                         button(uid: uid),
                       ],
                     ),

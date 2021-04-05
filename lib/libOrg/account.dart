@@ -136,6 +136,7 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
               child: ListView(children: [
                 SafeArea(
                   child: Container(
+                    margin: EdgeInsets.all(20),
                     decoration: BoxDecoration(),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
@@ -146,10 +147,17 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
                         Container(
                           child: Column(
                             children: [
-                              Setting(
-                                  title: "Account Information",
-                                  icon: Icons.account_circle_rounded,
-                                  page: navigateToAccountInfoOrg)
+                              Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Setting(
+                                    color: Colors.white12,
+                                      title: "Account Information",
+                                      icon: Icons.account_circle_rounded,
+                                      page: navigateToAccountInfoOrg),
+                                ),
+                              )
                             ],
                           ),
                         )
