@@ -201,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "For You",
+                          "Near You",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                               fontFamily: globals.montserrat,
@@ -252,7 +252,7 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                             color: Colors.black38,
                                           ),
-                                          padding: EdgeInsets.all(7),
+                                          padding: EdgeInsets.all(foryouCarouselHeight/16),
                                           child: Row(
                                             children: [
                                               Text(
@@ -285,7 +285,7 @@ class _HomePageState extends State<HomePage> {
                                         decoration: BoxDecoration(
                                           color: Colors.black38,
                                         ),
-                                        padding: EdgeInsets.all(7),
+                                        padding: EdgeInsets.all(foryouCarouselHeight/16),
                                         child: Row(
                                           children: [
                                             Text(
@@ -335,7 +335,7 @@ class _HomePageState extends State<HomePage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Near You",
+                          "For You",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                               fontFamily: globals.montserrat,
