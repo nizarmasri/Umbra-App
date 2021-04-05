@@ -114,7 +114,6 @@ class _AddEventFormState extends State<AddEventForm> {
                 urls.add(await firebaseStorageRef.getDownloadURL());
               });
             }
-            print(urls);
             return {"urls": urls, "id": id};
           }).then((value) async {
             await fb.collection('events').doc(value["id"]).update({

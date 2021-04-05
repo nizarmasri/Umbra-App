@@ -6,7 +6,6 @@ import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_loader/awesome_loader.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:intl/intl.dart';
 
 class CurrentEventsPage extends StatefulWidget {
@@ -17,7 +16,7 @@ class CurrentEventsPage extends StatefulWidget {
 class _CurrentEventsPageState extends State<CurrentEventsPage> {
   navigateToAddEventForm() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddEventForm())).then((value) => getEvents());
+        context, MaterialPageRoute(builder: (context) => AddEventForm())).then((value) => setState(() {}));
   }
 
   navigateToEventDetailsPage(
@@ -52,7 +51,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
   String uid = FirebaseAuth.instance.currentUser.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
-
+  DateTime dateChecker;
   Future<List<QueryDocumentSnapshot>> getEvents() async {
     List<QueryDocumentSnapshot> events = [];
     await fb
@@ -61,7 +60,10 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         .get()
         .then((value) {
       value.docs.forEach((event) {
-        events.add(event);
+        dateChecker = event.data()['date'].toDate();
+        print(dateChecker.toString());
+        if(dateChecker.isAfter(DateTime.now()))
+          events.add(event);
       });
     });
     return events;
@@ -71,6 +73,8 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double listHeight = height * 0.8;
+
+    eventItems = [];
 
     return FutureBuilder(
         future: getEvents(),
@@ -112,7 +116,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                             margin: EdgeInsets.only(bottom: 10),
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              "Current Events",
+                              "On-Going Events",
                               style: TextStyle(
                                   fontFamily: globals.montserrat,
                                   fontSize: 30,
