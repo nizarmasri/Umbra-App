@@ -225,10 +225,6 @@ class _HomePageState extends State<HomePage> {
                                 field: "location"),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return globals.spinner;
-                          }
                           if (snapshot.data == null) {
                             return Text("No events near you");
                           } else {
