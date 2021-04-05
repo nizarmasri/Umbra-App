@@ -170,30 +170,58 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),*/
                     // Featured carousel
-                    Container(
-                      child: GFCarousel(
-                        height: featureCarouselHeight,
-                        enableInfiniteScroll: true,
-                        viewportFraction: 1.0,
-                        activeIndicator: Colors.white,
-                        pagination: true,
-                        items: containers.map(
-                          (con) {
-                            return Container(
-                              margin: EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
-                                  child: con),
-                            );
-                          },
-                        ).toList(),
-                        onPageChanged: (index) {
-                          setState(() {
-                            index;
-                          });
-                        },
-                      ),
+                    FutureBuilder<QuerySnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection("events")
+                          .limit(4)
+                          .get(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.data == null) {
+                          return Container();
+                        } else {
+                          print(snapshot.data.docs);
+
+                          return Container(
+                            child: GFCarousel(
+                              height: featureCarouselHeight,
+                              enableInfiniteScroll: true,
+                              viewportFraction: 1.0,
+                              activeIndicator: Colors.white,
+                              pagination: true,
+                              items: snapshot.data.docs.map(
+                                (con) {
+                                  return Container(
+                                    margin: EdgeInsets.all(8.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0)),
+                                      child: Stack(children: [
+                                        Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white10,
+                                                image: DecorationImage(
+                                                    image: NetworkImage(
+                                                      !con["urls"].isEmpty
+                                                          ? con["urls"][0]
+                                                          : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
+                                                    ),
+                                                    fit: BoxFit.fill)),
+                                            child: Container()),
+                                      ]),
+                                    ),
+                                  );
+                                },
+                              ).toList(),
+                              onPageChanged: (index) {
+                                setState(() {
+                                  index;
+                                });
+                              },
+                            ),
+                          );
+                        }
+                      },
                     ),
                     // For you text
                     Container(
@@ -252,7 +280,8 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                             color: Colors.black38,
                                           ),
-                                          padding: EdgeInsets.all(foryouCarouselHeight/16),
+                                          padding: EdgeInsets.all(
+                                              foryouCarouselHeight / 16),
                                           child: Row(
                                             children: [
                                               Text(
@@ -285,17 +314,17 @@ class _HomePageState extends State<HomePage> {
                                         decoration: BoxDecoration(
                                           color: Colors.black38,
                                         ),
-                                        padding: EdgeInsets.all(foryouCarouselHeight/16),
+                                        padding: EdgeInsets.all(
+                                            foryouCarouselHeight / 16),
                                         child: Row(
                                           children: [
                                             Text(
                                               snapshot.data[i]["title"] +
                                                   "\n" +
                                                   snapshot.data[i]
-                                                  ["locationName"],
+                                                      ["locationName"],
                                               style: TextStyle(
-                                                fontFamily:
-                                                globals.montserrat,
+                                                fontFamily: globals.montserrat,
                                                 color: Colors.white,
                                               ),
                                             ),
