@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:getwidget/components/image/gf_image_overlay.dart';
 
 class EventItem extends StatefulWidget {
   final String title;
@@ -11,6 +11,8 @@ class EventItem extends StatefulWidget {
   final String date;
   final String time;
   final String location;
+  final GeoPoint locationPoint;
+  final List<dynamic> urls;
 
   EventItem(
       {Key key,
@@ -21,12 +23,14 @@ class EventItem extends StatefulWidget {
       this.age,
       this.date,
       this.time,
-      this.location})
+      this.location,
+      this.locationPoint,
+      this.urls})
       : super(key: key);
 
   @override
-  _EventItemState createState() => _EventItemState(
-      title, description, type, fee, age, date, time, location);
+  _EventItemState createState() => _EventItemState(title, description, type,
+      fee, age, date, time, location, locationPoint, urls);
 }
 
 class _EventItemState extends State<EventItem> {
@@ -38,9 +42,11 @@ class _EventItemState extends State<EventItem> {
   final String date;
   final String time;
   final String location;
+  final GeoPoint locationPoint;
+  final List<dynamic> urls;
 
   _EventItemState(this.title, this.description, this.type, this.fee, this.age,
-      this.date, this.time, this.location);
+      this.date, this.time, this.location, this.locationPoint, this.urls);
 
   @override
   Widget build(BuildContext context) {
@@ -59,20 +65,33 @@ class _EventItemState extends State<EventItem> {
         children: [
           // Image
           Container(
-            height: imageHeight,
-            width: imageWidth,
-            child: GFImageOverlay(
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  topLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(0),
-                  topRight: Radius.circular(0)),
               height: imageHeight,
               width: imageWidth,
-              image: NetworkImage(
-                  'https://i.pinimg.com/originals/7c/cb/01/7ccb010d8fddc4bcd84587ef3c34d100.jpg'),
-            ),
-          ),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      topLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(0),
+                      topRight: Radius.circular(0)),
+                child: Image.network(
+                    (urls != null && urls.length != 0)
+                        ? urls[0]
+                        : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
+                    filterQuality: FilterQuality.low,
+                    fit: BoxFit.cover, loadingBuilder: (BuildContext context,
+                        Widget child, ImageChunkEvent loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.white12,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes
+                          : null,
+                    ),
+                  );
+                }),
+              )),
           // Info List Tile
           Container(
             height: tileHeight,

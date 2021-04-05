@@ -1,16 +1,11 @@
-import 'package:events/libOrg/blocs/application_bloc.dart';
 import 'package:events/libOrg/eventLocation.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:progress_button/progress_button.dart';
-import 'package:provider/provider.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 
 class AddEventForm extends StatefulWidget {
@@ -92,15 +87,21 @@ class _AddEventFormState extends State<AddEventForm> {
 
           await fb.collection('events').add({
             'title': titleController.text,
-            /* 'description': descController.text,
+            'description': descController.text,
             'age': _age,
+            'type': _type,
             'date': selectedDate,
             'time': selectedTime.toString().substring(10, 15),
-            'poster': uid,*/
+            'poster': uid,
             'location': myLocation.data,
-            'locationName': locationName
+            'locationName': locationName,
+            'fee': feeController.text
           }).then((value) async {
             final id = value.id;
+            List<String> ids = [id];
+            await fb.collection('users').doc(uid).update({
+              'events':FieldValue.arrayUnion(ids)
+            });
             for (var entry in images.asMap().entries) {
               int entryIndex = entry.key;
               final firebaseStorageRef =

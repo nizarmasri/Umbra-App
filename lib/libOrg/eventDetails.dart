@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
+import 'package:getwidget/components/carousel/gf_carousel.dart';
+import 'package:getwidget/components/image/gf_image_overlay.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,6 +16,8 @@ class EventDetails extends StatefulWidget {
   final String date;
   final String time;
   final String location;
+  final GeoPoint locationPoint;
+  final List<dynamic> urls;
 
   EventDetails(
       {Key key,
@@ -24,12 +28,14 @@ class EventDetails extends StatefulWidget {
       this.age,
       this.date,
       this.time,
-      this.location})
+      this.location,
+      this.locationPoint,
+      this.urls})
       : super(key: key);
 
   @override
-  _EventDetailsState createState() => _EventDetailsState(
-      title, description, type, fee, age, date, time, location);
+  _EventDetailsState createState() => _EventDetailsState(title, description,
+      type, fee, age, date, time, location, locationPoint, urls);
 }
 
 class _EventDetailsState extends State<EventDetails> {
@@ -41,9 +47,20 @@ class _EventDetailsState extends State<EventDetails> {
   final String date;
   final String time;
   final String location;
+  final GeoPoint locationPoint;
+  final List<dynamic> urls;
 
-  _EventDetailsState(this.title, this.description, this.type, this.fee,
-      this.age, this.date, this.time, this.location);
+  _EventDetailsState(
+      this.title,
+      this.description,
+      this.type,
+      this.fee,
+      this.age,
+      this.date,
+      this.time,
+      this.location,
+      this.locationPoint,
+      this.urls);
 
   double titleTextSize = 25;
   double descTextSize = 16;
@@ -54,33 +71,35 @@ class _EventDetailsState extends State<EventDetails> {
   double dateTextSize = 20;
   double timeTextSize = 22.5;
 
-  GeoPoint testLoc = GeoPoint(33.9008, 35.4807);
   LatLng markerPos;
   Marker marker;
   List<Marker> setMarker = [];
 
   void setMarkerPos() {
-    markerPos = LatLng(testLoc.latitude, testLoc.longitude);
+    markerPos = LatLng(locationPoint.latitude, locationPoint.longitude);
     marker =
         Marker(markerId: MarkerId(markerPos.toString()), position: markerPos);
     setMarker = [];
     setMarker.add(marker);
   }
 
-  static Future<void> openMaps (double lat, double lng) async {
-    String mapsUrl = "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
+  static Future<void> openMaps(double lat, double lng) async {
+    String mapsUrl =
+        "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
     if (await canLaunch(mapsUrl)) {
       await launch(mapsUrl);
     } else {
       throw 'Could not open maps.';
     }
-}
+  }
 
   @override
   void initState() {
     setMarkerPos();
     super.initState();
   }
+
+  List<Container> images = [];
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +109,36 @@ class _EventDetailsState extends State<EventDetails> {
     double infoRectsHeight = height * 0.114;
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
+    double imagesHeight = height * 0.3;
+
+    String feeCheck = "";
+    if (fee == "")
+      feeCheck = "-";
+    else
+      feeCheck = fee;
+
+    urls.forEach((url) {
+      images.add(Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10)
+        ),
+          child: Image.network(
+              url,
+              filterQuality: FilterQuality.low,
+              fit: BoxFit.cover,
+              loadingBuilder: (BuildContext context,
+              Widget child, ImageChunkEvent loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes
+                : null,
+          ),
+        );
+      })));
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -205,7 +254,7 @@ class _EventDetailsState extends State<EventDetails> {
                                   textAlign: TextAlign.center,
                                   text: TextSpan(children: <TextSpan>[
                                     TextSpan(
-                                      text: fee,
+                                      text: feeCheck,
                                       style: TextStyle(
                                           fontFamily: globals.montserrat,
                                           fontWeight: globals.fontWeight,
@@ -313,14 +362,40 @@ class _EventDetailsState extends State<EventDetails> {
                         zoomGesturesEnabled: false,
                         markers: Set.from(setMarker),
                         initialCameraPosition: CameraPosition(
-                            target: LatLng(testLoc.latitude, testLoc.longitude),
+                            target: LatLng(locationPoint.latitude,
+                                locationPoint.longitude),
                             zoom: 15.3),
                       ),
                     ),
                   )
                 ],
               ),
-            )
+            ),
+            // Images
+            if (urls != null && urls.length != 0)
+              Container(
+                width: width,
+                margin: EdgeInsets.only(top: 20, bottom: 10),
+                child: GFCarousel(
+                  height: imagesHeight,
+                  enableInfiniteScroll: true,
+                  viewportFraction: 0.8,
+                  activeIndicator: Colors.white,
+                  //aspectRatio: 1,
+                  items: images.map(
+                    (con) {
+                      return Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                            child: con),
+                      );
+                    },
+                  ).toList(),
+                  onPageChanged: (index) {},
+                ),
+              )
           ],
         )),
       ),
