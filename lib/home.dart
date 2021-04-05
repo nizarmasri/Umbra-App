@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double featureCarouselHeight = height * 0.5;
-    double foryouCarouselHeight = height * 0.3;
+    double foryouCarouselHeight = height * 0.35;
     double nearyouCarouselHeight = height * 0.33;
     double nearyouItemHeight = height * 0.14;
     double infoHeight = height * 0.25;
@@ -252,17 +252,23 @@ class _HomePageState extends State<HomePage> {
                                               fit: BoxFit.fill)),
                                       child: Align(
                                         alignment: Alignment.bottomCenter,
-                                        child: Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white30,
+                                          ),
+                                          padding: EdgeInsets.all(7),
                                           child: Row(
                                             children: [
                                               Text(
-                                                snapshot.data[i]["title"],
+                                                snapshot.data[i]["title"] +
+                                                    "\n" +
+                                                    snapshot.data[i]
+                                                        ["locationName"],
                                                 style: TextStyle(
-                                                    fontFamily:
-                                                        globals.montserrat,
-                                                    color: Colors.white,
-                                                    backgroundColor:
-                                                        Colors.black),
+                                                  fontFamily:
+                                                      globals.montserrat,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -282,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                               child: GFCarousel(
                                 height: foryouCarouselHeight,
                                 enableInfiniteScroll: true,
-                                viewportFraction: 0.7,
+                                viewportFraction: 0.8,
                                 activeIndicator: Colors.white,
                                 aspectRatio: 1,
                                 items: ads.map(
