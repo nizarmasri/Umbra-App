@@ -2,6 +2,7 @@ library events.globals;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:awesome_loader/awesome_loader.dart';
 
 TextStyle style = TextStyle(
     fontSize: 35,
@@ -13,7 +14,9 @@ String montserrat = "Montserrat";
 FontWeight fontWeight = FontWeight.w300;
 
 Size size(BuildContext c) => MediaQuery.of(c).size;
+
 double width(BuildContext c) => size(c).width;
+
 double height(BuildContext c) => size(c).height;
 
 TextStyle infoSectionStyle = TextStyle(
@@ -25,6 +28,12 @@ TextStyle infoSectionStyle = TextStyle(
 bool isOrg = false;
 
 String uid;
+
+/*AwesomeLoader spinner = AwesomeLoader(
+  loaderType: AwesomeLoader.AwesomeLoader2,
+  color: Colors.white,
+);*/
+
 SpinKitFadingCircle spinner = SpinKitFadingCircle(
   color: Colors.white,
   size: 50.0,

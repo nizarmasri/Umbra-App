@@ -61,7 +61,6 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         .then((value) {
       value.docs.forEach((event) {
         dateChecker = event.data()['date'].toDate();
-        print(dateChecker.toString());
         if(dateChecker.isAfter(DateTime.now()))
           events.add(event);
       });

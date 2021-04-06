@@ -1,4 +1,6 @@
+import 'package:awesome_loader/awesome_loader.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:events/libOrg/eventItem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,6 +9,8 @@ import 'globals.dart' as globals;
 import 'package:events/libOrg/services/geolocator_service.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:events/libOrg/eventDetails.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -135,6 +139,34 @@ class _HomePageState extends State<HomePage> {
     _getCurrentLocation();
   }
 
+  navigateToEventDetailsPage(
+      String title,
+      String description,
+      String age,
+      String type,
+      String fee,
+      String date,
+      String time,
+      String location,
+      GeoPoint locationPoint,
+      List<dynamic> urls) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventDetails(
+                  title: title,
+                  description: description,
+                  age: age,
+                  type: type,
+                  fee: fee,
+                  date: date,
+                  time: time,
+                  location: location,
+                  locationPoint: locationPoint,
+                  urls: urls,
+                )));
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -142,7 +174,7 @@ class _HomePageState extends State<HomePage> {
     double featureCarouselHeight = height * 0.5;
     double foryouCarouselHeight = height * 0.35;
     double nearyouCarouselHeight = height * 0.33;
-    double nearyouItemHeight = height * 0.14;
+    double nearyouItemHeight = height * 0.3;
     double infoHeight = height * 0.25;
 
     return _currentPosition != null
@@ -153,22 +185,7 @@ class _HomePageState extends State<HomePage> {
                 child: ListView(
                   children: [
                     // Featured text
-                    /*Container(
-                margin: EdgeInsets.only(top: 18, left: 10),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Featured",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontFamily: globals.montserrat,
-                      //fontWeight: globals.fontWeight,
-                      fontSize: 25,
-                      color: Colors.white
-                    ),
-                  ),
-                ),
-              ),*/
+
                     // Featured carousel
                     FutureBuilder<QuerySnapshot>(
                       future: FirebaseFirestore.instance
@@ -180,8 +197,6 @@ class _HomePageState extends State<HomePage> {
                         if (snapshot.data == null) {
                           return Container();
                         } else {
-                          print(snapshot.data.docs);
-
                           return Container(
                             child: GFCarousel(
                               height: featureCarouselHeight,
@@ -308,33 +323,52 @@ class _HomePageState extends State<HomePage> {
                                             image: NetworkImage(
                                                 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'),
                                             fit: BoxFit.fill)),
-                                    child: Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black38,
-                                        ),
-                                        padding: EdgeInsets.all(
-                                            foryouCarouselHeight / 16),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              snapshot.data[i]["title"] +
-                                                  "\n" +
-                                                  snapshot.data[i]
-                                                      ["locationName"],
-                                              style: TextStyle(
-                                                fontFamily: globals.montserrat,
-                                                color: Colors.white,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        DateTime date =
+                                            snapshot.data[i]['date'].toDate();
+                                        navigateToEventDetailsPage(
+                                          snapshot.data[i]["title"],
+                                          snapshot.data[i]["description"],
+                                          snapshot.data[i]["age"],
+                                          snapshot.data[i]["type"],
+                                          snapshot.data[i]["fee"],
+                                          DateFormat.MMMd().format(date),
+                                          snapshot.data[i]["time"],
+                                          snapshot.data[i]["locationName"],
+                                          snapshot.data[i]["location"]
+                                              ['geopoint'],
+                                          snapshot.data[i]["urls"],
+                                        );
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black38,
+                                          ),
+                                          padding: EdgeInsets.all(
+                                              foryouCarouselHeight / 16),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                snapshot.data[i]["title"] +
+                                                    "\n" +
+                                                    snapshot.data[i]
+                                                        ["locationName"],
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      globals.montserrat,
+                                                  color: Colors.white,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     )));
                               }
                             }
-                            print(snapshot.data);
                             return Container(
                               child: GFCarousel(
                                 height: foryouCarouselHeight,
@@ -360,7 +394,7 @@ class _HomePageState extends State<HomePage> {
                         }),
                     // Near you text
                     Container(
-                      margin: EdgeInsets.only(top: 5, left: 10),
+                      margin: EdgeInsets.only(top: 5, left: 10, bottom: 5),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -375,43 +409,115 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     // Near You carousel
-                    Container(
-                      child: GFCarousel(
-                        height: nearyouCarouselHeight,
-                        enableInfiniteScroll: true,
-                        viewportFraction: 1.0,
-                        activeIndicator: Colors.white,
-                        aspectRatio: 1,
-                        items: tiles.map(
-                          (con) {
-                            return Column(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.all(3.0),
-                                  height: nearyouItemHeight,
-                                  child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5.0)),
-                                      child: con),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.all(3.0),
-                                  height: nearyouItemHeight,
-                                  child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5.0)),
-                                      child: con),
-                                ),
-                              ],
-                            );
-                          },
-                        ).toList(),
-                        onPageChanged: (index) {
-                          setState(() {
-                            index;
-                          });
-                        },
-                      ),
+                    FutureBuilder<QuerySnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection("events")
+                          .limit(4)
+                          .get(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.data == null) {
+                          return Container();
+                        } else {
+                          int max = snapshot.data.docs.length;
+                          int eventTop = -2;
+                          int eventBottom = -1;
+
+                          return Container(
+                            child: GFCarousel(
+                              height: nearyouItemHeight,
+                              enableInfiniteScroll: true,
+                              viewportFraction: 1.0,
+                              activeIndicator: Colors.white,
+                              items: snapshot.data.docs.map(
+                                (con) {
+                                  DateTime date = con["date"].toDate();
+                                  eventTop += 2 ;
+                                  eventBottom += 2 ;
+                                  if(eventTop >= max)
+                                    eventTop = 0;
+                                  if(eventBottom >= max)
+                                    eventBottom = 1;
+
+                                  return Column(
+                                    children: [
+                                      if(eventTop < max)
+                                      GestureDetector(
+                                        onTap: () {
+                                          DateTime date =
+                                          snapshot.data.docs[eventTop]['date'].toDate();
+                                          navigateToEventDetailsPage(
+                                            snapshot.data.docs[eventTop]['title'],
+                                            snapshot.data.docs[eventTop]['description'],
+                                            snapshot.data.docs[eventTop]['age'],
+                                            snapshot.data.docs[eventTop]['type'],
+                                            snapshot.data.docs[eventTop]['fee'],
+                                            snapshot.data.docs[eventTop]['time'],
+                                            DateFormat.MMMd().format(date),
+                                            snapshot.data.docs[eventTop]['locationName'],
+                                            snapshot.data.docs[eventTop]['location']
+                                            ['geopoint'],
+                                            snapshot.data.docs[eventTop]['urls'],
+                                          );
+                                        },
+                                        child: EventItem(
+                                            title: snapshot.data.docs[eventTop]['title'],
+                                            description: snapshot.data.docs[eventTop]['description'],
+                                            age: snapshot.data.docs[eventTop]['age'],
+                                            type: snapshot.data.docs[eventTop]['type'],
+                                            fee: snapshot.data.docs[eventTop]['fee'],
+                                            time: snapshot.data.docs[eventTop]['time'],
+                                            date: DateFormat.MMMd().format(date),
+                                            location: snapshot.data.docs[eventTop]['locationName'],
+                                            locationPoint: snapshot.data.docs[eventTop]['location']
+                                                ['geopoint'],
+                                            urls: snapshot.data.docs[eventTop]['urls']),
+                                      ),
+                                      if(eventBottom < max)
+                                      GestureDetector(
+                                        onTap: () {
+                                          DateTime date =
+                                          snapshot.data.docs[eventBottom]['date'].toDate();
+                                          navigateToEventDetailsPage(
+                                            snapshot.data.docs[eventBottom]['title'],
+                                            snapshot.data.docs[eventBottom]['description'],
+                                            snapshot.data.docs[eventBottom]['age'],
+                                            snapshot.data.docs[eventBottom]['type'],
+                                            snapshot.data.docs[eventBottom]['fee'],
+                                            snapshot.data.docs[eventBottom]['time'],
+                                            DateFormat.MMMd().format(date),
+                                            snapshot.data.docs[eventBottom]['locationName'],
+                                            snapshot.data.docs[eventBottom]['location']
+                                            ['geopoint'],
+                                            snapshot.data.docs[eventBottom]['urls'],
+                                          );
+                                        },
+                                        child: EventItem(
+                                            title: snapshot.data.docs[eventBottom]['title'],
+                                            description: snapshot.data.docs[eventBottom]['description'],
+                                            age: snapshot.data.docs[eventBottom]['age'],
+                                            type: snapshot.data.docs[eventBottom]['type'],
+                                            fee: snapshot.data.docs[eventBottom]['fee'],
+                                            time: snapshot.data.docs[eventBottom]['time'],
+                                            date: DateFormat.MMMd().format(date),
+                                            location: snapshot.data.docs[eventBottom]['locationName'],
+                                            locationPoint: snapshot.data.docs[eventBottom]['location']
+                                                ['geopoint'],
+                                            urls: snapshot.data.docs[eventBottom]['urls']),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ).toList(),
+                              onPageChanged: (index) {
+                                setState(() {
+                                  index;
+                                });
+                              },
+                            ),
+                          );
+                        }
+                      },
                     ),
                     // Divider
                     Container(
