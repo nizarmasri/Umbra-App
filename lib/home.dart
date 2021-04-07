@@ -358,6 +358,7 @@ class _HomePageState extends State<HomePage> {
                                               image: NetworkImage(
                                                   snapshot.data[i]["urls"][0]),
                                               fit: BoxFit.fill)),
+<<<<<<< Updated upstream
                                       child: GestureDetector(
                                         onTap: () {
                                           DateTime date =
@@ -396,6 +397,28 @@ class _HomePageState extends State<HomePage> {
                                                         globals.montserrat,
                                                     color: Colors.white,
                                                   ),
+=======
+                                      child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black38,
+                                          ),
+                                          padding: EdgeInsets.all(
+                                              foryouCarouselHeight / 16),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                snapshot.data[i]["title"] +
+                                                    "\n" +
+                                                    snapshot.data[i]
+                                                            ["locationName"]
+                                                        .split(",")[0],
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      globals.montserrat,
+                                                  color: Colors.white,
+>>>>>>> Stashed changes
                                                 ),
                                               ],
                                             ),
