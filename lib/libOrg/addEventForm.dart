@@ -102,6 +102,9 @@ class _AddEventFormState extends State<AddEventForm> {
             await fb.collection('users').doc(uid).update({
               'events':FieldValue.arrayUnion(ids)
             });
+            await fb.collection('events').doc(id).update({
+              'id':id
+            });
             for (var entry in images.asMap().entries) {
               int entryIndex = entry.key;
               final firebaseStorageRef =

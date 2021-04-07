@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:getwidget/components/carousel/gf_carousel.dart';
-import 'package:getwidget/components/image/gf_image_overlay.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,6 +18,7 @@ class EventDetails extends StatefulWidget {
   final String location;
   final GeoPoint locationPoint;
   final List<dynamic> urls;
+  final String id;
 
   EventDetails(
       {Key key,
@@ -30,12 +31,13 @@ class EventDetails extends StatefulWidget {
       this.time,
       this.location,
       this.locationPoint,
-      this.urls})
+      this.urls,
+      this.id})
       : super(key: key);
 
   @override
   _EventDetailsState createState() => _EventDetailsState(title, description,
-      type, fee, age, date, time, location, locationPoint, urls);
+      type, fee, age, date, time, location, locationPoint, urls, id);
 }
 
 class _EventDetailsState extends State<EventDetails> {
@@ -49,6 +51,7 @@ class _EventDetailsState extends State<EventDetails> {
   final String location;
   final GeoPoint locationPoint;
   final List<dynamic> urls;
+  final String id;
 
   _EventDetailsState(
       this.title,
@@ -60,7 +63,8 @@ class _EventDetailsState extends State<EventDetails> {
       this.time,
       this.location,
       this.locationPoint,
-      this.urls);
+      this.urls,
+      this.id);
 
   double titleTextSize = 25;
   double descTextSize = 16;
@@ -93,13 +97,59 @@ class _EventDetailsState extends State<EventDetails> {
     }
   }
 
+  List<Container> images = [];
+
+  String uid = FirebaseAuth.instance.currentUser.uid;
+  FirebaseFirestore fb = FirebaseFirestore.instance;
+
+  bool isOrg = false;
+
+  Future<bool> checkIsOrg() async {
+    await fb.collection("users").doc(uid).get().then((value) {
+      if (value.data()["organizer"] == false)
+        setState(() {
+          isOrg = false;
+        });
+    });
+    return isOrg;
+  }
+
+  Future<void> checkIsAttendOrBooked() async {
+    await fb.collection("users").doc(uid).get().then((value) {
+      if (value.data()['attending'].contains(id)) isAttend = true;
+      if (value.data()['booked'].contains(id)) isBooked = true;
+    });
+  }
+
+  Icon notAttendIcon = Icon(
+    Icons.add_circle_outline_rounded,
+    color: Colors.green,
+  );
+  Icon isAttendIcon = Icon(
+    Icons.add_circle_rounded,
+    color: Colors.green,
+  );
+  bool isAttend = false;
+
+  Icon notBookedIcon = Icon(
+    Icons.bookmark_border,
+    color: Colors.blue,
+  );
+
+  Icon isBookedIcon = Icon(
+    Icons.bookmark,
+    color: Colors.blue,
+  );
+
+  bool isBooked = false;
+
   @override
   void initState() {
     setMarkerPos();
+    checkIsOrg();
+    checkIsAttendOrBooked();
     super.initState();
   }
-
-  List<Container> images = [];
 
   @override
   Widget build(BuildContext context) {
@@ -119,25 +169,21 @@ class _EventDetailsState extends State<EventDetails> {
 
     urls.forEach((url) {
       images.add(Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10)
-        ),
-          child: Image.network(
-              url,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+          child: Image.network(url,
               filterQuality: FilterQuality.low,
-              fit: BoxFit.cover,
-              loadingBuilder: (BuildContext context,
-              Widget child, ImageChunkEvent loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Center(
-          child: CircularProgressIndicator(
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes
-                : null,
-          ),
-        );
-      })));
+              fit: BoxFit.cover, loadingBuilder: (BuildContext context,
+                  Widget child, ImageChunkEvent loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes
+                    : null,
+              ),
+            );
+          })));
     });
 
     return Scaffold(
@@ -172,6 +218,90 @@ class _EventDetailsState extends State<EventDetails> {
                           color: Colors.white),
                     ),
                   ),
+                  if (!isOrg)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isAttend = !isAttend;
+                              List<String> ids = [id];
+                              if (isAttend)
+                                fb.collection("users").doc(uid).update(
+                                    {'attending': FieldValue.arrayUnion(ids)});
+                              else
+                                fb.collection("users").doc(uid).update(
+                                    {'attending': FieldValue.arrayRemove(ids)});
+                            });
+                          },
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              margin: EdgeInsets.only(bottom: 20, right: 10),
+                              height: infoSquaresSize / 2,
+                              width: infoSquaresSize * 1.5,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white12,
+                              ),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text((isAttend) ? "Attending" : "Attend",
+                                        style: TextStyle(
+                                            fontFamily: globals.montserrat,
+                                            fontSize: 15,
+                                            color: Colors.green)),
+                                    (isAttend) ? isAttendIcon : notAttendIcon
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isBooked = !isBooked;
+                              List<String> ids = [id];
+                              if (isBooked)
+                                fb.collection("users").doc(uid).update(
+                                    {'booked': FieldValue.arrayUnion(ids)});
+                              else
+                                fb.collection("users").doc(uid).update(
+                                    {'booked': FieldValue.arrayRemove(ids)});
+                            });
+                          },
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              margin: EdgeInsets.only(bottom: 20, left: 10),
+                              height: infoSquaresSize / 2,
+                              width: infoSquaresSize * 1.5,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white12,
+                              ),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text((isBooked) ? "Bookmarked" : "Bookmark",
+                                        style: TextStyle(
+                                            fontFamily: globals.montserrat,
+                                            fontSize: 15,
+                                            color: Colors.blue)),
+                                    (isBooked) ? isBookedIcon : notBookedIcon
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   // Description Text
                   Container(
                     margin: EdgeInsets.only(left: 20, right: 20),

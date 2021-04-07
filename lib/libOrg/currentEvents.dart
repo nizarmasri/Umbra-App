@@ -16,7 +16,8 @@ class CurrentEventsPage extends StatefulWidget {
 class _CurrentEventsPageState extends State<CurrentEventsPage> {
   navigateToAddEventForm() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddEventForm())).then((value) => setState(() {}));
+            context, MaterialPageRoute(builder: (context) => AddEventForm()))
+        .then((value) => setState(() {}));
   }
 
   navigateToEventDetailsPage(
@@ -29,7 +30,8 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
       String time,
       String location,
       GeoPoint locationPoint,
-      List<dynamic> urls) {
+      List<dynamic> urls,
+      String id) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -44,6 +46,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                   location: location,
                   locationPoint: locationPoint,
                   urls: urls,
+                  id: id,
                 )));
   }
 
@@ -52,6 +55,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
   String uid = FirebaseAuth.instance.currentUser.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
   DateTime dateChecker;
+
   Future<List<QueryDocumentSnapshot>> getEvents() async {
     List<QueryDocumentSnapshot> events = [];
     await fb
@@ -61,8 +65,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         .then((value) {
       value.docs.forEach((event) {
         dateChecker = event.data()['date'].toDate();
-        if(dateChecker.isAfter(DateTime.now()))
-          events.add(event);
+        if (dateChecker.isAfter(DateTime.now())) events.add(event);
       });
     });
     return events;
@@ -87,7 +90,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
             );
           }
 
-          if(snapshot.data != null && snapshot.data.length != 0){
+          if (snapshot.data != null && snapshot.data.length != 0) {
             snapshot.data.forEach((event) {
               DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
@@ -109,46 +112,46 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 child: SingleChildScrollView(
                   child: Container(
                       child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 15, top: 15),
-                            margin: EdgeInsets.only(bottom: 10),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "On-Going Events",
-                              style: TextStyle(
-                                  fontFamily: globals.montserrat,
-                                  fontSize: 30,
-                                  color: Colors.white),
-                            ),
-                          ),
-                          Container(
-                            height: listHeight,
-                            child: ListView.builder(
-                              itemCount: eventItems.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  child: eventItems[index],
-                                  onTap: () {
-                                    navigateToEventDetailsPage(
-                                      eventItems[index].title,
-                                      eventItems[index].description,
-                                      eventItems[index].age,
-                                      eventItems[index].type,
-                                      eventItems[index].fee,
-                                      eventItems[index].date,
-                                      eventItems[index].time,
-                                      eventItems[index].location,
-                                      eventItems[index].locationPoint,
-                                      eventItems[index].urls,
-                                    );
-                                  },
-                                );
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 15, top: 15),
+                        margin: EdgeInsets.only(bottom: 10),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "On-Going Events",
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              fontSize: 30,
+                              color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        height: listHeight,
+                        child: ListView.builder(
+                          itemCount: eventItems.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              child: eventItems[index],
+                              onTap: () {
+                                navigateToEventDetailsPage(
+                                    eventItems[index].title,
+                                    eventItems[index].description,
+                                    eventItems[index].age,
+                                    eventItems[index].type,
+                                    eventItems[index].fee,
+                                    eventItems[index].date,
+                                    eventItems[index].time,
+                                    eventItems[index].location,
+                                    eventItems[index].locationPoint,
+                                    eventItems[index].urls,
+                                    eventItems[index].id);
                               },
-                            ),
-                          )
-                        ],
-                      )),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  )),
                 ),
               ),
               floatingActionButton: FloatingActionButton(
@@ -162,9 +165,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 },
               ),
             );
-          }
-
-          else
+          } else
             return Scaffold(
               body: SafeArea(
                 child: Center(
@@ -188,11 +189,10 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                           "You do not have any events in progress",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: globals.montserrat,
-                            fontWeight: globals.fontWeight,
-                            fontSize: 25,
-                            color: Colors.white
-                          ),
+                              fontFamily: globals.montserrat,
+                              fontWeight: globals.fontWeight,
+                              fontSize: 25,
+                              color: Colors.white),
                         ),
                       ),
                     ],
@@ -210,7 +210,6 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 },
               ),
             );
-
         });
   }
 }

@@ -149,7 +149,8 @@ class _HomePageState extends State<HomePage> {
       String time,
       String location,
       GeoPoint locationPoint,
-      List<dynamic> urls) {
+      List<dynamic> urls,
+      String id) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -164,6 +165,7 @@ class _HomePageState extends State<HomePage> {
                   location: location,
                   locationPoint: locationPoint,
                   urls: urls,
+                  id: id,
                 )));
   }
 
@@ -172,9 +174,8 @@ class _HomePageState extends State<HomePage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double featureCarouselHeight = height * 0.5;
-    double foryouCarouselHeight = height * 0.35;
-    double nearyouCarouselHeight = height * 0.33;
-    double nearyouItemHeight = height * 0.3;
+    double foryouCarouselHeight = height * 0.33;
+    double nearyouCarouselHeight = height * 0.35;
     double infoHeight = height * 0.25;
 
     return _currentPosition != null
@@ -272,7 +273,6 @@ class _HomePageState extends State<HomePage> {
                             return Text("No events near you");
                           } else {
                             List<Container> ads = [];
-                            print(snapshot.data.length);
                             var j;
                             if (snapshot.data.length > 5) {
                               j = 5;
@@ -289,28 +289,47 @@ class _HomePageState extends State<HomePage> {
                                               image: NetworkImage(
                                                   snapshot.data[i]["urls"][0]),
                                               fit: BoxFit.fill)),
-                                      child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.black38,
-                                          ),
-                                          padding: EdgeInsets.all(
-                                              foryouCarouselHeight / 16),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                snapshot.data[i]["title"] +
-                                                    "\n" +
-                                                    snapshot.data[i]
-                                                        ["locationName"],
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      globals.montserrat,
-                                                  color: Colors.white,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          DateTime date =
+                                              snapshot.data[i]['date'].toDate();
+                                          navigateToEventDetailsPage(
+                                              snapshot.data[i]["title"],
+                                              snapshot.data[i]["description"],
+                                              snapshot.data[i]["age"],
+                                              snapshot.data[i]["type"],
+                                              snapshot.data[i]["fee"],
+                                              DateFormat.MMMd().format(date),
+                                              snapshot.data[i]["time"],
+                                              snapshot.data[i]["locationName"],
+                                              snapshot.data[i]["location"]
+                                                  ['geopoint'],
+                                              snapshot.data[i]["urls"],
+                                              snapshot.data[i]["id"]);
+                                        },
+                                        child: Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black38,
+                                            ),
+                                            padding: EdgeInsets.all(
+                                                foryouCarouselHeight / 16),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  snapshot.data[i]["title"] +
+                                                      "\n" +
+                                                      snapshot.data[i]
+                                                          ["locationName"],
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        globals.montserrat,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       )),
@@ -328,18 +347,18 @@ class _HomePageState extends State<HomePage> {
                                         DateTime date =
                                             snapshot.data[i]['date'].toDate();
                                         navigateToEventDetailsPage(
-                                          snapshot.data[i]["title"],
-                                          snapshot.data[i]["description"],
-                                          snapshot.data[i]["age"],
-                                          snapshot.data[i]["type"],
-                                          snapshot.data[i]["fee"],
-                                          DateFormat.MMMd().format(date),
-                                          snapshot.data[i]["time"],
-                                          snapshot.data[i]["locationName"],
-                                          snapshot.data[i]["location"]
-                                              ['geopoint'],
-                                          snapshot.data[i]["urls"],
-                                        );
+                                            snapshot.data[i]["title"],
+                                            snapshot.data[i]["description"],
+                                            snapshot.data[i]["age"],
+                                            snapshot.data[i]["type"],
+                                            snapshot.data[i]["fee"],
+                                            DateFormat.MMMd().format(date),
+                                            snapshot.data[i]["time"],
+                                            snapshot.data[i]["locationName"],
+                                            snapshot.data[i]["location"]
+                                                ['geopoint'],
+                                            snapshot.data[i]["urls"],
+                                            snapshot.data[i]["id"]);
                                       },
                                       child: Align(
                                         alignment: Alignment.bottomCenter,
@@ -371,7 +390,7 @@ class _HomePageState extends State<HomePage> {
                             }
                             return Container(
                               child: GFCarousel(
-                                height: foryouCarouselHeight,
+                                height: nearyouCarouselHeight,
                                 enableInfiniteScroll: true,
                                 viewportFraction: 0.8,
                                 activeIndicator: Colors.white,
@@ -423,88 +442,123 @@ class _HomePageState extends State<HomePage> {
                           int eventTop = -2;
                           int eventBottom = -1;
 
+                          List<int> eventIndex = [];
+                          for (int i = 0; i < snapshot.data.docs.length; i++)
+                            eventIndex.add(i);
+
                           return Container(
                             child: GFCarousel(
-                              height: nearyouItemHeight,
-                              enableInfiniteScroll: true,
+                              height: foryouCarouselHeight,
+                              enableInfiniteScroll: false,
                               viewportFraction: 1.0,
                               activeIndicator: Colors.white,
-                              items: snapshot.data.docs.map(
+                              items: eventIndex.map(
                                 (con) {
-                                  DateTime date = con["date"].toDate();
-                                  eventTop += 2 ;
-                                  eventBottom += 2 ;
-                                  if(eventTop >= max)
-                                    eventTop = 0;
-                                  if(eventBottom >= max)
-                                    eventBottom = 1;
+                                  DateTime date = DateTime.now();
+                                  eventTop += 2;
+                                  eventBottom += 2;
+                                  if (eventTop >= max) eventTop = 0;
+                                  if (eventBottom >= max) eventBottom = 1;
 
                                   return Column(
                                     children: [
-                                      if(eventTop < max)
-                                      GestureDetector(
-                                        onTap: () {
-                                          DateTime date =
-                                          snapshot.data.docs[eventTop]['date'].toDate();
-                                          navigateToEventDetailsPage(
-                                            snapshot.data.docs[eventTop]['title'],
-                                            snapshot.data.docs[eventTop]['description'],
-                                            snapshot.data.docs[eventTop]['age'],
-                                            snapshot.data.docs[eventTop]['type'],
-                                            snapshot.data.docs[eventTop]['fee'],
-                                            snapshot.data.docs[eventTop]['time'],
-                                            DateFormat.MMMd().format(date),
-                                            snapshot.data.docs[eventTop]['locationName'],
-                                            snapshot.data.docs[eventTop]['location']
-                                            ['geopoint'],
-                                            snapshot.data.docs[eventTop]['urls'],
-                                          );
-                                        },
-                                        child: EventItem(
-                                            title: snapshot.data.docs[eventTop]['title'],
-                                            description: snapshot.data.docs[eventTop]['description'],
-                                            age: snapshot.data.docs[eventTop]['age'],
-                                            type: snapshot.data.docs[eventTop]['type'],
-                                            fee: snapshot.data.docs[eventTop]['fee'],
-                                            time: snapshot.data.docs[eventTop]['time'],
-                                            date: DateFormat.MMMd().format(date),
-                                            location: snapshot.data.docs[eventTop]['locationName'],
-                                            locationPoint: snapshot.data.docs[eventTop]['location']
-                                                ['geopoint'],
-                                            urls: snapshot.data.docs[eventTop]['urls']),
-                                      ),
-                                      if(eventBottom < max)
-                                      GestureDetector(
-                                        onTap: () {
-                                          DateTime date =
-                                          snapshot.data.docs[eventBottom]['date'].toDate();
-                                          navigateToEventDetailsPage(
-                                            snapshot.data.docs[eventBottom]['title'],
-                                            snapshot.data.docs[eventBottom]['description'],
-                                            snapshot.data.docs[eventBottom]['age'],
-                                            snapshot.data.docs[eventBottom]['type'],
-                                            snapshot.data.docs[eventBottom]['fee'],
-                                            snapshot.data.docs[eventBottom]['time'],
-                                            DateFormat.MMMd().format(date),
-                                            snapshot.data.docs[eventBottom]['locationName'],
-                                            snapshot.data.docs[eventBottom]['location']
-                                            ['geopoint'],
-                                            snapshot.data.docs[eventBottom]['urls'],
-                                          );
-                                        },
-                                        child: EventItem(
-                                            title: snapshot.data.docs[eventBottom]['title'],
-                                            description: snapshot.data.docs[eventBottom]['description'],
-                                            age: snapshot.data.docs[eventBottom]['age'],
-                                            type: snapshot.data.docs[eventBottom]['type'],
-                                            fee: snapshot.data.docs[eventBottom]['fee'],
-                                            time: snapshot.data.docs[eventBottom]['time'],
-                                            date: DateFormat.MMMd().format(date),
-                                            location: snapshot.data.docs[eventBottom]['locationName'],
-                                            locationPoint: snapshot.data.docs[eventBottom]['location']
-                                                ['geopoint'],
-                                            urls: snapshot.data.docs[eventBottom]['urls']),
-                                      ),
+                                      if (eventTop < max)
+                                        GestureDetector(
+                                          onTap: () {
+                                            print("top: $eventTop");
+                                            DateTime date = snapshot
+                                                .data.docs[con]['date']
+                                                .toDate();
+                                            navigateToEventDetailsPage(
+                                                snapshot.data.docs[con]
+                                                    ['title'],
+                                                snapshot.data.docs[con]
+                                                    ['description'],
+                                                snapshot.data.docs[con]['age'],
+                                                snapshot.data.docs[con]['type'],
+                                                snapshot.data.docs[con]['fee'],
+                                                snapshot.data.docs[con]['time'],
+                                                DateFormat.MMMd().format(date),
+                                                snapshot.data.docs[con]
+                                                    ['locationName'],
+                                                snapshot.data.docs[con]
+                                                    ['location']['geopoint'],
+                                                snapshot.data.docs[con]['urls'],
+                                                snapshot.data.docs[con]['id']);
+                                          },
+                                          child: EventItem(
+                                              title: snapshot.data.docs[con]
+                                                  ['title'],
+                                              description: snapshot.data
+                                                  .docs[con]['description'],
+                                              age: snapshot.data.docs[con]
+                                                  ['age'],
+                                              type: snapshot.data.docs[con]
+                                                  ['type'],
+                                              fee: snapshot.data.docs[con]
+                                                  ['fee'],
+                                              time: snapshot.data.docs[con]
+                                                  ['time'],
+                                              date: DateFormat.MMMd()
+                                                  .format(date),
+                                              location: snapshot.data.docs[con]
+                                                  ['locationName'],
+                                              locationPoint:
+                                                  snapshot.data.docs[con]
+                                                      ['location']['geopoint'],
+                                              urls: snapshot.data.docs[con]
+                                                  ['urls']),
+                                        ),
+                                      if (eventBottom < max)
+                                        GestureDetector(
+                                          onTap: () {
+                                            print("bottom: $eventBottom");
+
+                                            DateTime date = snapshot
+                                                .data.docs[eventBottom]['date']
+                                                .toDate();
+                                            navigateToEventDetailsPage(
+                                                snapshot.data.docs[eventBottom]
+                                                    ['title'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['description'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['age'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['type'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['fee'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['time'],
+                                                DateFormat.MMMd().format(date),
+                                                snapshot.data.docs[eventBottom]
+                                                    ['locationName'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['location']['geopoint'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['urls'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['id']);
+                                          },
+                                          child: EventItem(
+                                              title: snapshot.data
+                                                  .docs[eventBottom]['title'],
+                                              description:
+                                                  snapshot.data.docs[eventBottom]
+                                                      ['description'],
+                                              age: snapshot.data.docs[eventBottom]
+                                                  ['age'],
+                                              type: snapshot.data
+                                                  .docs[eventBottom]['type'],
+                                              fee: snapshot.data
+                                                  .docs[eventBottom]['fee'],
+                                              time: snapshot.data
+                                                  .docs[eventBottom]['time'],
+                                              date: DateFormat.MMMd().format(date),
+                                              location: snapshot.data.docs[eventBottom]['locationName'],
+                                              locationPoint: snapshot.data.docs[eventBottom]['location']['geopoint'],
+                                              urls: snapshot.data.docs[eventBottom]['urls']),
+                                        ),
                                     ],
                                   );
                                 },

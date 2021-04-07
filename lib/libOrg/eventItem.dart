@@ -13,6 +13,7 @@ class EventItem extends StatefulWidget {
   final String location;
   final GeoPoint locationPoint;
   final List<dynamic> urls;
+  final String id;
 
   EventItem(
       {Key key,
@@ -25,12 +26,14 @@ class EventItem extends StatefulWidget {
       this.time,
       this.location,
       this.locationPoint,
-      this.urls})
+      this.urls,
+      this.id
+      })
       : super(key: key);
 
   @override
   _EventItemState createState() => _EventItemState(title, description, type,
-      fee, age, date, time, location, locationPoint, urls);
+      fee, age, date, time, location, locationPoint, urls, id);
 }
 
 class _EventItemState extends State<EventItem> {
@@ -44,9 +47,10 @@ class _EventItemState extends State<EventItem> {
   final String location;
   final GeoPoint locationPoint;
   final List<dynamic> urls;
+  final String id;
 
   _EventItemState(this.title, this.description, this.type, this.fee, this.age,
-      this.date, this.time, this.location, this.locationPoint, this.urls);
+      this.date, this.time, this.location, this.locationPoint, this.urls, this.id);
 
   @override
   Widget build(BuildContext context) {
