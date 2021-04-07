@@ -167,6 +167,30 @@ class _HomePageState extends State<HomePage> {
                   urls: urls,
                   id: id,
                 )));
+  List<String> months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+
+  String dateConverter(Timestamp eventDate, String time) {
+    DateTime converted = eventDate.toDate();
+    return months[converted.month] +
+        " " +
+        converted.day.toString() +
+        ", " +
+        converted.year.toString() +
+        " @ " +
+        time;
   }
 
   @override
@@ -224,6 +248,46 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                     fit: BoxFit.fill)),
                                             child: Container()),
+                                        Container(
+                                          color: Colors.black38,
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 30, top: 30),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                con["title"],
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily:
+                                                        globals.montserrat,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 30),
+                                              ),
+                                              Text(
+                                                dateConverter(
+                                                    con["date"], con["time"]),
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily:
+                                                        globals.montserrat,
+                                                    fontSize: 15),
+                                              ),
+                                              Text(
+                                                con["locationName"]
+                                                    .split(",")[0],
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily:
+                                                        globals.montserrat,
+                                                    fontSize: 15),
+                                              ),
+                                            ],
+                                          ),
+                                        )
                                       ]),
                                     ),
                                   );
@@ -270,7 +334,10 @@ class _HomePageState extends State<HomePage> {
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.data == null) {
-                            return Text("No events near you");
+                            return Text(
+                              "No events near you",
+                              style: TextStyle(color: Colors.white),
+                            );
                           } else {
                             List<Container> ads = [];
                             var j;
@@ -374,7 +441,8 @@ class _HomePageState extends State<HomePage> {
                                                 snapshot.data[i]["title"] +
                                                     "\n" +
                                                     snapshot.data[i]
-                                                        ["locationName"],
+                                                            ["locationName"]
+                                                        .split(',')[0],
                                                 style: TextStyle(
                                                   fontFamily:
                                                       globals.montserrat,
