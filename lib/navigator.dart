@@ -19,7 +19,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
   _NavigatorPageState(this.uid);
 
   static const String montserrat = "Montserrat";
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
   static List<Widget> _widgetOptions = <Widget>[
     HomePage(),
