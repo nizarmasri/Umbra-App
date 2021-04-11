@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'globals.dart' as globals;
 
@@ -22,6 +23,8 @@ class _AccountInfoState extends State<AccountInfo> {
   var maskTextInputFormatter2 = MaskTextInputFormatter();
   TextEditingController _namecontroller;
   TextEditingController _numbercontroller;
+  TextEditingController _twittercontroller;
+  TextEditingController _instagramcontroller;
 
   Container avatar({String letter}) {
     return Container(
@@ -41,7 +44,7 @@ class _AccountInfoState extends State<AccountInfo> {
 
   Container newInput(
       {String hint,
-      IconData icon,
+      Icon icon,
       String defvalue,
       TextEditingController controller,
       MaskTextInputFormatter mask,
@@ -55,10 +58,7 @@ class _AccountInfoState extends State<AccountInfo> {
           keyboardType: type,
           controller: controller,
           decoration: new InputDecoration(
-            prefixIcon: Icon(
-              icon,
-              color: Colors.white,
-            ),
+            prefixIcon: icon,
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.red),
             ),
@@ -90,6 +90,8 @@ class _AccountInfoState extends State<AccountInfo> {
           await FirebaseFirestore.instance.collection('users').doc(uid).update({
             'name': _namecontroller.text,
             'number': _numbercontroller.text,
+            'twitter': _twittercontroller.text,
+            'instagram': _instagramcontroller.text
           }).then((value) {
             Navigator.pop(context);
           });
@@ -119,6 +121,10 @@ class _AccountInfoState extends State<AccountInfo> {
                   TextEditingController(text: snapshot.data.data()["name"]);
               _numbercontroller =
                   TextEditingController(text: snapshot.data.data()["number"]);
+              _twittercontroller =
+                  TextEditingController(text: snapshot.data.data()["twitter"]);
+              _instagramcontroller = TextEditingController(
+                  text: snapshot.data.data()["instagram"]);
               return Scaffold(
                 backgroundColor: Colors.black,
                 appBar: AppBar(
@@ -139,17 +145,39 @@ class _AccountInfoState extends State<AccountInfo> {
                                 .toUpperCase()),
                         newInput(
                             hint: "Name",
-                            icon: Icons.person,
+                            icon: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                            ),
                             defvalue: snapshot.data.data()["name"],
                             controller: _namecontroller,
                             mask: maskTextInputFormatter2),
                         newInput(
                             hint: "Number",
-                            icon: Icons.phone,
+                            icon: Icon(
+                              Icons.phone,
+                              color: Colors.white,
+                            ),
                             defvalue: snapshot.data.data()["number"],
                             controller: _numbercontroller,
                             type: TextInputType.phone,
                             mask: maskTextInputFormatter),
+                        newInput(
+                            hint: "Twitter",
+                            icon: Icon(
+                              FontAwesomeIcons.twitter,
+                              color: Colors.white,
+                            ),
+                            defvalue: snapshot.data.data()["twitter"],
+                            controller: _twittercontroller),
+                        newInput(
+                            hint: "Instagram",
+                            icon: Icon(
+                              FontAwesomeIcons.instagram,
+                              color: Colors.white,
+                            ),
+                            defvalue: snapshot.data.data()["instagram"],
+                            controller: _instagramcontroller),
                         button(uid: uid),
                       ],
                     ),

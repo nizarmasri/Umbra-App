@@ -4,7 +4,7 @@ import 'package:progress_button/progress_button.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'accountpage.dart';
 import 'accountinfo.dart';
 import 'authentication_service.dart';
 import 'globals.dart' as globals;
@@ -16,8 +16,9 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  String uid = FirebaseAuth.instance.currentUser.uid;
   double btnHeight = 60;
-  Container NameAvatar({String name, String email}) {
+  Container NameAvatar({String name, String email, Function page}) {
     return Container(
       margin: EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 20),
       decoration: BoxDecoration(),
@@ -47,6 +48,16 @@ class _AccountPageState extends State<AccountPage> {
                   email,
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
+                GestureDetector(
+                  onTap: () {
+                    print("QWEQWEQ");
+                    page();
+                  },
+                  child: Text(
+                    "View Account",
+                    style: TextStyle(fontSize: 13, color: Colors.blue),
+                  ),
+                )
               ],
             ),
           ),
@@ -93,6 +104,11 @@ class _AccountPageState extends State<AccountPage> {
         .then((value) => setState(() {}));
   }
 
+  navigateToAccountPageDetails() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AccountPageDetails()));
+  }
+
   InkWell Setting({String title, IconData icon, Color color, Function page}) {
     return InkWell(
       onTap: () {
@@ -119,7 +135,6 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    String uid = FirebaseAuth.instance.currentUser.uid;
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double btnWidth = width * 0.85;
@@ -148,7 +163,8 @@ class _AccountPageState extends State<AccountPage> {
                       children: [
                         NameAvatar(
                             name: snapshot.data.data()["name"],
-                            email: snapshot.data.data()["email"]),
+                            email: snapshot.data.data()["email"],
+                            page: navigateToAccountPageDetails),
                         Container(
                           child: Column(
                             children: [
