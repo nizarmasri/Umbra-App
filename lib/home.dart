@@ -150,7 +150,8 @@ class _HomePageState extends State<HomePage> {
       String location,
       GeoPoint locationPoint,
       List<dynamic> urls,
-      String id) {
+      String id,
+      String posteruid) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -166,6 +167,7 @@ class _HomePageState extends State<HomePage> {
                   locationPoint: locationPoint,
                   urls: urls,
                   id: id,
+                  posteruid: posteruid,
                 )));
   }
 
@@ -373,7 +375,8 @@ class _HomePageState extends State<HomePage> {
                                               snapshot.data[i]["location"]
                                                   ['geopoint'],
                                               snapshot.data[i]["urls"],
-                                              snapshot.data[i]["id"]);
+                                              snapshot.data[i]["id"],
+                                              snapshot.data[i]["poster"]);
                                         },
                                         child: Align(
                                           alignment: Alignment.bottomCenter,
@@ -421,7 +424,8 @@ class _HomePageState extends State<HomePage> {
                                             snapshot.data[i]["location"]
                                                 ['geopoint'],
                                             snapshot.data[i]["urls"],
-                                            snapshot.data[i]["id"]);
+                                            snapshot.data[i]["id"],
+                                            snapshot.data[i]["poster"]);
                                       },
                                       child: Align(
                                         alignment: Alignment.bottomCenter,
@@ -548,30 +552,33 @@ class _HomePageState extends State<HomePage> {
                                                 snapshot.data.docs[con]
                                                     ['location']['geopoint'],
                                                 snapshot.data.docs[con]['urls'],
-                                                snapshot.data.docs[con]['id']);
+                                                snapshot.data.docs[con]['id'],
+                                                snapshot.data.docs[con]
+                                                    ["poster"]);
                                           },
                                           child: EventItem(
-                                              title: snapshot.data.docs[con]
-                                                  ['title'],
-                                              description: snapshot.data
-                                                  .docs[con]['description'],
-                                              age: snapshot.data.docs[con]
-                                                  ['age'],
-                                              type: snapshot.data.docs[con]
-                                                  ['type'],
-                                              fee: snapshot.data.docs[con]
-                                                  ['fee'],
-                                              time: snapshot.data.docs[con]
-                                                  ['time'],
-                                              date: DateFormat.MMMd()
-                                                  .format(date),
-                                              location: snapshot.data.docs[con]
-                                                  ['locationName'],
-                                              locationPoint:
-                                                  snapshot.data.docs[con]
-                                                      ['location']['geopoint'],
-                                              urls: snapshot.data.docs[con]
-                                                  ['urls']),
+                                            title: snapshot.data.docs[con]
+                                                ['title'],
+                                            description: snapshot.data.docs[con]
+                                                ['description'],
+                                            age: snapshot.data.docs[con]['age'],
+                                            type: snapshot.data.docs[con]
+                                                ['type'],
+                                            fee: snapshot.data.docs[con]['fee'],
+                                            time: snapshot.data.docs[con]
+                                                ['time'],
+                                            date:
+                                                DateFormat.MMMd().format(date),
+                                            location: snapshot.data.docs[con]
+                                                ['locationName'],
+                                            locationPoint:
+                                                snapshot.data.docs[con]
+                                                    ['location']['geopoint'],
+                                            urls: snapshot.data.docs[con]
+                                                ['urls'],
+                                            posteruid: snapshot.data.docs[con]
+                                                ['poster'],
+                                          ),
                                         ),
                                       if (eventBottom < max)
                                         GestureDetector(
@@ -602,26 +609,37 @@ class _HomePageState extends State<HomePage> {
                                                 snapshot.data.docs[eventBottom]
                                                     ['urls'],
                                                 snapshot.data.docs[eventBottom]
-                                                    ['id']);
+                                                    ['id'],
+                                                snapshot.data.docs[eventBottom]
+                                                    ['poster']);
                                           },
                                           child: EventItem(
-                                              title: snapshot.data
-                                                  .docs[eventBottom]['title'],
-                                              description:
-                                                  snapshot.data.docs[eventBottom]
-                                                      ['description'],
-                                              age: snapshot.data.docs[eventBottom]
-                                                  ['age'],
-                                              type: snapshot.data
-                                                  .docs[eventBottom]['type'],
-                                              fee: snapshot.data
-                                                  .docs[eventBottom]['fee'],
-                                              time: snapshot.data
-                                                  .docs[eventBottom]['time'],
-                                              date: DateFormat.MMMd().format(date),
-                                              location: snapshot.data.docs[eventBottom]['locationName'],
-                                              locationPoint: snapshot.data.docs[eventBottom]['location']['geopoint'],
-                                              urls: snapshot.data.docs[eventBottom]['urls']),
+                                            title: snapshot.data
+                                                .docs[eventBottom]['title'],
+                                            description:
+                                                snapshot.data.docs[eventBottom]
+                                                    ['description'],
+                                            age: snapshot.data.docs[eventBottom]
+                                                ['age'],
+                                            type: snapshot
+                                                .data.docs[eventBottom]['type'],
+                                            fee: snapshot.data.docs[eventBottom]
+                                                ['fee'],
+                                            time: snapshot
+                                                .data.docs[eventBottom]['time'],
+                                            date:
+                                                DateFormat.MMMd().format(date),
+                                            location:
+                                                snapshot.data.docs[eventBottom]
+                                                    ['locationName'],
+                                            locationPoint:
+                                                snapshot.data.docs[eventBottom]
+                                                    ['location']['geopoint'],
+                                            urls: snapshot
+                                                .data.docs[eventBottom]['urls'],
+                                            posteruid: snapshot.data
+                                                .docs[eventBottom]['poster'],
+                                          ),
                                         ),
                                     ],
                                   );

@@ -19,6 +19,7 @@ class EventDetails extends StatefulWidget {
   final GeoPoint locationPoint;
   final List<dynamic> urls;
   final String id;
+  final String posteruid;
 
   EventDetails(
       {Key key,
@@ -32,12 +33,13 @@ class EventDetails extends StatefulWidget {
       this.location,
       this.locationPoint,
       this.urls,
-      this.id})
+      this.id,
+      this.posteruid})
       : super(key: key);
 
   @override
   _EventDetailsState createState() => _EventDetailsState(title, description,
-      type, fee, age, date, time, location, locationPoint, urls, id);
+      type, fee, age, date, time, location, locationPoint, urls, id, posteruid);
 }
 
 class _EventDetailsState extends State<EventDetails> {
@@ -52,6 +54,7 @@ class _EventDetailsState extends State<EventDetails> {
   final GeoPoint locationPoint;
   final List<dynamic> urls;
   final String id;
+  final String posteruid;
 
   _EventDetailsState(
       this.title,
@@ -64,7 +67,8 @@ class _EventDetailsState extends State<EventDetails> {
       this.location,
       this.locationPoint,
       this.urls,
-      this.id);
+      this.id,
+      this.posteruid);
 
   double titleTextSize = 25;
   double descTextSize = 16;
@@ -160,7 +164,7 @@ class _EventDetailsState extends State<EventDetails> {
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
     double imagesHeight = height * 0.3;
-
+    print(posteruid);
     String feeCheck = "";
     if (fee == "")
       feeCheck = "-";
@@ -465,6 +469,50 @@ class _EventDetailsState extends State<EventDetails> {
                 ],
               ),
             ),
+            // Phone Number
+            Text("Hosted by:", style: TextStyle(color: Colors.white)),
+            FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(posteruid)
+                  .get(),
+              builder: (context, snapshot) {
+                return Container(
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(color: Colors.white, width: 1)),
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 20),
+                            child: CircleAvatar(
+                              radius: 25,
+                              child: Text(snapshot.data.data()["name"][0]),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              snapshot.data.data()["name"],
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              launch("tel://" + snapshot.data.data()["number"]);
+                            },
+                            child: Align(
+                                child: Icon(Icons.phone, color: Colors.green),
+                                alignment: Alignment.centerRight),
+                          ),
+                        ],
+                      ),
+                    ));
+              },
+            ),
+
             // Location
             Container(
               child: Column(

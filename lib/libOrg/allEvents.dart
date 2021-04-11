@@ -16,7 +16,8 @@ class AllEventsPage extends StatefulWidget {
 class _AllEventsPageState extends State<AllEventsPage> {
   navigateToAddEventForm() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddEventForm())).then((value) => setState(() {}));
+            context, MaterialPageRoute(builder: (context) => AddEventForm()))
+        .then((value) => setState(() {}));
   }
 
   navigateToEventDetailsPage(
@@ -29,22 +30,24 @@ class _AllEventsPageState extends State<AllEventsPage> {
       String time,
       String location,
       GeoPoint locationPoint,
-      List<dynamic> urls) {
+      List<dynamic> urls,
+      String posteruid) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-              title: title,
-              description: description,
-              age: age,
-              type: type,
-              fee: fee,
-              date: date,
-              time: time,
-              location: location,
-              locationPoint: locationPoint,
-              urls: urls,
-            )));
+                  title: title,
+                  description: description,
+                  age: age,
+                  type: type,
+                  fee: fee,
+                  date: date,
+                  time: time,
+                  location: location,
+                  locationPoint: locationPoint,
+                  urls: urls,
+                  posteruid: posteruid,
+                )));
   }
 
   List<EventItem> eventItems = [];
@@ -85,20 +88,22 @@ class _AllEventsPageState extends State<AllEventsPage> {
             );
           }
 
-          if(snapshot.data != null && snapshot.data.length != 0){
+          if (snapshot.data != null && snapshot.data.length != 0) {
             snapshot.data.forEach((event) {
               DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
-                  title: event['title'],
-                  description: event['description'],
-                  age: event['age'],
-                  type: event['type'],
-                  fee: event['fee'],
-                  time: event['time'],
-                  date: DateFormat.MMMd().format(date),
-                  location: event['locationName'],
-                  locationPoint: event['location']['geopoint'],
-                  urls: event['urls']));
+                title: event['title'],
+                description: event['description'],
+                age: event['age'],
+                type: event['type'],
+                fee: event['fee'],
+                time: event['time'],
+                date: DateFormat.MMMd().format(date),
+                location: event['locationName'],
+                locationPoint: event['location']['geopoint'],
+                urls: event['urls'],
+                posteruid: event['poster'],
+              ));
             });
 
             return Scaffold(
@@ -107,52 +112,50 @@ class _AllEventsPageState extends State<AllEventsPage> {
                 child: SingleChildScrollView(
                   child: Container(
                       child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 15, top: 15),
-                            margin: EdgeInsets.only(bottom: 10),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "All Events",
-                              style: TextStyle(
-                                  fontFamily: globals.montserrat,
-                                  fontSize: 30,
-                                  color: Colors.white),
-                            ),
-                          ),
-                          Container(
-                            height: listHeight,
-                            child: ListView.builder(
-                              itemCount: eventItems.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  child: eventItems[index],
-                                  onTap: () {
-                                    navigateToEventDetailsPage(
-                                      eventItems[index].title,
-                                      eventItems[index].description,
-                                      eventItems[index].age,
-                                      eventItems[index].type,
-                                      eventItems[index].fee,
-                                      eventItems[index].date,
-                                      eventItems[index].time,
-                                      eventItems[index].location,
-                                      eventItems[index].locationPoint,
-                                      eventItems[index].urls,
-                                    );
-                                  },
-                                );
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 15, top: 15),
+                        margin: EdgeInsets.only(bottom: 10),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "All Events",
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              fontSize: 30,
+                              color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        height: listHeight,
+                        child: ListView.builder(
+                          itemCount: eventItems.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              child: eventItems[index],
+                              onTap: () {
+                                navigateToEventDetailsPage(
+                                    eventItems[index].title,
+                                    eventItems[index].description,
+                                    eventItems[index].age,
+                                    eventItems[index].type,
+                                    eventItems[index].fee,
+                                    eventItems[index].date,
+                                    eventItems[index].time,
+                                    eventItems[index].location,
+                                    eventItems[index].locationPoint,
+                                    eventItems[index].urls,
+                                    eventItems[index].posteruid);
                               },
-                            ),
-                          )
-                        ],
-                      )),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  )),
                 ),
               ),
             );
-          }
-
-          else
+          } else
             return Scaffold(
               body: SafeArea(
                 child: Center(
@@ -179,8 +182,7 @@ class _AllEventsPageState extends State<AllEventsPage> {
                               fontFamily: globals.montserrat,
                               fontWeight: globals.fontWeight,
                               fontSize: 25,
-                              color: Colors.white
-                          ),
+                              color: Colors.white),
                         ),
                       ),
                     ],
@@ -188,7 +190,6 @@ class _AllEventsPageState extends State<AllEventsPage> {
                 ),
               ),
             );
-
         });
   }
 }

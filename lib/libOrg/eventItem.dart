@@ -14,6 +14,7 @@ class EventItem extends StatefulWidget {
   final GeoPoint locationPoint;
   final List<dynamic> urls;
   final String id;
+  final String posteruid;
 
   EventItem(
       {Key key,
@@ -27,13 +28,13 @@ class EventItem extends StatefulWidget {
       this.location,
       this.locationPoint,
       this.urls,
-      this.id
-      })
+      this.id,
+      this.posteruid})
       : super(key: key);
 
   @override
   _EventItemState createState() => _EventItemState(title, description, type,
-      fee, age, date, time, location, locationPoint, urls, id);
+      fee, age, date, time, location, locationPoint, urls, id, posteruid);
 }
 
 class _EventItemState extends State<EventItem> {
@@ -48,9 +49,20 @@ class _EventItemState extends State<EventItem> {
   final GeoPoint locationPoint;
   final List<dynamic> urls;
   final String id;
-
-  _EventItemState(this.title, this.description, this.type, this.fee, this.age,
-      this.date, this.time, this.location, this.locationPoint, this.urls, this.id);
+  final String posteruid;
+  _EventItemState(
+      this.title,
+      this.description,
+      this.type,
+      this.fee,
+      this.age,
+      this.date,
+      this.time,
+      this.location,
+      this.locationPoint,
+      this.urls,
+      this.id,
+      this.posteruid);
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +84,11 @@ class _EventItemState extends State<EventItem> {
               height: imageHeight,
               width: imageWidth,
               child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      topLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(0),
-                      topRight: Radius.circular(0)),
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    topLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(0),
+                    topRight: Radius.circular(0)),
                 child: Image.network(
                     (urls != null && urls.length != 0)
                         ? urls[0]

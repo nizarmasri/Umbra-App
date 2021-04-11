@@ -15,6 +15,7 @@ class SearchItem extends StatefulWidget {
   final GeoPoint locationPoint;
   final List<dynamic> urls;
   final String id;
+  final String posteruid;
 
   SearchItem(
       {Key key,
@@ -28,12 +29,13 @@ class SearchItem extends StatefulWidget {
       this.location,
       this.locationPoint,
       this.urls,
-      this.id})
+      this.id,
+      this.posteruid})
       : super(key: key);
 
   @override
   _SearchItemState createState() => _SearchItemState(title, description, type,
-      fee, age, date, time, location, locationPoint, urls, id);
+      fee, age, date, time, location, locationPoint, urls, id, posteruid);
 }
 
 class _SearchItemState extends State<SearchItem> {
@@ -48,6 +50,7 @@ class _SearchItemState extends State<SearchItem> {
   final GeoPoint locationPoint;
   final List<dynamic> urls;
   final String id;
+  final String posteruid;
 
   _SearchItemState(
       this.title,
@@ -60,7 +63,8 @@ class _SearchItemState extends State<SearchItem> {
       this.location,
       this.locationPoint,
       this.urls,
-      this.id);
+      this.id,
+      this.posteruid);
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +80,10 @@ class _SearchItemState extends State<SearchItem> {
         height: itemHeight,
         width: itemWidth,
         decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(20),
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(20),
             image: DecorationImage(
-              fit: BoxFit.cover,
+                fit: BoxFit.cover,
                 image: NetworkImage((urls != null && urls.length != 0)
                     ? urls[0]
                     : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'))),
@@ -89,23 +93,21 @@ class _SearchItemState extends State<SearchItem> {
             width: itemWidth,
             height: shadedHeight,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: <Color>[
-                  Colors.black45,
-                  Colors.transparent
-                ]
-              )
-            ),
+                gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: <Color>[Colors.black45, Colors.transparent])),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Container(
                 margin: EdgeInsets.only(left: 10),
                 child: Text(
                   "Villa White Party",
-                  style:
-                      TextStyle(fontFamily: globals.montserrat, fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontFamily: globals.montserrat,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),

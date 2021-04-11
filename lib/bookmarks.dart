@@ -17,7 +17,7 @@ class Bookmarks extends StatefulWidget {
 class _BookmarksState extends State<Bookmarks> {
   navigateToAddEventForm() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddEventForm()))
+            context, MaterialPageRoute(builder: (context) => AddEventForm()))
         .then((value) => setState(() {}));
   }
 
@@ -32,23 +32,24 @@ class _BookmarksState extends State<Bookmarks> {
       String location,
       GeoPoint locationPoint,
       List<dynamic> urls,
-      String id) {
+      String id,
+      String posteruid) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-              title: title,
-              description: description,
-              age: age,
-              type: type,
-              fee: fee,
-              date: date,
-              time: time,
-              location: location,
-              locationPoint: locationPoint,
-              urls: urls,
-              id: id,
-            )));
+                title: title,
+                description: description,
+                age: age,
+                type: type,
+                fee: fee,
+                date: date,
+                time: time,
+                location: location,
+                locationPoint: locationPoint,
+                urls: urls,
+                id: id,
+                posteruid: posteruid)));
   }
 
   List<EventItem> eventItems = [];
@@ -61,10 +62,9 @@ class _BookmarksState extends State<Bookmarks> {
     List<QueryDocumentSnapshot> events = [];
     List<dynamic> eventIds = [];
 
-    await fb.collection('users').doc(uid).get().then((value){
+    await fb.collection('users').doc(uid).get().then((value) {
       eventIds = value.data()['booked'];
     });
-
 
     await fb
         .collection("events")
@@ -101,18 +101,18 @@ class _BookmarksState extends State<Bookmarks> {
             snapshot.data.forEach((event) {
               DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
-                title: event['title'],
-                description: event['description'],
-                age: event['age'],
-                type: event['type'],
-                fee: event['fee'],
-                time: event['time'],
-                date: DateFormat.MMMd().format(date),
-                location: event['locationName'],
-                locationPoint: event['location']['geopoint'],
-                urls: event['urls'],
-                id: event['id'],
-              ));
+                  title: event['title'],
+                  description: event['description'],
+                  age: event['age'],
+                  type: event['type'],
+                  fee: event['fee'],
+                  time: event['time'],
+                  date: DateFormat.MMMd().format(date),
+                  location: event['locationName'],
+                  locationPoint: event['location']['geopoint'],
+                  urls: event['urls'],
+                  id: event['id'],
+                  posteruid: event["poster"]));
             });
 
             return Scaffold(
@@ -124,46 +124,47 @@ class _BookmarksState extends State<Bookmarks> {
                 child: SingleChildScrollView(
                   child: Container(
                       child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 15, top: 15),
-                            margin: EdgeInsets.only(bottom: 10),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Bookmarks",
-                              style: TextStyle(
-                                  fontFamily: globals.montserrat,
-                                  fontSize: 30,
-                                  color: Colors.white),
-                            ),
-                          ),
-                          Container(
-                            height: listHeight,
-                            child: ListView.builder(
-                              itemCount: eventItems.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  child: eventItems[index],
-                                  onTap: () {
-                                    navigateToEventDetailsPage(
-                                        eventItems[index].title,
-                                        eventItems[index].description,
-                                        eventItems[index].age,
-                                        eventItems[index].type,
-                                        eventItems[index].fee,
-                                        eventItems[index].date,
-                                        eventItems[index].time,
-                                        eventItems[index].location,
-                                        eventItems[index].locationPoint,
-                                        eventItems[index].urls,
-                                        eventItems[index].id);
-                                  },
-                                );
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 15, top: 15),
+                        margin: EdgeInsets.only(bottom: 10),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Bookmarks",
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              fontSize: 30,
+                              color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        height: listHeight,
+                        child: ListView.builder(
+                          itemCount: eventItems.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              child: eventItems[index],
+                              onTap: () {
+                                navigateToEventDetailsPage(
+                                    eventItems[index].title,
+                                    eventItems[index].description,
+                                    eventItems[index].age,
+                                    eventItems[index].type,
+                                    eventItems[index].fee,
+                                    eventItems[index].date,
+                                    eventItems[index].time,
+                                    eventItems[index].location,
+                                    eventItems[index].locationPoint,
+                                    eventItems[index].urls,
+                                    eventItems[index].id,
+                                    eventItems[index].posteruid);
                               },
-                            ),
-                          )
-                        ],
-                      )),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  )),
                 ),
               ),
             );

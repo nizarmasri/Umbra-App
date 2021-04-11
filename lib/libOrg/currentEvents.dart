@@ -31,7 +31,8 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
       String location,
       GeoPoint locationPoint,
       List<dynamic> urls,
-      String id) {
+      String id,
+      String posteruid) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -47,6 +48,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                   locationPoint: locationPoint,
                   urls: urls,
                   id: id,
+                  posteruid: posteruid,
                 )));
   }
 
@@ -94,16 +96,18 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
             snapshot.data.forEach((event) {
               DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
-                  title: event['title'],
-                  description: event['description'],
-                  age: event['age'],
-                  type: event['type'],
-                  fee: event['fee'],
-                  time: event['time'],
-                  date: DateFormat.MMMd().format(date),
-                  location: event['locationName'],
-                  locationPoint: event['location']['geopoint'],
-                  urls: event['urls']));
+                title: event['title'],
+                description: event['description'],
+                age: event['age'],
+                type: event['type'],
+                fee: event['fee'],
+                time: event['time'],
+                date: DateFormat.MMMd().format(date),
+                location: event['locationName'],
+                locationPoint: event['location']['geopoint'],
+                urls: event['urls'],
+                posteruid: event['poster'],
+              ));
             });
 
             return Scaffold(
@@ -144,7 +148,8 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                                     eventItems[index].location,
                                     eventItems[index].locationPoint,
                                     eventItems[index].urls,
-                                    eventItems[index].id);
+                                    eventItems[index].id,
+                                    eventItems[index].posteruid);
                               },
                             );
                           },
