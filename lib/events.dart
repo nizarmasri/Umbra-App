@@ -68,7 +68,7 @@ class _EventsPageState extends State<EventsPage> {
 
     await fb
         .collection("events")
-        .where('id', whereIn: eventIds)
+        .where('__name__', whereIn: eventIds)
         .get()
         .then((value) {
       value.docs.forEach((event) {
