@@ -112,7 +112,7 @@ class _EventsPageState extends State<EventsPage> {
                 locationPoint: event['location']['geopoint'],
                 urls: event['urls'],
                 id: event['id'],
-                posteruid: event['posteruid'],
+                posteruid: event['poster'],
               ));
             });
 
