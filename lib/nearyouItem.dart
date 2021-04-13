@@ -5,19 +5,19 @@ import 'package:intl/intl.dart';
 import 'package:events/libOrg/eventDetails.dart';
 import 'package:events/globals.dart' as globals;
 
-class SearchItem extends StatefulWidget {
+class NearyouItem extends StatefulWidget {
   final QueryDocumentSnapshot data;
 
-  SearchItem(
+  NearyouItem(
       {Key key,
-      this.data})
+        this.data})
       : super(key: key);
 
   @override
-  _SearchItemState createState() => _SearchItemState(data);
+  _NearyouItemState createState() => _NearyouItemState(data);
 }
 
-class _SearchItemState extends State<SearchItem> {
+class _NearyouItemState extends State<NearyouItem> {
   final QueryDocumentSnapshot data;
 
   String title;
@@ -46,7 +46,7 @@ class _SearchItemState extends State<SearchItem> {
     location = data['locationName'];
     locationPoint = data['location']['geopoint'];
     urls = data['urls'];
-    //id = data['id'];
+    id = data['id'];
     posteruid = data['poster'];
   }
 
@@ -82,7 +82,7 @@ class _SearchItemState extends State<SearchItem> {
             )));
   }
 
-  _SearchItemState(this.data);
+  _NearyouItemState(this.data);
 
   @override
   Widget build(BuildContext context) {
@@ -97,28 +97,28 @@ class _SearchItemState extends State<SearchItem> {
     return GestureDetector(
       onTap: () {
         navigateToEventDetailsPage(
-          title,
-          description,
-          age,
-          type,
-          fee,
-          date,
-          time,
-          location,
-          locationPoint,
-          urls,
-          id,
-          posteruid
+            title,
+            description,
+            age,
+            type,
+            fee,
+            date,
+            time,
+            location,
+            locationPoint,
+            urls,
+            id,
+            posteruid
         );
       },
       child: Container(
           height: itemHeight,
           width: itemWidth,
           decoration: BoxDecoration(
-            color: Colors.white12,
-            borderRadius: BorderRadius.circular(20),
+              color: Colors.white12,
+              borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
-                fit: BoxFit.cover,
+                  fit: BoxFit.cover,
                   image: NetworkImage((urls != null && urls.length != 0)
                       ? urls[0]
                       : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'))),
@@ -128,14 +128,14 @@ class _SearchItemState extends State<SearchItem> {
               width: itemWidth,
               height: shadedHeight,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: <Color>[
-                    Colors.black45,
-                    Colors.transparent
-                  ]
-                )
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: <Color>[
+                        Colors.black45,
+                        Colors.transparent
+                      ]
+                  )
               ),
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -144,7 +144,7 @@ class _SearchItemState extends State<SearchItem> {
                   child: Text(
                     title,
                     style:
-                        TextStyle(fontFamily: globals.montserrat, fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                    TextStyle(fontFamily: globals.montserrat, fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),

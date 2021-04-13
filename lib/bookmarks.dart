@@ -118,6 +118,13 @@ class _BookmarksState extends State<Bookmarks> {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Colors.black,
+                title: Text(
+                  "Bookmarks",
+                  style: TextStyle(
+                      fontFamily: globals.montserrat,
+                      fontSize: 25,
+                      color: Colors.white),
+                ),
               ),
               backgroundColor: Colors.black,
               body: SafeArea(
@@ -125,18 +132,6 @@ class _BookmarksState extends State<Bookmarks> {
                   child: Container(
                       child: Column(
                     children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 15, top: 15),
-                        margin: EdgeInsets.only(bottom: 10),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Bookmarks",
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontSize: 30,
-                              color: Colors.white),
-                        ),
-                      ),
                       Container(
                         height: listHeight,
                         child: ListView.builder(

@@ -158,6 +158,7 @@ class _AccountPageState extends State<AccountPage> {
               child: ListView(children: [
                 SafeArea(
                   child: Container(
+                    margin: EdgeInsets.all(20),
                     decoration: BoxDecoration(),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,

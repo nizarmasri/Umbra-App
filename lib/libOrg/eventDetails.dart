@@ -83,7 +83,7 @@ class _EventDetailsState extends State<EventDetails> {
 
   double titleTextSize = 25;
   double descTextSize = 16;
-  double ageTextSize = 25;
+  double ageTextSize = 23;
   double typeTextSize = 18;
   double feeTextSize = 24;
   double currencyTextSize = 12;
@@ -187,6 +187,10 @@ class _EventDetailsState extends State<EventDetails> {
       feeCheck = "-";
     else
       feeCheck = fee;
+
+    String ageCheck = age;
+    if(age == "All ages")
+      ageCheck = "All\nages";
 
     urls.forEach((url) {
       images.add(Container(
@@ -374,7 +378,8 @@ class _EventDetailsState extends State<EventDetails> {
                                             10)),
                                     child: Center(
                                       child: Text(
-                                        age,
+                                        ageCheck,
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontFamily: globals.montserrat,
                                             fontWeight: globals.fontWeight,

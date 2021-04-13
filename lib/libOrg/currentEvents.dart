@@ -59,6 +59,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
   DateTime dateChecker;
 
   Future<List<QueryDocumentSnapshot>> getEvents() async {
+    eventItems = [];
     List<QueryDocumentSnapshot> events = [];
     await fb
         .collection("events")
@@ -93,6 +94,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
           }
 
           if (snapshot.data != null && snapshot.data.length != 0) {
+            eventItems = [];
             snapshot.data.forEach((event) {
               DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
