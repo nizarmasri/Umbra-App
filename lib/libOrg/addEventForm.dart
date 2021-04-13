@@ -361,6 +361,10 @@ class _AddEventFormState extends State<AddEventForm> {
                                   'Pub',
                                   'Gig',
                                   'House Party',
+                                  'Concert',
+                                  'Trivia night',
+                                  'Viewing party',
+                                  'Gathering'
                                 ].map<DropdownMenuItem<String>>((String type) {
                                   return DropdownMenuItem<String>(
                                     value: type,
@@ -537,6 +541,7 @@ class _AddEventFormState extends State<AddEventForm> {
                             child: Center(
                               child: ListTile(
                                 title: TextField(
+                                  keyboardType: TextInputType.number,
                                   controller: feeController,
                                   cursorColor: Colors.white,
                                   style: TextStyle(
