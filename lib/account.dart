@@ -178,7 +178,19 @@ class _AccountPageState extends State<AccountPage> {
                               Setting(
                                   title: "Account Information",
                                   icon: Icons.account_circle_rounded,
-                                  page: navigateToAccountInfo)
+                                  page: navigateToAccountInfo),
+                              Setting(
+                                title: "About",
+                                icon: Icons.contact_mail,
+                              ),
+                              Setting(
+                                title: "Guidelines",
+                                icon: Icons.rule,
+                              ),
+                              Setting(
+                                title: "Report",
+                                icon: Icons.report,
+                              ),
                             ],
                           ),
                         )
