@@ -18,7 +18,8 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   String uid = FirebaseAuth.instance.currentUser.uid;
   double btnHeight = 60;
-  Container NameAvatar({String name, String email, Function page}) {
+  Container NameAvatar(
+      {String name, String email, Function page, String picture}) {
     return Container(
       margin: EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 20),
       decoration: BoxDecoration(),
@@ -29,8 +30,9 @@ class _AccountPageState extends State<AccountPage> {
             child: CircleAvatar(
               radius: 40,
               backgroundColor: Colors.brown.shade800,
+              backgroundImage: picture != '' ? NetworkImage(picture) : null,
               child: Text(
-                name[0].toString().toUpperCase(),
+                picture == '' ? name[0].toString().toUpperCase() : '',
                 style: TextStyle(fontSize: 50),
               ),
             ),
@@ -50,7 +52,6 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    print("QWEQWEQ");
                     page();
                   },
                   child: Text(
@@ -164,7 +165,8 @@ class _AccountPageState extends State<AccountPage> {
                         NameAvatar(
                             name: snapshot.data.data()["name"],
                             email: snapshot.data.data()["email"],
-                            page: navigateToAccountPageDetails),
+                            page: navigateToAccountPageDetails,
+                            picture: snapshot.data.data()['dp']),
                         Container(
                           child: Column(
                             children: [

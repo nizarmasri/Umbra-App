@@ -5,6 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'globals.dart' as globals;
+import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AccountInfo extends StatefulWidget {
   @override
@@ -17,6 +20,8 @@ class _AccountInfoState extends State<AccountInfo> {
     super.initState();
   }
 
+  String uid = FirebaseAuth.instance.currentUser.uid;
+
   bool loading = false;
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "## ### ###", filter: {"#": RegExp(r'[0-9]')});
@@ -26,18 +31,82 @@ class _AccountInfoState extends State<AccountInfo> {
   TextEditingController _twittercontroller;
   TextEditingController _instagramcontroller;
 
-  Container avatar({String letter}) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 30),
-      child: Center(
-        child: CircleAvatar(
-          radius: 75,
-          backgroundColor: Colors.brown.shade800,
-          child: Text(
-            letter,
-            style: TextStyle(fontSize: 80),
-          ),
+  String _error = 'No Error Dectected';
+  List<Asset> images = <Asset>[];
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = <Asset>[];
+    String error = 'No Error Detected';
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 1,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
         ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+      print(error);
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      _error = error;
+    });
+  }
+
+  Container avatar({String letter, String existingPicture}) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20),
+      child: Column(
+        children: [
+          Center(
+            child: CircleAvatar(
+              radius: 75,
+              backgroundColor: Colors.brown.shade800,
+              backgroundImage: images.isNotEmpty
+                  ? AssetThumbImageProvider(
+                      images[0],
+                      width: 200,
+                      height: 200,
+                      quality: 100,
+                    )
+                  : existingPicture != ''
+                      ? NetworkImage(existingPicture)
+                      : null,
+              child: Text(
+                images.isEmpty && existingPicture == '' ? letter : "",
+                style: TextStyle(fontSize: 80),
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            child: Center(
+                child: IconButton(
+              onPressed: () {
+                loadAssets();
+              },
+              icon: Icon(
+                Icons.edit,
+                color: Colors.white,
+                size: 30,
+              ),
+            )),
+          ),
+        ],
       ),
     );
   }
@@ -87,14 +156,41 @@ class _AccountInfoState extends State<AccountInfo> {
           setState(() {
             loading = true;
           });
-          await FirebaseFirestore.instance.collection('users').doc(uid).update({
-            'name': _namecontroller.text,
-            'number': _numbercontroller.text,
-            'twitter': _twittercontroller.text,
-            'instagram': _instagramcontroller.text
-          }).then((value) {
-            Navigator.pop(context);
-          });
+          if (images.isNotEmpty) {
+            final firebaseStorageRef =
+                FirebaseStorage.instance.ref().child('profilepictures/$uid');
+            final upload = await firebaseStorageRef
+                .putData((await images[0].getByteData(quality: 50))
+                    .buffer
+                    .asUint8List())
+                .then((value) async {
+              final url = await firebaseStorageRef.getDownloadURL();
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .update({
+                'name': _namecontroller.text,
+                'number': _numbercontroller.text,
+                'twitter': _twittercontroller.text,
+                'instagram': _instagramcontroller.text,
+                'dp': url,
+              }).then((value) {
+                Navigator.pop(context);
+              });
+            });
+          } else {
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(uid)
+                .update({
+              'name': _namecontroller.text,
+              'number': _numbercontroller.text,
+              'twitter': _twittercontroller.text,
+              'instagram': _instagramcontroller.text
+            }).then((value) {
+              Navigator.pop(context);
+            });
+          }
         },
         child: Container(
           width: 300,
@@ -110,7 +206,6 @@ class _AccountInfoState extends State<AccountInfo> {
 
   @override
   Widget build(BuildContext context) {
-    String uid = FirebaseAuth.instance.currentUser.uid;
     return !loading
         ? FutureBuilder<DocumentSnapshot>(
             future:
@@ -142,7 +237,9 @@ class _AccountInfoState extends State<AccountInfo> {
                             letter: snapshot.data
                                 .data()["name"][0]
                                 .toString()
-                                .toUpperCase()),
+                                .toUpperCase(),
+                            existingPicture:
+                                snapshot.data.data()['dp'].toString()),
                         newInput(
                             hint: "Name",
                             icon: Icon(

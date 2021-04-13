@@ -296,6 +296,9 @@ class _NewUserFormState extends State<NewUserForm> {
                 'birthday': selectedDate,
                 'number': phonenumber1,
                 'new': false,
+                'dp': '',
+                'instagram': '',
+                'twitter': '',
               });
             },
             child: Text(

@@ -15,7 +15,6 @@ class AccountPageDetails extends StatefulWidget {
 
 class _AccountPageDetailsState extends State<AccountPageDetails> {
   String uid = FirebaseAuth.instance.currentUser.uid;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +31,8 @@ class _AccountPageDetailsState extends State<AccountPageDetails> {
               future:
                   FirebaseFirestore.instance.collection("users").doc(uid).get(),
               builder: (context, snapshot) {
+                final url = snapshot.data.data()['dp'].toString();
+
                 final Uri params = Uri(
                   scheme: 'mailto',
                   path: snapshot.data.data()["email"],
@@ -50,8 +51,15 @@ class _AccountPageDetailsState extends State<AccountPageDetails> {
                         children: [
                           CircleAvatar(
                             radius: 60,
+                            backgroundColor: Colors.brown.shade800,
+                            backgroundImage:
+                                url != '' ? NetworkImage(url) : null,
                             child: Text(
-                              snapshot.data.data()["name"][0].toUpperCase(),
+                              url == ''
+                                  ? snapshot.data
+                                      .data()["name"][0]
+                                      .toUpperCase()
+                                  : '',
                               style: TextStyle(fontSize: 55),
                             ),
                           ),
