@@ -20,36 +20,11 @@ class _EventsPageState extends State<EventsPage> {
         .then((value) => setState(() {}));
   }
 
-  navigateToEventDetailsPage(
-      String title,
-      String description,
-      String age,
-      String type,
-      String fee,
-      String date,
-      String time,
-      String location,
-      GeoPoint locationPoint,
-      List<dynamic> urls,
-      String id,
-      String posteruid) {
+  navigateToEventDetailsPage(QueryDocumentSnapshot data) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(
-                  title: title,
-                  description: description,
-                  age: age,
-                  type: type,
-                  fee: fee,
-                  date: date,
-                  time: time,
-                  location: location,
-                  locationPoint: locationPoint,
-                  urls: urls,
-                  id: id,
-                  posteruid: posteruid,
-                )));
+            builder: (context) => EventDetails(data: data,)));
   }
 
   List<EventItem> eventItems = [];
@@ -99,20 +74,8 @@ class _EventsPageState extends State<EventsPage> {
 
           if (snapshot.data != null && snapshot.data.length != 0) {
             snapshot.data.forEach((event) {
-              DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
-                title: event['title'],
-                description: event['description'],
-                age: event['age'],
-                type: event['type'],
-                fee: event['fee'],
-                time: event['time'],
-                date: DateFormat.MMMd().format(date),
-                location: event['locationName'],
-                locationPoint: event['location']['geopoint'],
-                urls: event['urls'],
-                id: event['id'],
-                posteruid: event['poster'],
+                data: event,
               ));
             });
 
@@ -144,18 +107,7 @@ class _EventsPageState extends State<EventsPage> {
                               child: eventItems[index],
                               onTap: () {
                                 navigateToEventDetailsPage(
-                                    eventItems[index].title,
-                                    eventItems[index].description,
-                                    eventItems[index].age,
-                                    eventItems[index].type,
-                                    eventItems[index].fee,
-                                    eventItems[index].date,
-                                    eventItems[index].time,
-                                    eventItems[index].location,
-                                    eventItems[index].locationPoint,
-                                    eventItems[index].urls,
-                                    eventItems[index].id,
-                                    eventItems[index].posteruid);
+                                    eventItems[index].data);
                               },
                             );
                           },

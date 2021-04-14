@@ -7,79 +7,56 @@ import 'package:events/globals.dart' as globals;
 import 'package:getwidget/components/carousel/gf_carousel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
+
 
 class EventDetails extends StatefulWidget {
-  final String title;
-  final String description;
-  final String type;
-  final String fee;
-  final String age;
-  final String date;
-  final String time;
-  final String location;
-  final GeoPoint locationPoint;
-  final List<dynamic> urls;
-  final String id;
-  final String posteruid;
+  final QueryDocumentSnapshot data;
 
   EventDetails({Key key,
-    this.title,
-    this.description,
-    this.type,
-    this.fee,
-    this.age,
-    this.date,
-    this.time,
-    this.location,
-    this.locationPoint,
-    this.urls,
-    this.id,
-    this.posteruid})
+    this.data})
       : super(key: key);
 
   @override
   _EventDetailsState createState() =>
-      _EventDetailsState(
-          title,
-          description,
-          type,
-          fee,
-          age,
-          date,
-          time,
-          location,
-          locationPoint,
-          urls,
-          id,
-          posteruid);
+      _EventDetailsState(data);
 }
 
 class _EventDetailsState extends State<EventDetails> {
-  final String title;
-  final String description;
-  final String type;
-  final String fee;
-  final String age;
-  final String date;
-  final String time;
-  final String location;
-  final GeoPoint locationPoint;
-  final List<dynamic> urls;
-  final String id;
-  final String posteruid;
+  String title;
+  String description;
+  String type;
+  String fee;
+  String age;
+  String date;
+  String time;
+  String location;
+  GeoPoint locationPoint;
+  List<dynamic> urls;
+  String id;
+  String posteruid;
 
-  _EventDetailsState(this.title,
-      this.description,
-      this.type,
-      this.fee,
-      this.age,
-      this.date,
-      this.time,
-      this.location,
-      this.locationPoint,
-      this.urls,
-      this.id,
-      this.posteruid);
+  final QueryDocumentSnapshot data;
+
+
+  _EventDetailsState(this.data);
+
+  void getData() {
+    DateTime dateFormatted = data['date'].toDate();
+
+    title = data['title'];
+    description = data['description'];
+    type = data['type'];
+    fee = data['fee'];
+    age = data['age'];
+    date = DateFormat.MMMd().format(dateFormatted);
+    time = data['time'];
+    location = data['locationName'];
+    locationPoint = data['location']['geopoint'];
+    urls = data['urls'];
+    id = data['id'];
+    posteruid = data['poster'];
+  }
 
   double titleTextSize = 25;
   double descTextSize = 16;
@@ -160,6 +137,7 @@ class _EventDetailsState extends State<EventDetails> {
 
   @override
   void initState() {
+    getData();
     setMarkerPos();
     checkIsOrg();
     checkIsAttendOrBooked();

@@ -50,36 +50,11 @@ class _SearchItemState extends State<SearchItem> {
     posteruid = data['poster'];
   }
 
-  navigateToEventDetailsPage(
-      String title,
-      String description,
-      String age,
-      String type,
-      String fee,
-      String date,
-      String time,
-      String location,
-      GeoPoint locationPoint,
-      List<dynamic> urls,
-      String id,
-      String posteruid) {
+  navigateToEventDetailsPage(QueryDocumentSnapshot data) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(
-              title: title,
-              description: description,
-              age: age,
-              type: type,
-              fee: fee,
-              date: date,
-              time: time,
-              location: location,
-              locationPoint: locationPoint,
-              urls: urls,
-              id: id,
-              posteruid: posteruid,
-            )));
+            builder: (context) => EventDetails(data: data,)));
   }
 
   _SearchItemState(this.data);
@@ -96,20 +71,7 @@ class _SearchItemState extends State<SearchItem> {
 
     return GestureDetector(
       onTap: () {
-        navigateToEventDetailsPage(
-          title,
-          description,
-          age,
-          type,
-          fee,
-          date,
-          time,
-          location,
-          locationPoint,
-          urls,
-          id,
-          posteruid
-        );
+        navigateToEventDetailsPage(data);
       },
       child: Container(
           height: itemHeight,

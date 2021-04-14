@@ -1,68 +1,61 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:events/globals.dart' as globals;
 
 class EventItem extends StatefulWidget {
-  final String title;
-  final String description;
-  final String type;
-  final String fee;
-  final String age;
-  final String date;
-  final String time;
-  final String location;
-  final GeoPoint locationPoint;
-  final List<dynamic> urls;
-  final String id;
-  final String posteruid;
+  final QueryDocumentSnapshot data;
 
   EventItem(
       {Key key,
-      this.title,
-      this.description,
-      this.type,
-      this.fee,
-      this.age,
-      this.date,
-      this.time,
-      this.location,
-      this.locationPoint,
-      this.urls,
-      this.id,
-      this.posteruid})
+      this.data})
       : super(key: key);
 
   @override
-  _EventItemState createState() => _EventItemState(title, description, type,
-      fee, age, date, time, location, locationPoint, urls, id, posteruid);
+  _EventItemState createState() => _EventItemState(data);
 }
 
 class _EventItemState extends State<EventItem> {
-  final String title;
-  final String description;
-  final String type;
-  final String fee;
-  final String age;
-  final String date;
-  final String time;
-  final String location;
-  final GeoPoint locationPoint;
-  final List<dynamic> urls;
-  final String id;
-  final String posteruid;
+  String title;
+  String description;
+  String type;
+  String fee;
+  String age;
+  String date;
+  String time;
+  String location;
+  GeoPoint locationPoint;
+  List<dynamic> urls;
+  String id;
+  String posteruid;
+
+  final QueryDocumentSnapshot data;
+
+
   _EventItemState(
-      this.title,
-      this.description,
-      this.type,
-      this.fee,
-      this.age,
-      this.date,
-      this.time,
-      this.location,
-      this.locationPoint,
-      this.urls,
-      this.id,
-      this.posteruid);
+      this.data);
+
+  void getData() {
+    DateTime dateFormatted = data['date'].toDate();
+
+    title = data['title'];
+    description = data['description'];
+    type = data['type'];
+    fee = data['fee'];
+    age = data['age'];
+    date = DateFormat.MMMd().format(dateFormatted);
+    time = data['time'];
+    location = data['locationName'];
+    locationPoint = data['location']['geopoint'];
+    urls = data['urls'];
+    posteruid = data['poster'];
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,34 +103,49 @@ class _EventItemState extends State<EventItem> {
               )),
           // Info List Tile
           Container(
-            height: tileHeight,
-            width: tileWidth,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(0),
-                  topLeft: Radius.circular(0),
-                  bottomRight: Radius.circular(10),
-                  topRight: Radius.circular(10)),
-            ),
-            child: ListTile(
-              title: Text(
-                title,
-                style: TextStyle(
-                    fontFamily: globals.montserrat,
-                    fontSize: 17,
-                    color: Colors.white),
+              height: tileHeight,
+              width: tileWidth,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white12,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(0),
+                    topLeft: Radius.circular(0),
+                    bottomRight: Radius.circular(10),
+                    topRight: Radius.circular(10)),
               ),
-              subtitle: Text(
-                type + "\n" + location,
-                style: TextStyle(
-                    fontFamily: globals.montserrat,
-                    fontSize: 15,
-                    fontWeight: globals.fontWeight,
-                    color: Colors.white),
-              ),
-              tileColor: Colors.white12,
-            ),
-          ),
+              child: RichText(
+                text: TextSpan(children: <TextSpan>[
+                  TextSpan(
+                      text: title,
+                      style: TextStyle(
+                          fontFamily: globals.montserrat,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          color: Colors.white)),
+                  TextSpan(
+                      text: "\n" + type,
+                      style: TextStyle(
+                          fontFamily: globals.montserrat,
+                          fontSize: 13,
+                          fontWeight: globals.fontWeight,
+                          color: Colors.white)),
+                  TextSpan(
+                      text: "\n" + location,
+                      style: TextStyle(
+                          fontFamily: globals.montserrat,
+                          fontSize: 13,
+                          fontWeight: globals.fontWeight,
+                          color: Colors.white)),
+                  TextSpan(
+                      text: "\n" + date,
+                      style: TextStyle(
+                          fontFamily: globals.montserrat,
+                          fontSize: 13,
+                          fontWeight: globals.fontWeight,
+                          color: Colors.white)),
+                ]),
+              )),
         ],
       ),
     );
