@@ -94,7 +94,7 @@ class _outerLoginState extends State<outerLogin> {
                           child: ElevatedButton.icon(
                             icon: FaIcon(
                               FontAwesomeIcons.facebook,
-                              color: Colors.white38,
+                              color: Colors.blue,
                             ),
                             style: ButtonStyle(
                                 backgroundColor:
@@ -125,7 +125,7 @@ class _outerLoginState extends State<outerLogin> {
                           child: ElevatedButton.icon(
                             icon: FaIcon(
                               FontAwesomeIcons.google,
-                              color: Colors.white38,
+                              color: Colors.blue,
                             ),
                             style: ButtonStyle(
                                 backgroundColor:
@@ -142,7 +142,6 @@ class _outerLoginState extends State<outerLogin> {
                               Future<String> temp = context
                                   .read<AuthenticationService>()
                                   .signInWithGoogle();
-
                               temp.then((String result) {
                                 if (result == "Signed in")
                                   globals.isOrg = false;
