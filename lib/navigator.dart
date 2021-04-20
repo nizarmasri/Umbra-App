@@ -54,7 +54,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
               ),
               icon: Icon(
                 Icons.home_outlined,
-                color: Colors.white,
+                color: Colors.white38,
               ),
               title: Text("")),
           BottomNavigationBarItem(
@@ -62,21 +62,21 @@ class _NavigatorPageState extends State<NavigatorPage> {
                 Icons.view_list,
                 color: Colors.white,
               ),
-              icon: Icon(Icons.view_list_outlined, color: Colors.white),
+              icon: Icon(Icons.view_list_outlined, color: Colors.white38),
               title: Text("")),
           BottomNavigationBarItem(
               activeIcon: Icon(
                 Icons.search,
                 color: Colors.white,
               ),
-              icon: Icon(Icons.search, color: Colors.white),
+              icon: Icon(Icons.search, color: Colors.white38),
               title: Text("")),
           BottomNavigationBarItem(
               activeIcon: Icon(
                 Icons.person,
                 color: Colors.white,
               ),
-              icon: Icon(Icons.person_outline, color: Colors.white),
+              icon: Icon(Icons.person_outline, color: Colors.white38),
               title: Text(""))
         ],
         currentIndex: _selectedIndex,

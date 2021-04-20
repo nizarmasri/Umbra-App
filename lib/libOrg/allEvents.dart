@@ -6,7 +6,6 @@ import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_loader/awesome_loader.dart';
-import 'package:intl/intl.dart';
 
 class AllEventsPage extends StatefulWidget {
   @override
@@ -44,13 +43,18 @@ class _AllEventsPageState extends State<AllEventsPage> {
         events.add(event);
       });
     });
+    events.sort((a,b) => b['date'].compareTo(a['date']));
+
     return events;
   }
+
+  String _sortBy = 'Descending';
+
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double listHeight = height * 0.8;
+    double listHeight = height * 0.75;
 
     eventItems = [];
 
@@ -67,9 +71,20 @@ class _AllEventsPageState extends State<AllEventsPage> {
           }
 
           if (snapshot.data != null && snapshot.data.length != 0) {
+            eventItems = [];
             snapshot.data.forEach((event) {
-              eventItems.add(EventItem(data: event,));
+              eventItems.add(EventItem(
+                data: event,
+                key: Key(event['title'] + event['date'].toString()),
+              ));
             });
+
+            if (_sortBy == 'Descending')
+              eventItems
+                  .sort((a, b) => b.data['date'].compareTo(a.data['date']));
+            else if (_sortBy == 'Ascending')
+              eventItems
+                  .sort((a, b) => a.data['date'].compareTo(b.data['date']));
 
             return Scaffold(
               backgroundColor: Colors.black,
@@ -88,6 +103,64 @@ class _AllEventsPageState extends State<AllEventsPage> {
                               fontFamily: globals.montserrat,
                               fontSize: 30,
                               color: Colors.white),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 15),
+                        margin: EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Sort by ",
+                              style: TextStyle(
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight,
+                                  fontSize: 15,
+                                  color: Colors.white),
+                            ),
+                            Container(
+                              //margin: EdgeInsets.only(left: 5),
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  //color: Colors.white12,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    dropdownColor: Colors.grey[900],
+                                    value: _sortBy,
+                                    style: TextStyle(
+                                      fontFamily: globals.montserrat,
+                                      fontSize: 15,
+                                      fontWeight: globals.fontWeight,
+                                      color: Colors.white,
+                                    ),
+                                    //elevation: 5,
+                                    items: <String>[
+                                      'Ascending',
+                                      'Descending',
+                                    ].map<DropdownMenuItem<String>>(
+                                            (String sorting) {
+                                          return DropdownMenuItem<String>(
+                                            value: sorting,
+                                            child: Text(sorting),
+                                          );
+                                        }).toList(),
+                                    hint: Text(
+                                      _sortBy,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: globals.fontWeight,
+                                          fontFamily: globals.montserrat),
+                                    ),
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        _sortBy = value;
+                                      });
+                                    },
+                                  ),
+                                ))
+                          ],
                         ),
                       ),
                       Container(

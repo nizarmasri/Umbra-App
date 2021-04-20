@@ -1,3 +1,4 @@
+import 'package:awesome_loader/awesome_loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -121,6 +122,14 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: AwesomeLoader(
+                    loaderType: AwesomeLoader.AwesomeLoader2,
+                    color: Colors.white,
+                  ),
+                );
+              }
           return Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.black,

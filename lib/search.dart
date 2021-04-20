@@ -2,6 +2,7 @@ import 'package:awesome_loader/awesome_loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/searchItem.dart';
 import 'package:flutter/material.dart';
+import 'package:events/searchResults.dart';
 import 'globals.dart' as globals;
 
 
@@ -46,6 +47,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   List<SearchItem> searchItems = [];
+
+  navigateToSearchResultsPage(String searchString) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SearchResultsPage(searchString: searchString,)));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +137,9 @@ class _SearchPageState extends State<SearchPage> {
                                         border: InputBorder.none,
                                         focusColor: Colors.black,
                                         fillColor: Colors.black),
+                                    onSubmitted: (searchText){
+                                      navigateToSearchResultsPage(searchText);
+                                    },
                                   ),
                                 ),
                               ),
@@ -144,19 +155,24 @@ class _SearchPageState extends State<SearchPage> {
                                       mainAxisSpacing: 10),
                                   itemCount: keyWords.length,
                                   itemBuilder: (BuildContext context, index) {
-                                    return Container(
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white12,
-                                          borderRadius: BorderRadius.circular(
-                                              5)),
-                                      child: Text(
-                                        keyWords[index],
-                                        style: TextStyle(
-                                            fontFamily: globals.montserrat,
-                                            fontWeight: globals.fontWeight,
-                                            fontSize: 10.5,
-                                            color: Colors.white
+                                    return GestureDetector(
+                                      onTap: () {
+                                        navigateToSearchResultsPage(keyWords[index]);
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white12,
+                                            borderRadius: BorderRadius.circular(
+                                                5)),
+                                        child: Text(
+                                          keyWords[index],
+                                          style: TextStyle(
+                                              fontFamily: globals.montserrat,
+                                              fontWeight: globals.fontWeight,
+                                              fontSize: 10.5,
+                                              color: Colors.white
+                                          ),
                                         ),
                                       ),
                                     );

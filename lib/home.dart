@@ -62,7 +62,9 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(data: data,)));
+            builder: (context) => EventDetails(
+                  data: data,
+                )));
   }
 
   List<String> months = [
@@ -97,17 +99,13 @@ class _HomePageState extends State<HomePage> {
   Future<List<QueryDocumentSnapshot>> getForyouEvents() async {
     List<QueryDocumentSnapshot> events = [];
 
-    await fb
-        .collection("events")
-        .get()
-        .then((value) {
+    await fb.collection("events").get().then((value) {
       value.docs.forEach((event) {
         events.add(event);
       });
     });
     return events;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -163,47 +161,60 @@ class _HomePageState extends State<HomePage> {
                                                           : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
                                                     ),
                                                     fit: BoxFit.fill)),
-                                            child: Container()),
-                                        Container(
-                                          color: Colors.black38,
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: 30, top: 30),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                con["title"],
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontFamily:
-                                                        globals.montserrat,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 30),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Container(
+                                                padding: EdgeInsets.all(20),
+                                                width: width,
+                                                height:
+                                                    featureCarouselHeight * 0.33,
+                                                decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                        begin:
+                                                            Alignment.topCenter,
+                                                        end: Alignment
+                                                            .bottomCenter,
+                                                        colors: <Color>[
+                                                      Colors.black54,
+                                                      Colors.transparent
+                                                    ])),
+                                                child: RichText(
+                                                  textAlign: TextAlign.start,
+                                                  text: TextSpan(children: <
+                                                      TextSpan>[
+                                                    TextSpan(
+                                                      text: con["title"],
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontFamily: globals
+                                                              .montserrat,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 30),
+                                                    ),
+                                                    TextSpan(
+                                                        text: '\n' +
+                                                            dateConverter(
+                                                                con["date"],
+                                                                con["time"]),
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontFamily: globals
+                                                                .montserrat,
+                                                            fontSize: 15)),
+                                                    TextSpan(
+                                                        text: '\n' +
+                                                            con["locationName"]
+                                                                .split(",")[0],
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontFamily: globals
+                                                                .montserrat,
+                                                            fontSize: 15))
+                                                  ]),
+                                                ),
                                               ),
-                                              Text(
-                                                dateConverter(
-                                                    con["date"], con["time"]),
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontFamily:
-                                                        globals.montserrat,
-                                                    fontSize: 15),
-                                              ),
-                                              Text(
-                                                con["locationName"]
-                                                    .split(",")[0],
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontFamily:
-                                                        globals.montserrat,
-                                                    fontSize: 15),
-                                              ),
-                                            ],
-                                          ),
-                                        )
+                                            )),
                                       ]),
                                     ),
                                   );
@@ -301,7 +312,6 @@ class _HomePageState extends State<HomePage> {
                     FutureBuilder(
                       future: getForyouEvents(),
                       builder: (context, snapshot) {
-
                         if (!snapshot.hasData) {
                           return Center(
                             child: AwesomeLoader(
@@ -311,7 +321,8 @@ class _HomePageState extends State<HomePage> {
                           );
                         }
 
-                        if (snapshot.data != null && snapshot.data.length != 0){
+                        if (snapshot.data != null &&
+                            snapshot.data.length != 0) {
                           snapshot.data.forEach((event) {
                             foryouItems.add(EventItem(
                               data: event,
@@ -320,7 +331,8 @@ class _HomePageState extends State<HomePage> {
                           return Container(
                             height: height,
                             child: ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),                              itemCount: foryouItems.length,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: foryouItems.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   child: foryouItems[index],
@@ -332,14 +344,10 @@ class _HomePageState extends State<HomePage> {
                               },
                             ),
                           );
-                        }
-
-                        else
+                        } else
                           return Container();
-
                       },
                     ),
-
                   ],
                 ),
               ),

@@ -1,3 +1,4 @@
+
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,7 +55,7 @@ class _EventDetailsState extends State<EventDetails> {
     location = data['locationName'];
     locationPoint = data['location']['geopoint'];
     urls = data['urls'];
-    id = data['id'];
+    id = data.id;
     posteruid = data['poster'];
   }
 
@@ -98,9 +99,9 @@ class _EventDetailsState extends State<EventDetails> {
 
   Future<bool> checkIsOrg() async {
     await fb.collection("users").doc(uid).get().then((value) {
-      if (value.data()["organizer"] == false)
+      if (value.data()["organizer"] == true)
         setState(() {
-          isOrg = false;
+          isOrg = true;
         });
     });
     return isOrg;
@@ -108,8 +109,10 @@ class _EventDetailsState extends State<EventDetails> {
 
   Future<void> checkIsAttendOrBooked() async {
     await fb.collection("users").doc(uid).get().then((value) {
-      if (value.data()['attending'].contains(id)) isAttend = true;
-      if (value.data()['booked'].contains(id)) isBooked = true;
+      setState(() {
+        if (value.data()['attending'].contains(id)) isAttend = true;
+        if (value.data()['booked'].contains(id)) isBooked = true;
+      });
     });
   }
 
@@ -138,28 +141,25 @@ class _EventDetailsState extends State<EventDetails> {
   @override
   void initState() {
     getData();
+    checkIsAttendOrBooked();
     setMarkerPos();
     checkIsOrg();
-    checkIsAttendOrBooked();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    double width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     double infoSquaresSize = height * 0.114;
     double infoRectsHeight = height * 0.114;
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
     double imagesHeight = height * 0.3;
-    print(posteruid);
+
+    print("is attend: " + isAttend.toString());
+
+
     String feeCheck = "";
     if (fee == "")
       feeCheck = "-";
@@ -167,8 +167,14 @@ class _EventDetailsState extends State<EventDetails> {
       feeCheck = fee;
 
     String ageCheck = age;
-    if(age == "All ages")
+    if(age == "All ages") {
       ageCheck = "All\nages";
+      ageTextSize = 18;
+    }
+    String typeCheck = type;
+    if(type.contains(' ')){
+      typeCheck = typeCheck.replaceAll(' ', '\n');
+    }
 
     urls.forEach((url) {
       images.add(Container(
@@ -192,6 +198,12 @@ class _EventDetailsState extends State<EventDetails> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
+        leading: GestureDetector(
+          child: Icon(Icons.arrow_back, color: Colors.white),
+          onTap: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SafeArea(
         child: Container(
@@ -381,7 +393,7 @@ class _EventDetailsState extends State<EventDetails> {
                                             10)),
                                     child: Center(
                                       child: Text(
-                                        type,
+                                        typeCheck,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                             fontFamily: globals.montserrat,

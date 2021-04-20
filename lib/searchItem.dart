@@ -10,7 +10,7 @@ class SearchItem extends StatefulWidget {
 
   SearchItem(
       {Key key,
-      this.data})
+        this.data})
       : super(key: key);
 
   @override
@@ -77,10 +77,10 @@ class _SearchItemState extends State<SearchItem> {
           height: itemHeight,
           width: itemWidth,
           decoration: BoxDecoration(
-            color: Colors.white12,
-            borderRadius: BorderRadius.circular(20),
+              color: Colors.white12,
+              borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
-                fit: BoxFit.cover,
+                  fit: BoxFit.cover,
                   image: NetworkImage((urls != null && urls.length != 0)
                       ? urls[0]
                       : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'))),
@@ -90,14 +90,14 @@ class _SearchItemState extends State<SearchItem> {
               width: itemWidth,
               height: shadedHeight,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: <Color>[
-                    Colors.black45,
-                    Colors.transparent
-                  ]
-                )
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: <Color>[
+                        Colors.black45,
+                        Colors.transparent
+                      ]
+                  )
               ),
               child: Align(
                 alignment: Alignment.centerLeft,
@@ -106,7 +106,7 @@ class _SearchItemState extends State<SearchItem> {
                   child: Text(
                     title,
                     style:
-                        TextStyle(fontFamily: globals.montserrat, fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                    TextStyle(fontFamily: globals.montserrat, fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),

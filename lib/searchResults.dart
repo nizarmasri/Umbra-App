@@ -3,24 +3,31 @@ import 'dart:async';
 import 'package:events/libOrg/addEventForm.dart';
 import 'package:events/libOrg/eventItem.dart';
 import 'package:events/libOrg/eventDetails.dart';
+import 'package:events/searchItem.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_loader/awesome_loader.dart';
+import 'package:events/searchResultItem.dart';
 import 'package:intl/intl.dart';
 
-class CurrentEventsPage extends StatefulWidget {
+class SearchResultsPage extends StatefulWidget {
+  final String searchString;
+
+  SearchResultsPage({Key key, this.searchString}) : super(key: key);
+
   @override
-  _CurrentEventsPageState createState() => _CurrentEventsPageState();
+  _SearchResultsPageState createState() =>
+      _SearchResultsPageState(searchString);
 }
 
-class _CurrentEventsPageState extends State<CurrentEventsPage> {
-  navigateToAddEventForm() {
-    Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AddEventForm()))
-        .then((value) => setState(() {}));
-  }
+class _SearchResultsPageState extends State<SearchResultsPage> {
+  final String searchString;
+
+  _SearchResultsPageState(this.searchString);
+
+  String searchStringFormatted = '';
 
   navigateToEventDetailsPage(QueryDocumentSnapshot data) {
     Navigator.push(
@@ -28,10 +35,15 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         MaterialPageRoute(
             builder: (context) => EventDetails(
                   data: data,
-                )));
+                ))).then((value) => setState(() {}));
   }
 
-  List<EventItem> eventItems = [];
+  List<SearchResultItem> eventItems = [];
+
+  void searchStringFormat() {
+    searchStringFormatted = searchString.trim().toUpperCase();
+    if (searchStringFormatted == 'FREE') searchStringFormatted = '';
+  }
 
   String uid = FirebaseAuth.instance.currentUser.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
@@ -40,14 +52,37 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
   Future<List<QueryDocumentSnapshot>> getEvents() async {
     eventItems = [];
     List<QueryDocumentSnapshot> events = [];
+    searchStringFormat();
+    String descSearch = "";
+    String titleSearch = "";
+    String ageSearch = "";
+    String typeSearch = "";
+    String locationSearch = "";
+    String feeSearch = "";
+
     await fb
         .collection("events")
-        .where('poster', isEqualTo: uid)
+        .where('date', isGreaterThanOrEqualTo: Timestamp.now())
         .get()
         .then((value) {
       value.docs.forEach((event) {
-        dateChecker = event.data()['date'].toDate();
-        if (dateChecker.isAfter(DateTime.now())) events.add(event);
+        descSearch = event.data()['description'].toUpperCase();
+        titleSearch = event.data()['title'].toUpperCase();
+        ageSearch = event.data()['age'].toUpperCase();
+        typeSearch = event.data()['type'].toUpperCase();
+        locationSearch = event.data()['locationName'].toUpperCase();
+        feeSearch = event.data()['fee'].toUpperCase();
+
+        /*if(searchStringFormatted == "" && feeSearch.contains(searchStringFormatted))
+          events.add(event);*/
+
+        if (event.data().containsValue(searchString) ||
+            descSearch.contains(searchStringFormatted) ||
+            titleSearch.contains(searchStringFormatted) ||
+            typeSearch.contains(searchStringFormatted) ||
+            locationSearch.contains(searchStringFormatted) ||
+            ageSearch.contains(searchStringFormatted) ||
+            feeSearch.contains(searchStringFormatted)) events.add(event);
       });
     });
     events.sort((a, b) => a['date'].compareTo(b['date']));
@@ -59,7 +94,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double listHeight = height * 0.75;
+    double listHeight = height * 0.8;
 
     eventItems = [];
 
@@ -78,7 +113,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
           if (snapshot.data != null && snapshot.data.length != 0) {
             eventItems = [];
             snapshot.data.forEach((event) {
-              eventItems.add(EventItem(
+              eventItems.add(SearchResultItem(
                 data: event,
                 key: Key(event['title'] + event['date'].toString()),
               ));
@@ -93,25 +128,21 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
             return Scaffold(
               backgroundColor: Colors.black,
+              appBar: AppBar(
+                backgroundColor: Colors.black,
+                title: Text(
+                  searchString,
+                  style: TextStyle(
+                      fontFamily: globals.montserrat,
+                      fontSize: 25,
+                      color: Colors.white),
+                ),
+              ),
               body: SafeArea(
                 child: SingleChildScrollView(
                   child: Container(
                       child: Column(
                     children: [
-                      // Title field
-                      Container(
-                        padding: EdgeInsets.only(left: 15, top: 15),
-                        margin: EdgeInsets.only(bottom: 10),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "On-Going Events",
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontSize: 30,
-                              color: Colors.white),
-                        ),
-                      ),
-
                       // Sort menu
                       Container(
                         padding: EdgeInsets.only(left: 15),
@@ -177,13 +208,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                         child: ListView.builder(
                           itemCount: eventItems.length,
                           itemBuilder: (context, index) {
-                            return GestureDetector(
-                              child: eventItems[index],
-                              onTap: () {
-                                navigateToEventDetailsPage(
-                                    eventItems[index].data);
-                              },
-                            );
+                            return eventItems[index];
                           },
                         ),
                       )
@@ -191,60 +216,34 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                   )),
                 ),
               ),
-              floatingActionButton: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                backgroundColor: Colors.white10,
-                onPressed: () {
-                  navigateToAddEventForm();
-                },
-              ),
             );
           } else
             return Scaffold(
-              body: SafeArea(
-                child: Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 15, top: 15),
-                        margin: EdgeInsets.only(bottom: 10),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Current Events",
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontSize: 30,
-                              color: Colors.white),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.all(30),
-                        child: Text(
-                          "You do not have any events in progress",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight,
-                              fontSize: 25,
-                              color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
+              appBar: AppBar(
+                backgroundColor: Colors.black,
+                title: Text(
+                  searchString,
+                  style: TextStyle(
+                      fontFamily: globals.montserrat,
+                      fontSize: 25,
+                      color: Colors.white),
                 ),
               ),
-              floatingActionButton: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
+              body: SafeArea(
+                child: Center(
+                  child: Container(
+                    margin: EdgeInsets.all(30),
+                    child: Text(
+                      "No events found",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontFamily: globals.montserrat,
+                          fontWeight: globals.fontWeight,
+                          fontSize: 25,
+                          color: Colors.white),
+                    ),
+                  ),
                 ),
-                backgroundColor: Colors.white10,
-                onPressed: () {
-                  navigateToAddEventForm();
-                },
               ),
             );
         });

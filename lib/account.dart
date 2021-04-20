@@ -1,3 +1,4 @@
+import 'package:awesome_loader/awesome_loader.dart';
 import 'package:events/foryouItem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -144,6 +145,16 @@ class _AccountPageState extends State<AccountPage> {
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+
+              if (!snapshot.hasData) {
+                return Center(
+                  child: AwesomeLoader(
+                    loaderType: AwesomeLoader.AwesomeLoader2,
+                    color: Colors.white,
+                  ),
+                );
+              }
+
           return Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.black,
