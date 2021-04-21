@@ -110,7 +110,6 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
 
   @override
   Widget build(BuildContext context) {
-
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double textFieldWidth = width * 0.9;
@@ -132,9 +131,7 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                 appBar: AppBar(
                   title: Text(
                     "Account Information",
-                    style: TextStyle(
-                      fontFamily: globals.montserrat
-                    ),
+                    style: TextStyle(fontFamily: globals.montserrat),
                   ),
                   backgroundColor: Colors.black,
                 ),
@@ -157,7 +154,10 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                           margin: EdgeInsets.only(bottom: 15),
                           child: Center(
                             child: ListTile(
-                              leading: Icon(Icons.person, color: Colors.white,),
+                              leading: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
                               title: TextField(
                                 controller: _namecontroller,
                                 cursorColor: Colors.white,
@@ -189,7 +189,10 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                           margin: EdgeInsets.only(bottom: 15),
                           child: Center(
                             child: ListTile(
-                              leading: Icon(Icons.phone, color: Colors.white,),
+                              leading: Icon(
+                                Icons.phone,
+                                color: Colors.white,
+                              ),
                               title: TextField(
                                 inputFormatters: [
                                   maskTextInputFormatter,
@@ -230,7 +233,6 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                             type: TextInputType.phone,
                             mask: maskTextInputFormatter),
                             */
-
 
                         button(uid: uid),
                       ],

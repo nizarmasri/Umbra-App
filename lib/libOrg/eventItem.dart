@@ -6,10 +6,7 @@ import 'package:events/globals.dart' as globals;
 class EventItem extends StatefulWidget {
   final QueryDocumentSnapshot data;
 
-  EventItem(
-      {Key key,
-      this.data})
-      : super(key: key);
+  EventItem({Key key, this.data}) : super(key: key);
 
   @override
   _EventItemState createState() => _EventItemState(data);
@@ -31,9 +28,7 @@ class _EventItemState extends State<EventItem> {
 
   final QueryDocumentSnapshot data;
 
-
-  _EventItemState(
-      this.data);
+  _EventItemState(this.data);
 
   void getData() {
     DateTime dateFormatted = data['date'].toDate();

@@ -166,8 +166,8 @@ class _HomePageState extends State<HomePage> {
                                               child: Container(
                                                 padding: EdgeInsets.all(20),
                                                 width: width,
-                                                height:
-                                                    featureCarouselHeight * 0.33,
+                                                //   height: featureCarouselHeight *
+                                                //       0.33,
                                                 decoration: BoxDecoration(
                                                     gradient: LinearGradient(
                                                         begin:
