@@ -46,7 +46,7 @@ class _NearyouItemState extends State<NearyouItem> {
     location = data['locationName'];
     locationPoint = data['location']['geopoint'];
     urls = data['urls'];
-    id = data['id'];
+    id = data.id;
     posteruid = data['poster'];
   }
 
@@ -91,7 +91,7 @@ class _NearyouItemState extends State<NearyouItem> {
               width: itemWidth,
               height: shadedHeight,
               decoration: BoxDecoration(
-                color: Colors.white70,
+                color: Colors.white,
 
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
@@ -128,7 +128,7 @@ class _NearyouItemState extends State<NearyouItem> {
                                   color: Colors.black),
                             ),
                             TextSpan(
-                              text: "\n" + type,
+                              text: "\n" + type + "  |  " + date,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,

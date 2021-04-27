@@ -1,7 +1,8 @@
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:events/libOrg/eventItem.dart';
-import 'package:events/foryouItem.dart';
+import 'package:events/nearyouItem.dart';
+import 'package:events/searchResultItem.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -93,7 +94,7 @@ class _HomePageState extends State<HomePage> {
         time;
   }
 
-  List<EventItem> foryouItems = [];
+  List<SearchResultItem> foryouItems = [];
   FirebaseFirestore fb = FirebaseFirestore.instance;
 
   Future<List<QueryDocumentSnapshot>> getForyouEvents() async {
@@ -123,8 +124,6 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 child: ListView(
                   children: [
-                    // Featured text
-
                     // Featured carousel
                     FutureBuilder<QuerySnapshot>(
                       future: FirebaseFirestore.instance
@@ -133,8 +132,13 @@ class _HomePageState extends State<HomePage> {
                           .get(),
                       builder: (BuildContext context,
                           AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.data == null) {
-                          return Container();
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: AwesomeLoader(
+                              loaderType: AwesomeLoader.AwesomeLoader2,
+                              color: Colors.white,
+                            ),
+                          );
                         } else {
                           return Container(
                             child: GFCarousel(
@@ -232,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     // Near you text
                     Container(
-                      margin: EdgeInsets.only(top: 5, left: 10),
+                      margin: EdgeInsets.only(top: 5, left: 10, bottom: 10),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -294,7 +298,7 @@ class _HomePageState extends State<HomePage> {
                         }),
                     // For you text
                     Container(
-                      margin: EdgeInsets.only(top: 5, left: 10, bottom: 5),
+                      margin: EdgeInsets.only(top: 10, left: 10, bottom: 10),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -324,7 +328,7 @@ class _HomePageState extends State<HomePage> {
                         if (snapshot.data != null &&
                             snapshot.data.length != 0) {
                           snapshot.data.forEach((event) {
-                            foryouItems.add(EventItem(
+                            foryouItems.add(SearchResultItem(
                               data: event,
                             ));
                           });
@@ -334,13 +338,7 @@ class _HomePageState extends State<HomePage> {
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: foryouItems.length,
                               itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  child: foryouItems[index],
-                                  onTap: () {
-                                    navigateToEventDetailsPage(
-                                        foryouItems[index].data);
-                                  },
-                                );
+                                return foryouItems[index];
                               },
                             ),
                           );

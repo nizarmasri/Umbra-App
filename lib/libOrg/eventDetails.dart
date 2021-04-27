@@ -8,8 +8,8 @@ import 'package:getwidget/components/carousel/gf_carousel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
-import 'organizeraccount.dart';
-
+import 'package:events/libOrg/organizeraccount.dart';
+import 'package:events/libOrg/eventStatistics.dart';
 class EventDetails extends StatefulWidget {
   final QueryDocumentSnapshot data;
 
@@ -147,9 +147,17 @@ class _EventDetailsState extends State<EventDetails> {
         context,
         MaterialPageRoute(
             builder: (context) => OrganizerPage(
-                  organizeruid: organizeruid,
-                )));
+              organizeruid: organizeruid,
+            )));
   }
+
+  navigateToEventStatistics(QueryDocumentSnapshot data) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventStatistics(data: data)));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -160,8 +168,6 @@ class _EventDetailsState extends State<EventDetails> {
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
     double imagesHeight = height * 0.3;
-
-    print("is attend: " + isAttend.toString());
 
     String feeCheck = "";
     if (fee == "")
@@ -201,11 +207,20 @@ class _EventDetailsState extends State<EventDetails> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
+        actions: <Widget>[
+          if (isOrg)
+            IconButton(
+                icon: Icon(Icons.equalizer, color: Colors.white),
+                onPressed: () {navigateToEventStatistics(data);}),
+        ],
         leading: GestureDetector(
-          child: Icon(Icons.arrow_back, color: Colors.white),
           onTap: () {
             Navigator.pop(context);
           },
+          child: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
         ),
       ),
       body: SafeArea(
@@ -245,12 +260,19 @@ class _EventDetailsState extends State<EventDetails> {
                             setState(() {
                               isAttend = !isAttend;
                               List<String> ids = [id];
-                              if (isAttend)
+                              List<String> uids = [uid];
+                              if (isAttend) {
                                 fb.collection("users").doc(uid).update(
                                     {'attending': FieldValue.arrayUnion(ids)});
-                              else
+                                fb.collection("events").doc(id).update(
+                                    {'attending': FieldValue.arrayUnion(uids)});
+                              } else {
                                 fb.collection("users").doc(uid).update(
                                     {'attending': FieldValue.arrayRemove(ids)});
+                                fb.collection("events").doc(id).update({
+                                  'attending': FieldValue.arrayRemove(uids)
+                                });
+                              }
                             });
                           },
                           child: Align(
@@ -502,7 +524,7 @@ class _EventDetailsState extends State<EventDetails> {
                   ),
                   // Map
                   Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
+                    margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
                     height: mapHeight,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),

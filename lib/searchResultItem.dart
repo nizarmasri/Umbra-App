@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:events/libOrg/eventDetails.dart';
 import 'package:events/globals.dart' as globals;
 
-class SearchResultItem extends StatefulWidget {
+class SearchResultItem extends StatefulWidget{
   final QueryDocumentSnapshot data;
 
   SearchResultItem({Key key, this.data}) : super(key: key);
@@ -15,8 +15,10 @@ class SearchResultItem extends StatefulWidget {
   _SearchResultItemState createState() => _SearchResultItemState(data);
 }
 
-class _SearchResultItemState extends State<SearchResultItem> {
+class _SearchResultItemState extends State<SearchResultItem> with AutomaticKeepAliveClientMixin {
   final QueryDocumentSnapshot data;
+
+  get wantKeepAlive => true;
 
   String title;
   String description;
@@ -102,6 +104,7 @@ class _SearchResultItemState extends State<SearchResultItem> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     double picSquaresSize = height * 0.13;
@@ -260,11 +263,11 @@ class _SearchResultItemState extends State<SearchResultItem> {
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: 17,
                                 color: Colors.white),
                           ),
                           TextSpan(
-                            text: "\n" + type,
+                            text: "\n" + type + "  |  " + date,
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight,

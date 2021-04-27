@@ -46,7 +46,7 @@ dependencies:
   url_launcher: ^6.0.3
   geoflutterfire: ^3.0.0-nullsafety.2
   awesome_loader: ^0.0.3
-
+  percent_indicator: ^3.0.1
 
 
   # The following adds the Cupertino Icons font to your application.

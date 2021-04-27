@@ -24,7 +24,9 @@ class _EventsPageState extends State<EventsPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(data: data,)));
+            builder: (context) => EventDetails(
+                  data: data,
+                )));
   }
 
   List<EventItem> eventItems = [];
@@ -41,16 +43,79 @@ class _EventsPageState extends State<EventsPage> {
       eventIds = value.data()['attending'];
     });
 
-    await fb
-        .collection("events")
-        .where('__name__', whereIn: eventIds)
-        .get()
-        .then((value) {
-      value.docs.forEach((event) {
-        events.add(event);
+    // Handles up to 20 events attending
+    // Loop code for > 20 not implemented
+    if (eventIds.length > 10) {
+      List<dynamic> currentList = [];
+      for (int i = 0; i < 10; i++) {
+        currentList.add(eventIds[i]);
+      }
+      await fb
+          .collection("events")
+          .where('__name__', whereIn: currentList)
+          .get()
+          .then((value) {
+        value.docs.forEach((event) {
+          print("ey");
+          events.add(event);
+        });
       });
-    });
+
+      int currentSize = eventIds.length - 10;
+      if (currentSize > 10) {
+        bool isLessThanTen = false;
+        while (isLessThanTen == false) {}
+      } else if (currentSize > 0) {
+        currentList = [];
+        for (int i = 10; i < currentSize + 10; i++) {
+          currentList.add(eventIds[i]);
+        }
+        await fb
+            .collection("events")
+            .where('__name__', whereIn: currentList)
+            .get()
+            .then((value) {
+          value.docs.forEach((event) {
+            print("ey");
+            events.add(event);
+          });
+        });
+      }
+    }
+    else {
+      await fb
+          .collection("events")
+          .where('__name__', whereIn: eventIds)
+          .get()
+          .then((value) {
+        value.docs.forEach((event) {
+          print("ey");
+          events.add(event);
+        });
+      });
+    }
+
     return events;
+  }
+
+  List<List<dynamic>> listDivisions(List<dynamic> list) {
+    List<List<dynamic>> dividedList;
+    if (list.length >= 10) {
+      int arraySize = list.length - 10;
+      int divisions = 1;
+      bool isLessThanTen;
+      if (arraySize >= 10) isLessThanTen = false;
+      while (isLessThanTen == false) {
+        if (arraySize >= 10) {
+          arraySize -= 10;
+          divisions++;
+        } else
+          isLessThanTen = true;
+      }
+
+      for (int i = 0; i < divisions; i++) {}
+      print(divisions);
+    }
   }
 
   @override
