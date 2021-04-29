@@ -46,8 +46,10 @@ class _NavigatorPageState extends State<NavigatorPage> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.black,
+
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+
               activeIcon: Icon(
                 Icons.home,
                 color: Colors.white,

@@ -20,6 +20,8 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   String uid = FirebaseAuth.instance.currentUser.uid;
   double btnHeight = 60;
+
+  // Top widget
   Container NameAvatar(
       {String name, String email, Function page, String picture}) {
     return Container(
@@ -69,6 +71,7 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
+  // Logout button
   Container LogoutButton({double width, double height}) {
     return Container(
         height: height,
@@ -112,20 +115,25 @@ class _AccountPageState extends State<AccountPage> {
         context, MaterialPageRoute(builder: (context) => AccountPageDetails()));
   }
 
+  // Settings tile
   InkWell Setting({String title, IconData icon, Color color, Function page}) {
     return InkWell(
       onTap: () {
         page();
       },
       child: Container(
-        decoration: BoxDecoration(color: color),
+        margin: EdgeInsets.only(bottom: 15),
+        decoration: BoxDecoration(
+            color: Colors.white10,
+          borderRadius: BorderRadius.circular(10)
+        ),
         child: Row(
           children: [
             Container(
               margin: EdgeInsets.fromLTRB(15, 15, 25, 15),
               child: Icon(
                 icon,
-                size: 40,
+                size: 30,
                 color: Colors.white,
               ),
             ),

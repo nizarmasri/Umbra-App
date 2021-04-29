@@ -150,9 +150,11 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
+                        // Circle avatar
                         NameAvatar(
                             name: snapshot.data.data()["name"],
                             email: snapshot.data.data()["email"]),
+                        // Account info tile
                         Container(
                           child: Column(
                             children: [

@@ -56,7 +56,6 @@ class _EventsPageState extends State<EventsPage> {
           .get()
           .then((value) {
         value.docs.forEach((event) {
-          print("ey");
           events.add(event);
         });
       });
@@ -76,7 +75,6 @@ class _EventsPageState extends State<EventsPage> {
             .get()
             .then((value) {
           value.docs.forEach((event) {
-            print("ey");
             events.add(event);
           });
         });
@@ -89,7 +87,6 @@ class _EventsPageState extends State<EventsPage> {
           .get()
           .then((value) {
         value.docs.forEach((event) {
-          print("ey");
           events.add(event);
         });
       });
