@@ -48,6 +48,8 @@ dependencies:
   awesome_loader: ^0.0.3
   percent_indicator: ^3.0.1
   pull_to_refresh: ^1.6.5
+  numberpicker: ^2.0.1
+
 
 
   # The following adds the Cupertino Icons font to your application.

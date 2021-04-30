@@ -19,7 +19,7 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
   double btnHeight = 60;
   Container NameAvatar({String name, String email}) {
     return Container(
-      margin: EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 20),
+      margin: EdgeInsets.only(top: 40, right: 10, bottom: 20),
       decoration: BoxDecoration(),
       child: Row(
         children: [
@@ -41,7 +41,7 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
               children: [
                 Text(
                   name,
-                  style: TextStyle(fontSize: 23, color: Colors.white),
+                  style: TextStyle(fontSize: 21, color: Colors.white),
                 ),
                 Text(
                   email,
@@ -122,14 +122,14 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (!snapshot.hasData) {
-                return Center(
-                  child: AwesomeLoader(
-                    loaderType: AwesomeLoader.AwesomeLoader2,
-                    color: Colors.white,
-                  ),
-                );
-              }
+          if (!snapshot.hasData) {
+            return Center(
+              child: AwesomeLoader(
+                loaderType: AwesomeLoader.AwesomeLoader2,
+                color: Colors.white,
+              ),
+            );
+          }
           return Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.black,
@@ -163,7 +163,7 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Setting(
-                                    color: Colors.white12,
+                                      color: Colors.white12,
                                       title: "Account Information",
                                       icon: Icons.account_circle_rounded,
                                       page: navigateToAccountInfoOrg),

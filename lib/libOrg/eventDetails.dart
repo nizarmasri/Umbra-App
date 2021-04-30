@@ -10,6 +10,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import 'package:events/libOrg/organizeraccount.dart';
 import 'package:events/libOrg/eventStatistics.dart';
+import 'package:numberpicker/numberpicker.dart';
+import 'ticketAlert.dart';
+import 'TicketCancelAlert.dart';
+import 'attendeeList.dart';
+
 class EventDetails extends StatefulWidget {
   final QueryDocumentSnapshot data;
 
@@ -147,17 +152,14 @@ class _EventDetailsState extends State<EventDetails> {
         context,
         MaterialPageRoute(
             builder: (context) => OrganizerPage(
-              organizeruid: organizeruid,
-            )));
+                  organizeruid: organizeruid,
+                )));
   }
 
   navigateToEventStatistics(QueryDocumentSnapshot data) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => EventStatistics(data: data)));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => EventStatistics(data: data)));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +170,7 @@ class _EventDetailsState extends State<EventDetails> {
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
     double imagesHeight = height * 0.3;
+    int _tickets = 0;
 
     String feeCheck = "";
     if (fee == "")
@@ -211,7 +214,9 @@ class _EventDetailsState extends State<EventDetails> {
           if (isOrg)
             IconButton(
                 icon: Icon(Icons.equalizer, color: Colors.white),
-                onPressed: () {navigateToEventStatistics(data);}),
+                onPressed: () {
+                  navigateToEventStatistics(data);
+                }),
         ],
         leading: GestureDetector(
           onTap: () {
@@ -255,52 +260,159 @@ class _EventDetailsState extends State<EventDetails> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isAttend = !isAttend;
-                              List<String> ids = [id];
-                              List<String> uids = [uid];
-                              if (isAttend) {
-                                fb.collection("users").doc(uid).update(
-                                    {'attending': FieldValue.arrayUnion(ids)});
-                                fb.collection("events").doc(id).update(
-                                    {'attending': FieldValue.arrayUnion(uids)});
-                              } else {
-                                fb.collection("users").doc(uid).update(
-                                    {'attending': FieldValue.arrayRemove(ids)});
-                                fb.collection("events").doc(id).update({
-                                  'attending': FieldValue.arrayRemove(uids)
-                                });
-                              }
-                            });
-                          },
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 20, right: 10),
-                              height: infoSquaresSize / 2,
-                              width: infoSquaresSize * 1.5,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white12,
-                              ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text((isAttend) ? "Attending" : "Attend",
-                                        style: TextStyle(
-                                            fontFamily: globals.montserrat,
-                                            fontSize: 15,
-                                            color: Colors.green)),
-                                    (isAttend) ? isAttendIcon : notAttendIcon
-                                  ],
+                        data["ticketsleft"] == 0
+                            ? Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  margin:
+                                      EdgeInsets.only(bottom: 20, right: 10),
+                                  height: infoSquaresSize / 2,
+                                  width: infoSquaresSize * 1.5,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white12,
+                                  ),
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("SOLD OUT",
+                                            style: TextStyle(
+                                                fontFamily: globals.montserrat,
+                                                fontSize: 15,
+                                                color: Colors.red)),
+                                        Icon(
+                                          Icons.cancel_outlined,
+                                          color: Colors.red,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  TicketAlert alert =
+                                      TicketAlert(limit: data["ticketsleft"]);
+                                  TicketCancelAlert cancelAlert =
+                                      TicketCancelAlert();
+
+                                  if (!isAttend) {
+                                    return showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return alert;
+                                        }).then((value) async {
+                                      if (value != null) {
+                                        setState(() {
+                                          isAttend = !isAttend;
+                                        });
+                                        List<String> ids = [id];
+                                        List<String> uids = [uid];
+                                        DocumentSnapshot user = await fb
+                                            .collection("users")
+                                            .doc(uid)
+                                            .get();
+
+                                        fb
+                                            .collection("reservations")
+                                            .doc(id)
+                                            .collection("attendees")
+                                            .doc(uid)
+                                            .set({
+                                          'amount': value,
+                                          'name': user['name'],
+                                          'dp': user['dp'],
+                                          'confirmed': 0
+                                        });
+
+                                        fb.collection("users").doc(uid).update({
+                                          'attending':
+                                              FieldValue.arrayUnion(ids)
+                                        });
+                                        fb.collection("events").doc(id).update({
+                                          'attending':
+                                              FieldValue.arrayUnion(uids),
+                                          'ticketsleft':
+                                              FieldValue.increment(-value),
+                                        });
+                                      }
+                                    });
+                                  } else {
+                                    return showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return cancelAlert;
+                                        }).then((value) async {
+                                      setState(() {
+                                        isAttend = !isAttend;
+                                      });
+                                      List<String> ids = [id];
+                                      List<String> uids = [uid];
+
+                                      dynamic reservation = await fb
+                                          .collection("reservations")
+                                          .doc(id)
+                                          .collection("attendees")
+                                          .doc(uid)
+                                          .get();
+
+                                      print(reservation['amount']);
+
+                                      fb.collection("users").doc(uid).update({
+                                        'attending': FieldValue.arrayRemove(ids)
+                                      });
+                                      fb.collection("events").doc(id).update({
+                                        'attending':
+                                            FieldValue.arrayRemove(uids),
+                                        'ticketsleft': FieldValue.increment(
+                                            reservation['amount']),
+                                      });
+
+                                      fb
+                                          .collection("reservations")
+                                          .doc(id)
+                                          .collection("attendees")
+                                          .doc(uid)
+                                          .delete();
+                                    });
+                                  }
+                                },
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    margin:
+                                        EdgeInsets.only(bottom: 20, right: 10),
+                                    height: infoSquaresSize / 2,
+                                    width: infoSquaresSize * 1.5,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white12,
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              (isAttend)
+                                                  ? "Attending"
+                                                  : "Attend",
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                      globals.montserrat,
+                                                  fontSize: 15,
+                                                  color: Colors.green)),
+                                          (isAttend)
+                                              ? isAttendIcon
+                                              : notAttendIcon
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -319,7 +431,7 @@ class _EventDetailsState extends State<EventDetails> {
                             child: Container(
                               margin: EdgeInsets.only(bottom: 20, left: 10),
                               height: infoSquaresSize / 2,
-                              width: infoSquaresSize * 1.5,
+                              // width: infoSquaresSize * 1.5,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: Colors.white12,
@@ -506,6 +618,29 @@ class _EventDetailsState extends State<EventDetails> {
                 ],
               ),
             ),
+            if (isOrg)
+              Align(
+                alignment: Alignment.center,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AttendeeList(id: id)));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration:
+                        BoxDecoration(border: Border.all(color: Colors.white)),
+                    margin: EdgeInsets.only(top: 20),
+                    child: Text("Attendees",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: globals.montserrat,
+                            fontSize: 20)),
+                  ),
+                ),
+              ),
             // Location
             Container(
               child: Column(

@@ -20,9 +20,6 @@ class _OrganizerPageState extends State<OrganizerPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
-          "Your Profile",
-        ),
       ),
       backgroundColor: Colors.black,
       body: SafeArea(

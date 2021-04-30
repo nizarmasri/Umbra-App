@@ -2,8 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import '../globals.dart' as globals;
+import 'package:events/globals.dart' as globals;
+import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AccountInfoOrg extends StatefulWidget {
   @override
@@ -24,60 +28,133 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
   var maskTextInputFormatter2 = MaskTextInputFormatter();
   TextEditingController _namecontroller;
   TextEditingController _numbercontroller;
+  TextEditingController _twittercontroller;
+  TextEditingController _instagramcontroller;
 
-  Container avatar({String letter}) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 30),
-      child: Center(
-        child: CircleAvatar(
-          radius: 75,
-          backgroundColor: Colors.brown.shade800,
-          child: Text(
-            letter,
-            style: TextStyle(fontSize: 80),
-          ),
+  String uid = FirebaseAuth.instance.currentUser.uid;
+
+  String _error = 'No Error Dectected';
+  List<Asset> images = <Asset>[];
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = <Asset>[];
+    String error = 'No Error Detected';
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 1,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
         ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+      print(error);
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      _error = error;
+    });
+  }
+
+  Container avatar({String letter, String existingPicture}) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20),
+      child: Column(
+        children: [
+          Center(
+            child: CircleAvatar(
+              radius: 75,
+              backgroundColor: Colors.brown.shade800,
+              backgroundImage: images.isNotEmpty
+                  ? AssetThumbImageProvider(
+                      images[0],
+                      width: 200,
+                      height: 200,
+                      quality: 100,
+                    )
+                  : existingPicture != ''
+                      ? NetworkImage(existingPicture)
+                      : null,
+              child: Text(
+                images.isEmpty && existingPicture == '' ? letter : "",
+                style: TextStyle(fontSize: 80),
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            child: Center(
+                child: IconButton(
+              onPressed: () {
+                loadAssets();
+              },
+              icon: Icon(
+                Icons.edit,
+                color: Colors.white,
+                size: 30,
+              ),
+            )),
+          ),
+        ],
       ),
     );
   }
 
   Container newInput(
       {String hint,
-      IconData icon,
+      Icon icon,
       String defvalue,
       TextEditingController controller,
       MaskTextInputFormatter mask,
-      TextInputType type}) {
+      TextInputType type,
+      double height,
+      double width}) {
     return Container(
-      margin: EdgeInsets.only(bottom: 25),
-      child: TextField(
-          inputFormatters: [
-            mask,
-          ],
-          keyboardType: type,
-          controller: controller,
-          decoration: new InputDecoration(
-            prefixIcon: Icon(
-              icon,
-              color: Colors.white,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red),
-            ),
-            enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(20.0)),
-            labelStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-            ),
-            labelText: hint,
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.red, width: 3.0),
-                borderRadius: BorderRadius.circular(10.0)),
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+          color: Colors.white12, borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.only(bottom: 15),
+      child: Center(
+        child: ListTile(
+          leading: icon,
+          title: TextField(
+            inputFormatters: [
+              mask,
+            ],
+            keyboardType: type,
+            controller: controller,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: inputSize,
+                fontFamily: globals.montserrat,
+                fontWeight: globals.fontWeight),
+            decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(
+                    color: Colors.white38,
+                    fontSize: inputSize,
+                    fontFamily: globals.montserrat,
+                    fontWeight: globals.fontWeight),
+                border: InputBorder.none,
+                focusColor: Colors.black,
+                fillColor: Colors.black),
           ),
-          style:
-              new TextStyle(fontSize: 15.0, height: 1.2, color: Colors.white)),
+        ),
+      ),
     );
   }
 
@@ -89,12 +166,41 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
           setState(() {
             loading = true;
           });
-          await FirebaseFirestore.instance.collection('users').doc(uid).update({
-            'name': _namecontroller.text,
-            'number': _numbercontroller.text,
-          }).then((value) {
-            Navigator.pop(context);
-          });
+          if (images.isNotEmpty) {
+            final firebaseStorageRef =
+                FirebaseStorage.instance.ref().child('profilepictures/$uid');
+            final upload = await firebaseStorageRef
+                .putData((await images[0].getByteData(quality: 50))
+                    .buffer
+                    .asUint8List())
+                .then((value) async {
+              final url = await firebaseStorageRef.getDownloadURL();
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .update({
+                'name': _namecontroller.text,
+                'number': _numbercontroller.text,
+                'twitter': _twittercontroller.text,
+                'instagram': _instagramcontroller.text,
+                'dp': url,
+              }).then((value) {
+                Navigator.pop(context);
+              });
+            });
+          } else {
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(uid)
+                .update({
+              'name': _namecontroller.text,
+              'number': _numbercontroller.text,
+              'twitter': _twittercontroller.text,
+              'instagram': _instagramcontroller.text
+            }).then((value) {
+              Navigator.pop(context);
+            });
+          }
         },
         child: Container(
           width: 300,
@@ -110,12 +216,6 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-    double textFieldWidth = width * 0.9;
-    double titleFieldHeight = height * 0.1;
-
-    String uid = FirebaseAuth.instance.currentUser.uid;
     return !loading
         ? FutureBuilder<DocumentSnapshot>(
             future:
@@ -123,9 +223,13 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               _namecontroller =
-                  TextEditingController(text: snapshot.data.data()["name"]);
-              _numbercontroller =
-                  TextEditingController(text: snapshot.data.data()["number"]);
+                  new TextEditingController(text: snapshot.data.data()["name"]);
+              _numbercontroller = new TextEditingController(
+                  text: snapshot.data.data()["number"]);
+              _twittercontroller = new TextEditingController(
+                  text: snapshot.data.data()["twitter"]);
+              _instagramcontroller = new TextEditingController(
+                  text: snapshot.data.data()["instagram"]);
               return Scaffold(
                 backgroundColor: Colors.black,
                 appBar: AppBar(
@@ -144,96 +248,45 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                             letter: snapshot.data
                                 .data()["name"][0]
                                 .toString()
-                                .toUpperCase()),
-                        Container(
-                          height: titleFieldHeight,
-                          width: textFieldWidth,
-                          decoration: BoxDecoration(
-                              color: Colors.white12,
-                              borderRadius: BorderRadius.circular(10)),
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: Center(
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                              ),
-                              title: TextField(
-                                controller: _namecontroller,
-                                cursorColor: Colors.white,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
-                                decoration: InputDecoration(
-                                    hintText: "Full Name",
-                                    hintStyle: TextStyle(
-                                        color: Colors.white38,
-                                        fontSize: inputSize,
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight),
-                                    border: InputBorder.none,
-                                    focusColor: Colors.black,
-                                    fillColor: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: titleFieldHeight,
-                          width: textFieldWidth,
-                          decoration: BoxDecoration(
-                              color: Colors.white12,
-                              borderRadius: BorderRadius.circular(10)),
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: Center(
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.phone,
-                                color: Colors.white,
-                              ),
-                              title: TextField(
-                                inputFormatters: [
-                                  maskTextInputFormatter,
-                                ],
-                                controller: _numbercontroller,
-                                cursorColor: Colors.white,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
-                                decoration: InputDecoration(
-                                    hintText: "Phone Number",
-                                    hintStyle: TextStyle(
-                                        color: Colors.white38,
-                                        fontSize: inputSize,
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight),
-                                    border: InputBorder.none,
-                                    focusColor: Colors.black,
-                                    fillColor: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ),
-                        /*
+                                .toUpperCase(),
+                            existingPicture:
+                                snapshot.data.data()['dp'].toString()),
                         newInput(
-                            hint: "Name",
-                            icon: Icons.person,
-                            defvalue: snapshot.data.data()["name"],
-                            controller: _namecontroller,
+                          hint: "Name",
+                          icon: Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          controller: _namecontroller,
+                          mask: maskTextInputFormatter2,
+                        ),
+                        newInput(
+                          hint: "Number",
+                          icon: Icon(
+                            Icons.phone,
+                            color: Colors.white,
+                          ),
+                          controller: _numbercontroller,
+                          type: TextInputType.phone,
+                          mask: maskTextInputFormatter,
+                        ),
+                        newInput(
+                            hint: "Twitter",
+                            icon: Icon(
+                              FontAwesomeIcons.twitter,
+                              color: Colors.white,
+                            ),
+                            controller: _twittercontroller,
                             mask: maskTextInputFormatter2),
                         newInput(
-                            hint: "Number",
-                            icon: Icons.phone,
-                            defvalue: snapshot.data.data()["number"],
-                            controller: _numbercontroller,
-                            type: TextInputType.phone,
-                            mask: maskTextInputFormatter),
-                            */
-
+                          hint: "Instagram",
+                          icon: Icon(
+                            FontAwesomeIcons.instagram,
+                            color: Colors.white,
+                          ),
+                          controller: _instagramcontroller,
+                          mask: maskTextInputFormatter2,
+                        ),
                         button(uid: uid),
                       ],
                     ),

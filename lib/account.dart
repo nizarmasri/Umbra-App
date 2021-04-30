@@ -25,7 +25,7 @@ class _AccountPageState extends State<AccountPage> {
   Container NameAvatar(
       {String name, String email, Function page, String picture}) {
     return Container(
-      margin: EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 20),
+      margin: EdgeInsets.only(top: 40, right: 10, bottom: 20),
       decoration: BoxDecoration(),
       child: Row(
         children: [
@@ -48,11 +48,11 @@ class _AccountPageState extends State<AccountPage> {
               children: [
                 Text(
                   name,
-                  style: TextStyle(fontSize: 23, color: Colors.white),
+                  style: TextStyle(fontSize: 21, color: Colors.white),
                 ),
                 Text(
                   email,
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -124,9 +124,7 @@ class _AccountPageState extends State<AccountPage> {
       child: Container(
         margin: EdgeInsets.only(bottom: 15),
         decoration: BoxDecoration(
-            color: Colors.white10,
-          borderRadius: BorderRadius.circular(10)
-        ),
+            color: Colors.white10, borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
             Container(
@@ -153,15 +151,14 @@ class _AccountPageState extends State<AccountPage> {
         future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-
-              if (!snapshot.hasData) {
-                return Center(
-                  child: AwesomeLoader(
-                    loaderType: AwesomeLoader.AwesomeLoader2,
-                    color: Colors.white,
-                  ),
-                );
-              }
+          if (!snapshot.hasData) {
+            return Center(
+              child: AwesomeLoader(
+                loaderType: AwesomeLoader.AwesomeLoader2,
+                color: Colors.white,
+              ),
+            );
+          }
 
           return Scaffold(
             resizeToAvoidBottomInset: true,

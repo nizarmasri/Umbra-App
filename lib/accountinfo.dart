@@ -20,6 +20,8 @@ class _AccountInfoState extends State<AccountInfo> {
     super.initState();
   }
 
+  double inputSize = 17;
+
   String uid = FirebaseAuth.instance.currentUser.uid;
 
   bool loading = false;
@@ -56,9 +58,6 @@ class _AccountInfoState extends State<AccountInfo> {
       print(error);
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
@@ -117,34 +116,42 @@ class _AccountInfoState extends State<AccountInfo> {
       String defvalue,
       TextEditingController controller,
       MaskTextInputFormatter mask,
-      TextInputType type}) {
+      TextInputType type,
+      double height,
+      double width}) {
     return Container(
-      margin: EdgeInsets.only(bottom: 25),
-      child: TextField(
-          inputFormatters: [
-            mask,
-          ],
-          keyboardType: type,
-          controller: controller,
-          decoration: new InputDecoration(
-            prefixIcon: icon,
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red),
-            ),
-            enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(20.0)),
-            labelStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-            ),
-            labelText: hint,
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.red, width: 3.0),
-                borderRadius: BorderRadius.circular(10.0)),
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+          color: Colors.white12, borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.only(bottom: 15),
+      child: Center(
+        child: ListTile(
+          leading: icon,
+          title: TextField(
+            inputFormatters: [
+              mask,
+            ],
+            keyboardType: type,
+            controller: controller,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: inputSize,
+                fontFamily: globals.montserrat,
+                fontWeight: globals.fontWeight),
+            decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(
+                    color: Colors.white38,
+                    fontSize: inputSize,
+                    fontFamily: globals.montserrat,
+                    fontWeight: globals.fontWeight),
+                border: InputBorder.none,
+                focusColor: Colors.black,
+                fillColor: Colors.black),
           ),
-          style:
-              new TextStyle(fontSize: 15.0, height: 1.2, color: Colors.white)),
+        ),
+      ),
     );
   }
 
@@ -266,7 +273,8 @@ class _AccountInfoState extends State<AccountInfo> {
                               color: Colors.white,
                             ),
                             defvalue: snapshot.data.data()["twitter"],
-                            controller: _twittercontroller),
+                            controller: _twittercontroller,
+                            mask: maskTextInputFormatter2),
                         newInput(
                             hint: "Instagram",
                             icon: Icon(
@@ -274,7 +282,8 @@ class _AccountInfoState extends State<AccountInfo> {
                               color: Colors.white,
                             ),
                             defvalue: snapshot.data.data()["instagram"],
-                            controller: _instagramcontroller),
+                            controller: _instagramcontroller,
+                            mask: maskTextInputFormatter2),
                         button(uid: uid),
                       ],
                     ),

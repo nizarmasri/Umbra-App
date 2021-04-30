@@ -110,21 +110,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
-  Future<Null> _onRefresh() async{
+  Future<Null> _onRefresh() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
 
     Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(pageBuilder: (a, b, c) => NavigatorPage(), transitionDuration: Duration(seconds: 0))
-    );
+        context,
+        PageRouteBuilder(
+            pageBuilder: (a, b, c) => NavigatorPage(),
+            transitionDuration: Duration(seconds: 0)));
   }
 
-  void _onLoading() async{
+  void _onLoading() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use loadFailed(),if no data return,use LoadNodata()
@@ -132,8 +133,6 @@ class _HomePageState extends State<HomePage> {
     print("ima gay");
     _refreshController.loadComplete();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +176,7 @@ class _HomePageState extends State<HomePage> {
 
                           List<Container> featuredEvents = [];
 
-                          snapshot.data.docs.forEach((var doc){
+                          snapshot.data.docs.forEach((var doc) {
                             featuredEvents.add(Container(
                               key: Key(doc['title'] + doc.id),
                               margin: EdgeInsets.all(5.0),
@@ -187,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 child: ClipRRect(
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0)),
+                                      BorderRadius.all(Radius.circular(5.0)),
                                   child: Stack(children: [
                                     Container(
                                         decoration: BoxDecoration(
@@ -204,30 +203,27 @@ class _HomePageState extends State<HomePage> {
                                           child: Container(
                                             padding: EdgeInsets.all(20),
                                             width: width,
-                                            height:
-                                            featureCarouselHeight * 0.33,
+                                            // height: featureCarouselHeight * 0.33,
                                             decoration: BoxDecoration(
                                                 gradient: LinearGradient(
-                                                    begin:
-                                                    Alignment.topCenter,
-                                                    end: Alignment
-                                                        .bottomCenter,
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomCenter,
                                                     colors: <Color>[
-                                                      Colors.black87,
-                                                      Colors.transparent
-                                                    ])),
+                                                  Colors.black87,
+                                                  Colors.transparent
+                                                ])),
                                             child: RichText(
                                               textAlign: TextAlign.start,
-                                              text: TextSpan(children: <
-                                                  TextSpan>[
+                                              text:
+                                                  TextSpan(children: <TextSpan>[
                                                 TextSpan(
                                                   text: doc["title"],
                                                   style: TextStyle(
                                                       color: Colors.white,
                                                       fontFamily:
-                                                      globals.montserrat,
+                                                          globals.montserrat,
                                                       fontWeight:
-                                                      FontWeight.bold,
+                                                          FontWeight.bold,
                                                       fontSize: 30),
                                                 ),
                                                 TextSpan(
@@ -237,9 +233,10 @@ class _HomePageState extends State<HomePage> {
                                                             doc["time"]),
                                                     style: TextStyle(
                                                         color: Colors.white,
-                                                        fontFamily: globals
-                                                            .montserrat,
-                                                        fontWeight: globals.fontWeight,
+                                                        fontFamily:
+                                                            globals.montserrat,
+                                                        fontWeight:
+                                                            globals.fontWeight,
                                                         fontSize: 15)),
                                                 TextSpan(
                                                     text: '\n' +
@@ -247,9 +244,10 @@ class _HomePageState extends State<HomePage> {
                                                             .split(",")[0],
                                                     style: TextStyle(
                                                         color: Colors.white,
-                                                        fontFamily: globals
-                                                            .montserrat,
-                                                        fontWeight: globals.fontWeight,
+                                                        fontFamily:
+                                                            globals.montserrat,
+                                                        fontWeight:
+                                                            globals.fontWeight,
                                                         fontSize: 15))
                                               ]),
                                             ),
@@ -265,7 +263,6 @@ class _HomePageState extends State<HomePage> {
                             height: foryouCarouselHeight,
                             child: CarouselSlider(
                               items: featuredEvents,
-
                               options: CarouselOptions(
                                 autoPlay: true,
                                 initialPage: 0,
@@ -274,7 +271,6 @@ class _HomePageState extends State<HomePage> {
                                 height: foryouCarouselHeight,
                                 enlargeCenterPage: true,
                                 pauseAutoPlayOnTouch: true,
-
                               ),
                             ),
                           );
@@ -300,14 +296,14 @@ class _HomePageState extends State<HomePage> {
                       StreamBuilder(
                           stream: geo
                               .collection(
-                              collectionRef: FirebaseFirestore.instance
-                                  .collection('events'))
+                                  collectionRef: FirebaseFirestore.instance
+                                      .collection('events'))
                               .within(
-                              center: geo.point(
-                                  latitude: _currentPosition.latitude,
-                                  longitude: _currentPosition.longitude),
-                              radius: 10,
-                              field: "location"),
+                                  center: geo.point(
+                                      latitude: _currentPosition.latitude,
+                                      longitude: _currentPosition.longitude),
+                                  radius: 10,
+                                  field: "location"),
                           builder:
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.data == null) {
@@ -333,7 +329,7 @@ class _HomePageState extends State<HomePage> {
                                   viewportFraction: 0.8,
                                   activeIndicator: Colors.white,
                                   items: ads.map(
-                                        (con) {
+                                    (con) {
                                       return Container(child: con);
                                     },
                                   ).toList(),
