@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:events/libOrg/eventDetails.dart';
 import 'package:events/globals.dart' as globals;
 
-class SearchResultItem extends StatefulWidget{
+class SearchResultItem extends StatefulWidget {
   final QueryDocumentSnapshot data;
 
   SearchResultItem({Key key, this.data}) : super(key: key);
@@ -15,7 +15,8 @@ class SearchResultItem extends StatefulWidget{
   _SearchResultItemState createState() => _SearchResultItemState(data);
 }
 
-class _SearchResultItemState extends State<SearchResultItem> with AutomaticKeepAliveClientMixin {
+class _SearchResultItemState extends State<SearchResultItem>
+    with AutomaticKeepAliveClientMixin {
   final QueryDocumentSnapshot data;
 
   get wantKeepAlive => true;
@@ -110,9 +111,8 @@ class _SearchResultItemState extends State<SearchResultItem> with AutomaticKeepA
     double picSquaresSize = height * 0.13;
     double itemHeight = height * 0.25;
 
-
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         navigateToEventDetailsPage(data);
       },
       child: Container(
@@ -135,9 +135,8 @@ class _SearchResultItemState extends State<SearchResultItem> with AutomaticKeepA
                   child: Image.network(
                       'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
                       filterQuality: FilterQuality.low,
-                      fit: BoxFit.cover, loadingBuilder:
-                          (BuildContext context, Widget child,
-                              ImageChunkEvent loadingProgress) {
+                      fit: BoxFit.cover, loadingBuilder: (BuildContext context,
+                          Widget child, ImageChunkEvent loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Center(
                       child: CircularProgressIndicator(
@@ -306,10 +305,7 @@ class _SearchResultItemState extends State<SearchResultItem> with AutomaticKeepA
                           });
                         },
                         child: Container(
-                          child: (isAttend)
-                              ? isAttendIcon
-                              : notAttendIcon
-                        ),
+                            child: (isAttend) ? isAttendIcon : notAttendIcon),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -321,15 +317,11 @@ class _SearchResultItemState extends State<SearchResultItem> with AutomaticKeepA
                                   {'booked': FieldValue.arrayUnion(ids)});
                             else
                               fb.collection("users").doc(uid).update(
-                                  {
-                                    'booked': FieldValue.arrayRemove(ids)
-                                  });
+                                  {'booked': FieldValue.arrayRemove(ids)});
                           });
                         },
                         child: Container(
-                            child: (isBooked)
-                                ? isBookedIcon
-                                : notBookedIcon),
+                            child: (isBooked) ? isBookedIcon : notBookedIcon),
                       ),
                     ],
                   ),
