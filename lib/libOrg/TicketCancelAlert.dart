@@ -30,7 +30,7 @@ class TicketCancelAlert extends StatelessWidget {
         TextButton(
           child: Text('Confirm'),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           },
         ),
       ],

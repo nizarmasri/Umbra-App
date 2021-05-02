@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/libOrg/TicketCancelAlert.dart';
+import 'package:events/libOrg/ticketAlert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,11 @@ class _SearchResultItemState extends State<SearchResultItem>
   }
 
   _SearchResultItemState(this.data);
+
+  Icon soldOutIcon = Icon(
+    Icons.cancel_outlined,
+    color: Colors.red,
+  );
 
   Icon notAttendIcon = Icon(
     Icons.add_circle_outline_rounded,
@@ -293,19 +300,91 @@ class _SearchResultItemState extends State<SearchResultItem>
                     children: [
                       GestureDetector(
                         onTap: () {
-                          setState(() {
-                            isAttend = !isAttend;
-                            List<String> ids = [id];
-                            if (isAttend)
-                              fb.collection("users").doc(uid).update(
-                                  {'attending': FieldValue.arrayUnion(ids)});
-                            else
-                              fb.collection("users").doc(uid).update(
-                                  {'attending': FieldValue.arrayRemove(ids)});
-                          });
+                          TicketAlert alert =
+                              TicketAlert(limit: data["ticketsleft"]);
+                          TicketCancelAlert cancelAlert = TicketCancelAlert();
+
+                          if (!isAttend) {
+                            return showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return alert;
+                                }).then((value) async {
+                              if (value != null) {
+                                setState(() {
+                                  isAttend = !isAttend;
+                                });
+                                List<String> ids = [id];
+                                List<String> uids = [uid];
+                                DocumentSnapshot user =
+                                    await fb.collection("users").doc(uid).get();
+
+                                fb
+                                    .collection("reservations")
+                                    .doc(id)
+                                    .collection("attendees")
+                                    .doc(uid)
+                                    .set({
+                                  'amount': value,
+                                  'name': user['name'],
+                                  'dp': user['dp'],
+                                  'confirmed': 0
+                                });
+
+                                fb.collection("users").doc(uid).update(
+                                    {'attending': FieldValue.arrayUnion(ids)});
+                                fb.collection("events").doc(id).update({
+                                  'attending': FieldValue.arrayUnion(uids),
+                                  'ticketsleft': FieldValue.increment(-value),
+                                });
+                              }
+                            });
+                          } else {
+                            return showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return cancelAlert;
+                                }).then((value) async {
+                              if (value == true) {
+                                setState(() {
+                                  isAttend = !isAttend;
+                                });
+                                List<String> ids = [id];
+                                List<String> uids = [uid];
+
+                                dynamic reservation = await fb
+                                    .collection("reservations")
+                                    .doc(id)
+                                    .collection("attendees")
+                                    .doc(uid)
+                                    .get();
+
+                                print(reservation['amount']);
+
+                                fb.collection("users").doc(uid).update(
+                                    {'attending': FieldValue.arrayRemove(ids)});
+                                fb.collection("events").doc(id).update({
+                                  'attending': FieldValue.arrayRemove(uids),
+                                  'ticketsleft': FieldValue.increment(
+                                      reservation['amount']),
+                                });
+
+                                fb
+                                    .collection("reservations")
+                                    .doc(id)
+                                    .collection("attendees")
+                                    .doc(uid)
+                                    .delete();
+                              }
+                            });
+                          }
                         },
                         child: Container(
-                            child: (isAttend) ? isAttendIcon : notAttendIcon),
+                            child: data["ticketsleft"] == 0
+                                ? soldOutIcon
+                                : (isAttend)
+                                    ? isAttendIcon
+                                    : notAttendIcon),
                       ),
                       GestureDetector(
                         onTap: () {

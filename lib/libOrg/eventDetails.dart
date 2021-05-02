@@ -242,150 +242,250 @@ class _EventDetailsState extends State<EventDetails> {
                       topLeft: Radius.circular(10),
                       bottomRight: Radius.circular(10),
                       topRight: Radius.circular(10))),
-              child: Column(
-                children: [
-                  // Title Text
-                  Container(
-                    margin: EdgeInsets.all(20),
-                    width: width,
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                          fontFamily: globals.montserrat,
-                          fontSize: titleTextSize,
-                          color: Colors.white),
-                    ),
-                  ),
-                  if (!isOrg)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              child: StreamBuilder(
+                  stream: fb.collection("events").doc(id).snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: AwesomeLoader(
+                          loaderType: AwesomeLoader.AwesomeLoader2,
+                          color: Colors.white,
+                        ),
+                      );
+                    }
+                    return Column(
                       children: [
-                        data["ticketsleft"] == 0
-                            ? Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  margin:
-                                      EdgeInsets.only(bottom: 20, right: 10),
-                                  height: infoSquaresSize / 2,
-                                  width: infoSquaresSize * 1.5,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white12,
-                                  ),
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text("SOLD OUT",
-                                            style: TextStyle(
-                                                fontFamily: globals.montserrat,
-                                                fontSize: 15,
-                                                color: Colors.red)),
-                                        Icon(
-                                          Icons.cancel_outlined,
-                                          color: Colors.red,
-                                        )
-                                      ],
+                        // Title Text
+                        Column(
+                          children: [
+                            Container(
+                              margin:
+                                  EdgeInsets.only(left: 20, right: 20, top: 20),
+                              width: width,
+                              child: Text(
+                                title,
+                                style: TextStyle(
+                                    fontFamily: globals.montserrat,
+                                    fontSize: titleTextSize,
+                                    color: Colors.white),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  left: 20, right: 20, bottom: 20),
+                              width: width,
+                              child: Text(
+                                snapshot.data.data()["ticketsleft"].toString() +
+                                    " tickets left",
+                                style: TextStyle(
+                                    fontFamily: globals.montserrat,
+                                    fontSize: 16,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (!isOrg)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              snapshot.data.data()["ticketsleft"] == 0
+                                  ? Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        margin: EdgeInsets.only(
+                                            bottom: 20, right: 10),
+                                        height: infoSquaresSize / 2,
+                                        width: infoSquaresSize * 1.5,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white12,
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text("SOLD OUT",
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                          globals.montserrat,
+                                                      fontSize: 15,
+                                                      color: Colors.red)),
+                                              Icon(
+                                                Icons.cancel_outlined,
+                                                color: Colors.red,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : GestureDetector(
+                                      onTap: () {
+                                        TicketAlert alert = TicketAlert(
+                                            limit: snapshot.data
+                                                .data()["ticketsleft"]);
+                                        TicketCancelAlert cancelAlert =
+                                            TicketCancelAlert();
+
+                                        if (!isAttend) {
+                                          return showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return alert;
+                                              }).then((value) async {
+                                            if (value != null) {
+                                              setState(() {
+                                                isAttend = !isAttend;
+                                              });
+                                              List<String> ids = [id];
+                                              List<String> uids = [uid];
+                                              DocumentSnapshot user = await fb
+                                                  .collection("users")
+                                                  .doc(uid)
+                                                  .get();
+
+                                              fb
+                                                  .collection("reservations")
+                                                  .doc(id)
+                                                  .collection("attendees")
+                                                  .doc(uid)
+                                                  .set({
+                                                'amount': value,
+                                                'name': user['name'],
+                                                'dp': user['dp'],
+                                                'confirmed': 0
+                                              });
+
+                                              fb
+                                                  .collection("users")
+                                                  .doc(uid)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayUnion(ids)
+                                              });
+                                              fb
+                                                  .collection("events")
+                                                  .doc(id)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayUnion(uids),
+                                                'ticketsleft':
+                                                    FieldValue.increment(
+                                                        -value),
+                                              });
+                                            }
+                                          });
+                                        } else {
+                                          return showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return cancelAlert;
+                                              }).then((value) async {
+                                            if (value == true) {
+                                              setState(() {
+                                                isAttend = !isAttend;
+                                              });
+                                              List<String> ids = [id];
+                                              List<String> uids = [uid];
+
+                                              dynamic reservation = await fb
+                                                  .collection("reservations")
+                                                  .doc(id)
+                                                  .collection("attendees")
+                                                  .doc(uid)
+                                                  .get();
+
+                                              print(reservation['amount']);
+
+                                              fb
+                                                  .collection("users")
+                                                  .doc(uid)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayRemove(ids)
+                                              });
+                                              fb
+                                                  .collection("events")
+                                                  .doc(id)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayRemove(
+                                                        uids),
+                                                'ticketsleft':
+                                                    FieldValue.increment(
+                                                        reservation['amount']),
+                                              });
+
+                                              fb
+                                                  .collection("reservations")
+                                                  .doc(id)
+                                                  .collection("attendees")
+                                                  .doc(uid)
+                                                  .delete();
+                                            }
+                                          });
+                                        }
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          margin: EdgeInsets.only(
+                                              bottom: 20, right: 10),
+                                          height: infoSquaresSize / 2,
+                                          width: infoSquaresSize * 1.5,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.white12,
+                                          ),
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                    (isAttend)
+                                                        ? "Attending"
+                                                        : "Attend",
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            globals.montserrat,
+                                                        fontSize: 15,
+                                                        color: Colors.green)),
+                                                (isAttend)
+                                                    ? isAttendIcon
+                                                    : notAttendIcon
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              )
-                            : GestureDetector(
+                              GestureDetector(
                                 onTap: () {
-                                  TicketAlert alert =
-                                      TicketAlert(limit: data["ticketsleft"]);
-                                  TicketCancelAlert cancelAlert =
-                                      TicketCancelAlert();
-
-                                  if (!isAttend) {
-                                    return showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return alert;
-                                        }).then((value) async {
-                                      if (value != null) {
-                                        setState(() {
-                                          isAttend = !isAttend;
-                                        });
-                                        List<String> ids = [id];
-                                        List<String> uids = [uid];
-                                        DocumentSnapshot user = await fb
-                                            .collection("users")
-                                            .doc(uid)
-                                            .get();
-
-                                        fb
-                                            .collection("reservations")
-                                            .doc(id)
-                                            .collection("attendees")
-                                            .doc(uid)
-                                            .set({
-                                          'amount': value,
-                                          'name': user['name'],
-                                          'dp': user['dp'],
-                                          'confirmed': 0
-                                        });
-
-                                        fb.collection("users").doc(uid).update({
-                                          'attending':
-                                              FieldValue.arrayUnion(ids)
-                                        });
-                                        fb.collection("events").doc(id).update({
-                                          'attending':
-                                              FieldValue.arrayUnion(uids),
-                                          'ticketsleft':
-                                              FieldValue.increment(-value),
-                                        });
-                                      }
-                                    });
-                                  } else {
-                                    return showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return cancelAlert;
-                                        }).then((value) async {
-                                      setState(() {
-                                        isAttend = !isAttend;
-                                      });
-                                      List<String> ids = [id];
-                                      List<String> uids = [uid];
-
-                                      dynamic reservation = await fb
-                                          .collection("reservations")
-                                          .doc(id)
-                                          .collection("attendees")
-                                          .doc(uid)
-                                          .get();
-
-                                      print(reservation['amount']);
-
+                                  setState(() {
+                                    isBooked = !isBooked;
+                                    List<String> ids = [id];
+                                    if (isBooked)
                                       fb.collection("users").doc(uid).update({
-                                        'attending': FieldValue.arrayRemove(ids)
+                                        'booked': FieldValue.arrayUnion(ids)
                                       });
-                                      fb.collection("events").doc(id).update({
-                                        'attending':
-                                            FieldValue.arrayRemove(uids),
-                                        'ticketsleft': FieldValue.increment(
-                                            reservation['amount']),
+                                    else
+                                      fb.collection("users").doc(uid).update({
+                                        'booked': FieldValue.arrayRemove(ids)
                                       });
-
-                                      fb
-                                          .collection("reservations")
-                                          .doc(id)
-                                          .collection("attendees")
-                                          .doc(uid)
-                                          .delete();
-                                    });
-                                  }
+                                  });
                                 },
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     margin:
-                                        EdgeInsets.only(bottom: 20, right: 10),
+                                        EdgeInsets.only(bottom: 20, left: 10),
                                     height: infoSquaresSize / 2,
-                                    width: infoSquaresSize * 1.5,
+                                    // width: infoSquaresSize * 1.5,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.white12,
@@ -396,227 +496,196 @@ class _EventDetailsState extends State<EventDetails> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                              (isAttend)
-                                                  ? "Attending"
-                                                  : "Attend",
+                                              (isBooked)
+                                                  ? "Bookmarked"
+                                                  : "Bookmark",
                                               style: TextStyle(
                                                   fontFamily:
                                                       globals.montserrat,
                                                   fontSize: 15,
-                                                  color: Colors.green)),
-                                          (isAttend)
-                                              ? isAttendIcon
-                                              : notAttendIcon
+                                                  color: Colors.blue)),
+                                          (isBooked)
+                                              ? isBookedIcon
+                                              : notBookedIcon
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isBooked = !isBooked;
-                              List<String> ids = [id];
-                              if (isBooked)
-                                fb.collection("users").doc(uid).update(
-                                    {'booked': FieldValue.arrayUnion(ids)});
-                              else
-                                fb.collection("users").doc(uid).update(
-                                    {'booked': FieldValue.arrayRemove(ids)});
-                            });
-                          },
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 20, left: 10),
-                              height: infoSquaresSize / 2,
-                              // width: infoSquaresSize * 1.5,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white12,
-                              ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text((isBooked) ? "Bookmarked" : "Bookmark",
-                                        style: TextStyle(
-                                            fontFamily: globals.montserrat,
-                                            fontSize: 15,
-                                            color: Colors.blue)),
-                                    (isBooked) ? isBookedIcon : notBookedIcon
-                                  ],
-                                ),
-                              ),
-                            ),
+                            ],
+                          ),
+                        // Description Text
+                        Container(
+                          margin: EdgeInsets.only(left: 20, right: 20),
+                          width: width,
+                          child: Text(
+                            description,
+                            style: TextStyle(
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight,
+                                fontSize: descTextSize,
+                                color: Colors.white),
                           ),
                         ),
+                        // Age, Type, Fee squares
+                        Container(
+                            margin:
+                                EdgeInsets.only(left: 20, right: 20, top: 20),
+                            width: width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Age
+                                Container(
+                                  height: infoSquaresSize,
+                                  width: infoSquaresSize,
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white12,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                        child: Text(
+                                          ageCheck,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontFamily: globals.montserrat,
+                                              fontWeight: globals.fontWeight,
+                                              fontSize: ageTextSize,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Type
+                                Container(
+                                  height: infoSquaresSize,
+                                  width: infoSquaresSize,
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white12,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                        child: Text(
+                                          typeCheck,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontFamily: globals.montserrat,
+                                              fontWeight: globals.fontWeight,
+                                              fontSize: typeTextSize,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Fee
+                                Container(
+                                  height: infoSquaresSize,
+                                  width: infoSquaresSize,
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white12,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                          child: RichText(
+                                        textAlign: TextAlign.center,
+                                        text: TextSpan(children: <TextSpan>[
+                                          TextSpan(
+                                            text: feeCheck,
+                                            style: TextStyle(
+                                                fontFamily: globals.montserrat,
+                                                fontWeight: globals.fontWeight,
+                                                fontSize: feeTextSize,
+                                                color: Colors.white),
+                                          ),
+                                          TextSpan(
+                                            text: "\nLBP",
+                                            style: TextStyle(
+                                                fontFamily: globals.montserrat,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: currencyTextSize,
+                                                color: Colors.white),
+                                          ),
+                                        ]),
+                                      )),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )),
+                        // Date and Time squares
+                        Container(
+                            margin:
+                                EdgeInsets.only(left: 20, right: 20, top: 20),
+                            width: width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Date
+                                Container(
+                                  height: infoRectsHeight,
+                                  width: infoRectsWidth,
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white12,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                        child: Text(
+                                          date,
+                                          style: TextStyle(
+                                              fontFamily: globals.montserrat,
+                                              fontWeight: globals.fontWeight,
+                                              fontSize: dateTextSize,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Time
+                                Container(
+                                  height: infoRectsHeight,
+                                  width: infoRectsWidth,
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white12,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                        child: Text(
+                                          time,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontFamily: globals.montserrat,
+                                              fontWeight: globals.fontWeight,
+                                              fontSize: timeTextSize,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )),
                       ],
-                    ),
-                  // Description Text
-                  Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
-                    width: width,
-                    child: Text(
-                      description,
-                      style: TextStyle(
-                          fontFamily: globals.montserrat,
-                          fontWeight: globals.fontWeight,
-                          fontSize: descTextSize,
-                          color: Colors.white),
-                    ),
-                  ),
-                  // Age, Type, Fee squares
-                  Container(
-                      margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-                      width: width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Age
-                          Container(
-                            height: infoSquaresSize,
-                            width: infoSquaresSize,
-                            child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white12,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                  child: Text(
-                                    ageCheck,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight,
-                                        fontSize: ageTextSize,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Type
-                          Container(
-                            height: infoSquaresSize,
-                            width: infoSquaresSize,
-                            child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white12,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                  child: Text(
-                                    typeCheck,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight,
-                                        fontSize: typeTextSize,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Fee
-                          Container(
-                            height: infoSquaresSize,
-                            width: infoSquaresSize,
-                            child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white12,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                    child: RichText(
-                                  textAlign: TextAlign.center,
-                                  text: TextSpan(children: <TextSpan>[
-                                    TextSpan(
-                                      text: feeCheck,
-                                      style: TextStyle(
-                                          fontFamily: globals.montserrat,
-                                          fontWeight: globals.fontWeight,
-                                          fontSize: feeTextSize,
-                                          color: Colors.white),
-                                    ),
-                                    TextSpan(
-                                      text: "\nLBP",
-                                      style: TextStyle(
-                                          fontFamily: globals.montserrat,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: currencyTextSize,
-                                          color: Colors.white),
-                                    ),
-                                  ]),
-                                )),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
-                  // Date and Time squares
-                  Container(
-                      margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-                      width: width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Date
-                          Container(
-                            height: infoRectsHeight,
-                            width: infoRectsWidth,
-                            child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white12,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                  child: Text(
-                                    date,
-                                    style: TextStyle(
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight,
-                                        fontSize: dateTextSize,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Time
-                          Container(
-                            height: infoRectsHeight,
-                            width: infoRectsWidth,
-                            child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white12,
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                  child: Text(
-                                    time,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight,
-                                        fontSize: timeTextSize,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )),
-                ],
-              ),
+                    );
+                  }),
             ),
             if (isOrg)
               Align(
