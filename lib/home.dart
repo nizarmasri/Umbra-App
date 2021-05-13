@@ -14,8 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:events/libOrg/eventDetails.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import  'package:string_similarity/string_similarity.dart';
-
+import 'package:string_similarity/string_similarity.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -103,11 +102,13 @@ class _HomePageState extends State<HomePage> {
     }
 
     // If wordB is at least 80% similar to wordA, increment foundElements
-    var foundElements = list.where((wordA) => wordA.toUpperCase().similarityTo(wordB.toUpperCase()) >= 0.8);
+    var foundElements = list.where((wordA) =>
+        wordA.toUpperCase().similarityTo(wordB.toUpperCase()) >= 0.8);
     return foundElements.length;
   }
 
-  bool forYouAlgorithm(List<QueryDocumentSnapshot> eventsA, QueryDocumentSnapshot eventB) {
+  bool forYouAlgorithm(
+      List<QueryDocumentSnapshot> eventsA, QueryDocumentSnapshot eventB) {
     // Description of event to be analyzed
     String eventB_Desc = eventB['description'];
 
@@ -137,20 +138,20 @@ class _HomePageState extends State<HomePage> {
       // Check if words in eventB description are 80% similar to words in eventA description
       // Increment eventB_localCounter if it is similar
       eventB_words.forEach((wordB) {
-        if(countSimilarOccurrences(eventA_words, wordB) == 1)
+        if (countSimilarOccurrences(eventA_words, wordB) == 1)
           eventB_localCounter++;
       });
 
       // if the number of similar words in eventB to eventA is greater than 20% of total words in eventA
       // increment eventB_counter
-      if(eventB_localCounter >= twentyPercent)
-        eventB_counter++;
+      if (eventB_localCounter >= twentyPercent) eventB_counter++;
     });
 
     // if eventB is similar to at least 2 eventA's, return true
-    if(eventB_counter >= 2)
+    if (eventB_counter >= 2)
       return true;
-    else return false;
+    else
+      return false;
   }
 
   List<SearchResultItem> foryouItems = [];
@@ -172,7 +173,11 @@ class _HomePageState extends State<HomePage> {
     });
 
     // Get all events user is not attending
-    await fb.collection("events").where('__name__', whereNotIn: attendingEventsIds).get().then((value) {
+    await fb
+        .collection("events")
+        .where('__name__', whereNotIn: attendingEventsIds)
+        .get()
+        .then((value) {
       value.docs.forEach((event) {
         allEvents.add(event);
       });
@@ -190,23 +195,24 @@ class _HomePageState extends State<HomePage> {
       });
 
       // Sort events from newest to oldest
-      attendingEvents.sort((a,b) => b['date'].compareTo(a['date']));
+      attendingEvents.sort((a, b) => b['date'].compareTo(a['date']));
 
       // Sets number of latest event to 5 or lower
       int numberOfLatest = 0;
-      if(attendingEvents.length >= 5)
+      if (attendingEvents.length >= 5)
         numberOfLatest = 5;
-      else numberOfLatest = attendingEvents.length;
+      else
+        numberOfLatest = attendingEvents.length;
 
       // Add the latest 5 or less events to latest events list
-      for(int i = 0; i < numberOfLatest; i++)
+      for (int i = 0; i < numberOfLatest; i++)
         latestAttendingEvents.add(attendingEvents[i]);
     });
 
     // compares all events to the 5 latest events
     // if true, add event to for you events list
     allEvents.forEach((event) {
-      if(forYouAlgorithm(latestAttendingEvents, event) == true)
+      if (forYouAlgorithm(latestAttendingEvents, event) == true)
         foryouEvents.add(event);
     });
 
@@ -220,6 +226,9 @@ class _HomePageState extends State<HomePage> {
   Future<Null> _onRefresh() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
+    setState(() {
+      items = 4;
+    });
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
 
@@ -234,10 +243,14 @@ class _HomePageState extends State<HomePage> {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use loadFailed(),if no data return,use LoadNodata()
-    //setState(() {});
+    setState(() {
+      items = items + 3;
+    });
     print("ima gay");
     _refreshController.loadComplete();
   }
+
+  int items = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -484,15 +497,13 @@ class _HomePageState extends State<HomePage> {
                             print(snapshot.data[0]['date']);
                             print(Timestamp.now());
 
-                            return Container(
-                              height: height,
-                              child: ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: foryouItems.length,
-                                itemBuilder: (context, index) {
-                                  return foryouItems[index];
-                                },
-                              ),
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: items,
+                              itemBuilder: (context, index) {
+                                return foryouItems[index];
+                              },
                             );
                           } else
                             return Container();

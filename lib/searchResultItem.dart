@@ -124,8 +124,8 @@ class _SearchResultItemState extends State<SearchResultItem>
       },
       child: Container(
         width: width,
-        height: itemHeight,
-        margin: EdgeInsets.only(left: 20, right: 20, bottom: 0),
+        //  height: itemHeight,
+        margin: EdgeInsets.only(left: 20, right: 20, bottom: 30),
         child: Column(
           children: [
             if (urls == null || urls.length == 0)
@@ -358,8 +358,6 @@ class _SearchResultItemState extends State<SearchResultItem>
                                     .collection("attendees")
                                     .doc(uid)
                                     .get();
-
-                                print(reservation['amount']);
 
                                 fb.collection("users").doc(uid).update(
                                     {'attending': FieldValue.arrayRemove(ids)});
