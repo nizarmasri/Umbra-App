@@ -1,4 +1,5 @@
-import 'package:events/events.dart';
+import 'package:events/attendNavigator.dart';
+import 'package:events/attendingEvents.dart';
 import 'package:events/search.dart';
 import 'package:flutter/material.dart';
 import 'account.dart';
@@ -23,7 +24,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    EventsPage(),
+    AttendNavigatorPage(),
     SearchPage(),
     AccountPage()
   ];

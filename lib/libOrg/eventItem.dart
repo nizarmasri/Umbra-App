@@ -52,6 +52,8 @@ class _EventItemState extends State<EventItem> {
     super.initState();
   }
 
+  Color tileColor = Colors.white10;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -62,7 +64,7 @@ class _EventItemState extends State<EventItem> {
     double imageWidth = width * 0.3;
 
     return Container(
-      margin: EdgeInsets.only(left: 3, right: 3, bottom: 13),
+      margin: EdgeInsets.only(left: 3, right: 3, bottom: 14),
       height: tileHeight,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -102,44 +104,41 @@ class _EventItemState extends State<EventItem> {
               width: tileWidth,
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white12,
+                color: tileColor,
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(0),
                     topLeft: Radius.circular(0),
                     bottomRight: Radius.circular(10),
                     topRight: Radius.circular(10)),
               ),
-              child: RichText(
-                text: TextSpan(children: <TextSpan>[
-                  TextSpan(
-                      text: title,
-                      style: TextStyle(
-                          fontFamily: globals.montserrat,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                          color: Colors.white)),
-                  TextSpan(
-                      text: "\n" + type,
-                      style: TextStyle(
-                          fontFamily: globals.montserrat,
-                          fontSize: 13,
-                          fontWeight: globals.fontWeight,
-                          color: Colors.white)),
-                  TextSpan(
-                      text: "\n" + location,
-                      style: TextStyle(
-                          fontFamily: globals.montserrat,
-                          fontSize: 13,
-                          fontWeight: globals.fontWeight,
-                          color: Colors.white)),
-                  TextSpan(
-                      text: "\n" + date,
-                      style: TextStyle(
-                          fontFamily: globals.montserrat,
-                          fontSize: 13,
-                          fontWeight: globals.fontWeight,
-                          color: Colors.white)),
-                ]),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: RichText(
+                  text: TextSpan(children: <TextSpan>[
+                    TextSpan(
+                        text: title,
+                        style: TextStyle(
+                            fontFamily: globals.montserrat,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 17,
+                            color: Colors.white)),
+                    TextSpan(
+                        text: "\n" + type + "	• " + date,
+                        style: TextStyle(
+                            fontFamily: globals.montserrat,
+                            fontSize: 13,
+                            fontWeight: globals.fontWeight,
+                            color: Colors.white)),
+                    TextSpan(
+                        text: "\n" + location,
+                        style: TextStyle(
+                            fontFamily: globals.montserrat,
+                            fontSize: 13,
+                            fontWeight: globals.fontWeight,
+                            color: Colors.white)),
+
+                  ]),
+                ),
               )),
         ],
       ),

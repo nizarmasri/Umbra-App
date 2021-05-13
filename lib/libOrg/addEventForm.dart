@@ -9,21 +9,36 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 
 class AddEventForm extends StatefulWidget {
+  final QueryDocumentSnapshot data;
+
+  AddEventForm({Key key, this.data}) : super(key: key);
+
   @override
-  _AddEventFormState createState() => _AddEventFormState();
+  _AddEventFormState createState() => _AddEventFormState(data);
 }
 
 class _AddEventFormState extends State<AddEventForm> {
+  final QueryDocumentSnapshot data;
+
+  _AddEventFormState(this.data);
+
+  bool hasData = false;
+
   final geo = Geoflutterfire();
   double inputSize = 17;
+  double titleSize = 25;
   double feeText = 14.5;
+  Color boxesColor = Colors.black;
+  Color dividerColor = Colors.white12;
   String uid = FirebaseAuth.instance.currentUser.uid;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descController = TextEditingController();
   final TextEditingController feeController = TextEditingController();
+  final TextEditingController ticketsLeftController = TextEditingController();
 
   List<Marker> location;
-  String locationName;
+  String locationName = "Choose event location";
+  Color locationTextColor = Colors.white24;
 
   String _age;
   String _type;
@@ -38,6 +53,7 @@ class _AddEventFormState extends State<AddEventForm> {
       locationName = chosenLocation[1];
       if (location != null) print(location[0].position);
       print(locationName.split(",")[0]);
+      locationTextColor = Colors.white;
     });
   }
 
@@ -67,89 +83,171 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   List<String> urls = [];
-/*  addToArray(String url) {
-    urls.add(url);
-  }*/
 
-  Container button({String uid}) {
-    return Container(
-      margin: EdgeInsets.only(top: 30, bottom: 30),
-      child: InkWell(
-        focusColor: Colors.white,
-        onTap: () async {
-          setState(() {
-            loading = true;
-          });
-          FirebaseFirestore fb = FirebaseFirestore.instance;
-          GeoFirePoint myLocation = geo.point(
-              latitude: location[0].position.latitude,
-              longitude: location[0].position.longitude);
+  String submitError = "";
+  bool filledForm = true;
 
-          await fb.collection('events').add({
-            'title': titleController.text,
-            'description': descController.text,
-            'age': _age,
-            'type': _type,
-            'date': selectedDate,
-            'time': selectedTime.toString().substring(10, 15),
-            'poster': uid,
-            'location': myLocation.data,
-            'locationName': locationName,
-            'fee': feeController.text
-          }).then((value) async {
-            final id = value.id;
-            List<String> ids = [id];
-            await fb
-                .collection('users')
-                .doc(uid)
-                .update({'events': FieldValue.arrayUnion(ids)});
-            for (var entry in images.asMap().entries) {
-              int entryIndex = entry.key;
-              final firebaseStorageRef =
-                  FirebaseStorage.instance.ref().child('$id/$entryIndex');
-              final upload = await firebaseStorageRef
-                  .putData((await entry.value.getByteData(quality: 50))
-                      .buffer
-                      .asUint8List())
-                  .then((value) async {
-                urls.add(await firebaseStorageRef.getDownloadURL());
-              });
-            }
-            return {"urls": urls, "id": id};
-          }).then((value) async {
-            await fb.collection('events').doc(value["id"]).update({
-              'urls': FieldValue.arrayUnion(value["urls"]),
+  bool checkSubmit() {
+    List<String> values = [
+      titleController.text,
+      descController.text,
+      _age,
+      _type,
+      selectedDate.toString(),
+      selectedTimeFormatted,
+      location.toString(),
+      feeController.text
+    ];
+
+    print(values.toString());
+
+    bool tempCheck = true;
+
+    for (int i = 0; i < values.length; i++) {
+      setState(() {
+        if (values[i] == null ||
+            values[i] == "" ||
+            values[i] == "null" ||
+            values[i] == timeNow.toString().substring(10, 15) ||
+            values[i] == dateLimit.toString()) {
+          filledForm = false;
+          tempCheck = false;
+          if (i == 0)
+            submitError += "Title cannot be empty\n";
+          else if (i == 1)
+            submitError += "Description cannot be empty\n";
+          else if (i == 2)
+            submitError += "Please pick an age\n";
+          else if (i == 3)
+            submitError += "Please pick a type\n";
+          else if (i == 4)
+            submitError += "Please pick a date\n";
+          else if (i == 5)
+            submitError += "Please pick a time\n";
+          else if (i == 6)
+            submitError += "Please pick a location\n";
+          else if (i == 7) feeController.text = "Free";
+        } else if (tempCheck == true) filledForm = true;
+      });
+    }
+    return filledForm;
+  }
+
+  Future<void> submitEvent() async {
+    submitError = "";
+
+    if (checkSubmit()) {
+      setState(() {
+        loading = true;
+      });
+      FirebaseFirestore fb = FirebaseFirestore.instance;
+      GeoFirePoint myLocation = geo.point(
+          latitude: location[0].position.latitude,
+          longitude: location[0].position.longitude);
+      if(hasData){
+        await fb.collection('events').doc(data.id).update({
+          'title': titleController.text,
+          'description': descController.text,
+          'age': _age,
+          'type': _type,
+          'date': selectedDate,
+          'time': selectedTimeFormatted,
+          'location': myLocation.data,
+          'locationName': locationName,
+          'fee': feeController.text,
+          'ticketseft': titleController.text
+        }).then((value) async {
+          final id = data.id;
+          List<String> ids = [id];
+          await fb
+              .collection('users')
+              .doc(uid)
+              .update({'events': FieldValue.arrayUnion(ids)});
+          for (var entry in images.asMap().entries) {
+            int entryIndex = entry.key;
+            final firebaseStorageRef =
+            FirebaseStorage.instance.ref().child('$id/$entryIndex');
+            final upload = await firebaseStorageRef
+                .putData((await entry.value.getByteData(quality: 50))
+                .buffer
+                .asUint8List())
+                .then((value) async {
+              urls.add(await firebaseStorageRef.getDownloadURL());
             });
-            Navigator.pop(context);
+          }
+          return {"urls": urls, "id": id};
+        }).then((value) async {
+          await fb.collection('events').doc(data.id).update({
+            'urls': FieldValue.arrayUnion(value["urls"]),
           });
-        },
-        child: Container(
-          width: 300,
-          height: 50,
-          decoration: BoxDecoration(border: Border.all(color: Colors.white)),
-          child: Center(
-            child: Text("SUBMIT", style: TextStyle(color: Colors.white)),
-          ),
-        ),
-      ),
-    );
+          Navigator.pop(context);
+        });
+      }
+      else {
+        await fb.collection('events').add({
+          'title': titleController.text,
+          'description': descController.text,
+          'age': _age,
+          'type': _type,
+          'date': selectedDate,
+          'time': selectedTime.toString().substring(10, 15),
+          'poster': uid,
+          'location': myLocation.data,
+          'locationName': locationName,
+          'fee': feeController.text,
+          'ticketseft': titleController.text
+        }).then((value) async {
+          final id = value.id;
+          List<String> ids = [id];
+          await fb
+              .collection('users')
+              .doc(uid)
+              .update({'events': FieldValue.arrayUnion(ids)});
+          for (var entry in images.asMap().entries) {
+            int entryIndex = entry.key;
+            final firebaseStorageRef =
+            FirebaseStorage.instance.ref().child('$id/$entryIndex');
+            final upload = await firebaseStorageRef
+                .putData((await entry.value.getByteData(quality: 50))
+                .buffer
+                .asUint8List())
+                .then((value) async {
+              urls.add(await firebaseStorageRef.getDownloadURL());
+            });
+          }
+          return {"urls": urls, "id": id};
+        }).then((value) async {
+          await fb.collection('events').doc(value["id"]).update({
+            'urls': FieldValue.arrayUnion(value["urls"]),
+          });
+          Navigator.pop(context);
+        });
+      }
+
+    }
   }
 
   Future<void> loadAssets() async {
     List<Asset> resultList = <Asset>[];
+    String color = "#2b2b2b";
     String error = 'No Error Detected';
     try {
       resultList = await MultiImagePicker.pickImages(
         maxImages: 6,
         enableCamera: true,
         selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        cupertinoOptions: CupertinoOptions(
+            takePhotoIcon: "chat",
+            backgroundColor: color,
+            selectionFillColor: color,
+            selectionStrokeColor: color),
         materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
+          actionBarColor: color,
+          actionBarTitle: "Pick images",
           allViewTitle: "All Photos",
           useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
+          statusBarColor: color,
+          selectCircleStrokeColor: color,
         ),
       );
     } on Exception catch (e) {
@@ -194,6 +292,8 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   TimeOfDay selectedTime = TimeOfDay.now();
+  TimeOfDay timeNow = TimeOfDay.now();
+  String selectedTimeFormatted = "";
   bool changedTime = false;
 
   Future<void> _selectTime(BuildContext context) async {
@@ -206,6 +306,53 @@ class _AddEventFormState extends State<AddEventForm> {
         selectedTime = picked;
         changedTime = true;
       });
+    selectedTimeFormatted = selectedTime.toString().substring(10, 15);
+  }
+
+  bool isFree = true;
+
+  void checkEdit() {
+    if(data != null)
+      hasData = true;
+    else hasData = false;
+
+    if(hasData){
+      DateTime dateFormatted = data['date'].toDate();
+      changedDate = true;
+      changedTime = true;
+
+      if(data['fee'] == 'Free')
+        isFree = true;
+      else isFree = false;
+
+      location = [];
+
+      titleController.text = data['title'];
+      descController.text = data['description'];
+      _age = data['age'];
+      _type = data['type'];
+      selectedDate = dateFormatted;
+      selectedTimeFormatted = data['time'];
+      location.add(Marker(
+        markerId: MarkerId(data['location']['geohash']),
+        position: LatLng(
+            data['location']['geopoint'].latitude,
+            data['location']['geopoint'].longitude
+        )
+      ));
+      locationName = data['locationName'];
+      feeController.text = data['fee'];
+    }
+  }
+
+  void deleteEvent() {
+
+  }
+
+  @override
+  void initState() {
+    checkEdit();
+    super.initState();
   }
 
   @override
@@ -216,7 +363,7 @@ class _AddEventFormState extends State<AddEventForm> {
     double titleFieldHeight = height * 0.1;
     double descTextFieldHeight = height * 0.2;
     double btnsHeight = height * 0.07;
-    double btnsTextWidth = width * 0.3;
+    double btnsTextWidth = width * 0.2;
     double btnsWidth = width * 0.5;
 
     return !loading
@@ -224,6 +371,21 @@ class _AddEventFormState extends State<AddEventForm> {
             resizeToAvoidBottomInset: true,
             appBar: AppBar(
               backgroundColor: Colors.black,
+              actions: [
+                GestureDetector(
+                  onTap: () {
+                    submitEvent();
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: 15),
+                    child: Icon(
+                      Icons.check,
+                      color: Colors.blue,
+                      size: 30,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: SafeArea(
                 child: GestureDetector(
@@ -246,108 +408,120 @@ class _AddEventFormState extends State<AddEventForm> {
                               color: Colors.white),
                         ),
                       ),
+                      if (!filledForm)
+                        Container(
+                          padding:
+                              EdgeInsets.only(left: 15, top: 5, bottom: 10),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            submitError,
+                            style: TextStyle(
+                                fontFamily: globals.montserrat,
+                                fontSize: 15,
+                                color: Colors.red),
+                          ),
+                        ),
                       // Title field
                       Container(
                         height: titleFieldHeight,
                         width: textFieldWidth,
                         decoration: BoxDecoration(
-                            color: Colors.white12,
+                            color: boxesColor,
                             borderRadius: BorderRadius.circular(10)),
-                        margin: EdgeInsets.only(bottom: 15),
+                        margin: EdgeInsets.only(bottom: 0),
                         child: Center(
-                          child: ListTile(
-                            title: TextField(
-                              controller: titleController,
-                              cursorColor: Colors.white,
-                              style: TextStyle(
-                                  color: Colors.white,
+                            child: TextField(
+                          controller: titleController,
+                          cursorColor: Colors.white,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: titleSize,
+                              fontFamily: globals.montserrat,
+                              fontWeight: globals.fontWeight),
+                          decoration: InputDecoration(
+                              hintText: "Title",
+                              hintStyle: TextStyle(
+                                  color: Colors.white38,
                                   fontSize: inputSize,
                                   fontFamily: globals.montserrat,
                                   fontWeight: globals.fontWeight),
-                              decoration: InputDecoration(
-                                  hintText: "Title",
-                                  hintStyle: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                  border: InputBorder.none,
-                                  focusColor: Colors.black,
-                                  fillColor: Colors.black),
-                            ),
-                          ),
-                        ),
+                              border: InputBorder.none,
+                              focusColor: Colors.black,
+                              fillColor: Colors.black),
+                        )),
+                      ),
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
                       ),
                       // Description
                       Container(
-                        height: descTextFieldHeight,
+                        height: titleFieldHeight,
                         width: textFieldWidth,
                         decoration: BoxDecoration(
-                            color: Colors.white12,
-                            borderRadius: BorderRadius.circular(10)),
+                          color: boxesColor,
+                        ),
                         margin: EdgeInsets.only(bottom: 15),
                         child: Center(
-                          child: ListTile(
-                            title: TextField(
-                              textAlignVertical: TextAlignVertical.top,
-                              expands: true,
-                              maxLines: null,
-                              controller: descController,
-                              cursorColor: Colors.white,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: inputSize,
-                                  fontFamily: globals.montserrat,
-                                  fontWeight: globals.fontWeight),
-                              decoration: InputDecoration(
-                                  hintText: "Description",
-                                  hintStyle: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                  border: InputBorder.none,
-                                  focusColor: Colors.black,
-                                  fillColor: Colors.black),
-                            ),
+                          child: TextField(
+                            textAlignVertical: TextAlignVertical.top,
+                            expands: true,
+                            maxLines: null,
+                            controller: descController,
+                            cursorColor: Colors.white,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: inputSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                            decoration: InputDecoration(
+                                hintText: "Description",
+                                hintStyle: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                                border: InputBorder.none,
+                                focusColor: Colors.black,
+                                fillColor: Colors.black),
                           ),
                         ),
                       ),
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
                       // Event Type
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          // Type Text
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10)),
+                            color: Colors.black,
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: ListTile(
-                                title: Text(
-                                  "Type:",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
+                              child: Text(
+                                "Type:",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
                               ),
                             ),
                           ),
+                          // Type picker
                           Container(
                             height: btnsHeight,
                             width: btnsWidth,
-                            decoration: BoxDecoration(
-                                color: Colors.white12,
-                                borderRadius: BorderRadius.circular(10)),
+                            color: boxesColor,
                             margin: EdgeInsets.only(bottom: 15),
-                            child: Center(
-                                child: DropdownButtonHideUnderline(
+                            child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
+                                dropdownColor: Colors.grey[900],
                                 value: _type,
                                 style: TextStyle(
                                   fontFamily: globals.montserrat,
@@ -385,13 +559,17 @@ class _AddEventFormState extends State<AddEventForm> {
                                   });
                                 },
                               ),
-                            )),
+                            ),
                           ),
                         ],
                       ),
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
                       // Date
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           // Date Text
                           Container(
@@ -402,16 +580,14 @@ class _AddEventFormState extends State<AddEventForm> {
                                 borderRadius: BorderRadius.circular(10)),
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: ListTile(
-                                title: Text(
-                                  "Date:",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
+                              child: Text(
+                                "Date:",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
                               ),
                             ),
                           ),
@@ -422,10 +598,11 @@ class _AddEventFormState extends State<AddEventForm> {
                               height: btnsHeight,
                               width: btnsWidth,
                               decoration: BoxDecoration(
-                                  color: Colors.white12,
+                                  color: boxesColor,
                                   borderRadius: BorderRadius.circular(10)),
                               margin: EdgeInsets.only(bottom: 15),
-                              child: Center(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
                                 child: !changedDate
                                     ? Icon(
                                         Icons.calendar_today_outlined,
@@ -447,9 +624,13 @@ class _AddEventFormState extends State<AddEventForm> {
                           ),
                         ],
                       ),
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
                       // Time
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           // Time Text
                           Container(
@@ -460,16 +641,14 @@ class _AddEventFormState extends State<AddEventForm> {
                                 borderRadius: BorderRadius.circular(10)),
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: ListTile(
-                                title: Text(
-                                  "Time:",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
+                              child: Text(
+                                "Time:",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
                               ),
                             ),
                           ),
@@ -480,10 +659,11 @@ class _AddEventFormState extends State<AddEventForm> {
                               height: btnsHeight,
                               width: btnsWidth,
                               decoration: BoxDecoration(
-                                  color: Colors.white12,
+                                  color: boxesColor,
                                   borderRadius: BorderRadius.circular(10)),
                               margin: EdgeInsets.only(bottom: 15),
-                              child: Center(
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
                                   child: !changedTime
                                       ? Icon(
                                           Icons.access_time,
@@ -491,9 +671,7 @@ class _AddEventFormState extends State<AddEventForm> {
                                           size: 25,
                                         )
                                       : Text(
-                                          selectedTime
-                                              .toString()
-                                              .substring(10, 15),
+                                          selectedTimeFormatted,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
                                               fontWeight: globals.fontWeight,
@@ -504,76 +682,15 @@ class _AddEventFormState extends State<AddEventForm> {
                           ),
                         ],
                       ),
-                      // Entrance fee
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Entrance Text
-                          Container(
-                            height: btnsHeight,
-                            width: btnsTextWidth,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10)),
-                            margin: EdgeInsets.only(bottom: 15),
-                            child: Center(
-                              child: ListTile(
-                                title: Text(
-                                  "Entrance:",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Fee Text Field
-                          Container(
-                            height: btnsHeight,
-                            width: btnsWidth,
-                            decoration: BoxDecoration(
-                                color: Colors.white12,
-                                borderRadius: BorderRadius.circular(10)),
-                            margin: EdgeInsets.only(bottom: 15),
-                            child: Center(
-                              child: ListTile(
-                                title: TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller: feeController,
-                                  cursorColor: Colors.white,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                  decoration: InputDecoration(
-                                      hintText: "Fee (optional)",
-                                      icon: Icon(
-                                        Icons.attach_money,
-                                        color: Colors.white,
-                                        size: 22,
-                                      ),
-                                      hintStyle: TextStyle(
-                                          color: Colors.white38,
-                                          fontSize: feeText,
-                                          fontFamily: globals.montserrat,
-                                          fontWeight: globals.fontWeight),
-                                      border: InputBorder.none,
-                                      focusColor: Colors.black,
-                                      fillColor: Colors.black),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
                       ),
                       // Age
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          // Age Text
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
@@ -582,94 +699,174 @@ class _AddEventFormState extends State<AddEventForm> {
                                 borderRadius: BorderRadius.circular(10)),
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: ListTile(
-                                title: Text(
-                                  "Age:",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
+                              child: Text(
+                                "Age:",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
                               ),
                             ),
                           ),
+                          // Age picker
                           Container(
                             height: btnsHeight,
                             width: btnsWidth,
                             decoration: BoxDecoration(
-                                color: Colors.white12,
+                                color: boxesColor,
                                 borderRadius: BorderRadius.circular(10)),
                             margin: EdgeInsets.only(bottom: 15),
-                            child: Center(
+                            child: Align(
+                                alignment: Alignment.centerLeft,
                                 child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _age,
-                                style: TextStyle(
-                                  fontFamily: globals.montserrat,
-                                  fontSize: 16,
-                                  fontWeight: globals.fontWeight,
-                                  color: Colors.white,
-                                ),
-                                //elevation: 5,
-                                items: <String>[
-                                  'All ages',
-                                  '13 +',
-                                  '16 +',
-                                  '18 +',
-                                  '21 +',
-                                  '23 +',
-                                ].map<DropdownMenuItem<String>>((String age) {
-                                  return DropdownMenuItem<String>(
-                                    value: age,
-                                    child: Text(age),
-                                  );
-                                }).toList(),
-                                hint: Text(
-                                  "Choose an age",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
+                                  child: DropdownButton<String>(
+                                    dropdownColor: Colors.grey[900],
+                                    value: _age,
+                                    style: TextStyle(
+                                      fontFamily: globals.montserrat,
+                                      fontSize: 16,
                                       fontWeight: globals.fontWeight,
-                                      fontFamily: globals.montserrat),
-                                ),
-                                onChanged: (String value) {
-                                  setState(() {
-                                    _age = value;
-                                  });
-                                },
-                              ),
-                            )),
+                                      color: Colors.white,
+                                    ),
+                                    //elevation: 5,
+                                    items: <String>[
+                                      'All ages',
+                                      '13 +',
+                                      '16 +',
+                                      '18 +',
+                                      '21 +',
+                                      '23 +',
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String age) {
+                                      return DropdownMenuItem<String>(
+                                        value: age,
+                                        child: Text(age),
+                                      );
+                                    }).toList(),
+                                    hint: Text(
+                                      "Choose an age",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: globals.fontWeight,
+                                          fontFamily: globals.montserrat),
+                                    ),
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        _age = value;
+                                      });
+                                    },
+                                  ),
+                                )),
                           ),
                         ],
                       ),
-                      // Maps
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
+                      // Entrance fee
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          // Location Text
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
                             decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10)),
-                            margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: ListTile(
-                                title: Text(
-                                  "Location:",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.white38,
-                                      fontSize: inputSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
+                              child: Text(
+                                "Price",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
                               ),
                             ),
                           ),
+                          Container(
+                            height: btnsHeight,
+                            width: btnsTextWidth,
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Text(
+                                "Free",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            child: Switch(
+                              value: isFree,
+                              onChanged: (value) {
+                                setState(() {
+                                  isFree = !isFree;
+                                });
+                              },
+                              activeColor: Colors.red,
+                              inactiveTrackColor: Colors.blue,
+                            ),
+                          )
+                        ],
+                      ),
+                      if (!isFree)
+                        Container(
+                          height: btnsHeight,
+                          width: textFieldWidth,
+                          decoration: BoxDecoration(
+                              color: Colors.white12,
+                              borderRadius: BorderRadius.circular(10)),
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: Center(
+                            child: ListTile(
+                              title: TextField(
+                                keyboardType: TextInputType.number,
+                                controller: feeController,
+                                cursorColor: Colors.white,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                                decoration: InputDecoration(
+                                    hintText: "Fee",
+                                    icon: Icon(
+                                      Icons.attach_money,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                    hintStyle: TextStyle(
+                                        color: Colors.white38,
+                                        fontSize: feeText,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                    border: InputBorder.none,
+                                    focusColor: Colors.black,
+                                    fillColor: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ),
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
+                      // Maps
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
                           // Location button
                           GestureDetector(
                             onTap: () {
@@ -677,32 +874,61 @@ class _AddEventFormState extends State<AddEventForm> {
                             },
                             child: Container(
                               height: btnsHeight,
-                              width: btnsWidth,
+                              width: textFieldWidth,
                               decoration: BoxDecoration(
                                   color: Colors.white12,
                                   borderRadius: BorderRadius.circular(10)),
-                              margin: EdgeInsets.only(bottom: 15),
-                              child: Center(
-                                  child: Icon(
-                                Icons.pin_drop,
-                                color: Colors.blue,
-                                size: 30,
+                              margin: EdgeInsets.only(bottom: 10, top: 10),
+                              child: Container(
+                                  child: Center(
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.pin_drop_outlined,
+                                    color: Colors.blue,
+                                    size: 30,
+                                  ),
+                                  title: Text(
+                                    locationName,
+                                    style: TextStyle(
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight,
+                                        color: locationTextColor),
+                                  ),
+                                ),
                               )),
                             ),
                           ),
                         ],
                       ),
-                      ElevatedButton(
-                        child: Text("Pick images"),
-                        onPressed: () async {
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
+                      // Pick images button
+                      GestureDetector(
+                        onTap: () async {
                           loadAssets();
                         },
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(90),
+                              color: Colors.white10),
+                          child: Icon(
+                            Icons.camera_alt_outlined,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
+
+                      // Grid of images
                       Container(
-                          height: calculateHeight(images.length).toDouble(),
-                          width: width,
+                          height:
+                              calculateHeight(images.length).toDouble() + 70,
+                          width: width * 0.95,
+                          margin: EdgeInsets.only(top: 10),
                           child: buildGridView()),
-                      button(uid: uid),
                     ],
                   ),
                 ),
@@ -717,6 +943,7 @@ class DetailScreen extends StatelessWidget {
   DetailScreen(this.asset);
 
   final Asset asset;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;

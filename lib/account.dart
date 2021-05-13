@@ -189,7 +189,7 @@ class _AccountPageState extends State<AccountPage> {
                           child: Column(
                             children: [
                               Setting(
-                                title: "Bookmarks",
+                                title: "Saved",
                                 icon: Icons.bookmark_outline,
                                 page: navigateToBookmark,
                               ),

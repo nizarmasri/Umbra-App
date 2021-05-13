@@ -38,3 +38,6 @@ SpinKitFadingCircle spinner = SpinKitFadingCircle(
   color: Colors.white,
   size: 50.0,
 );
+
+AssetImage background = AssetImage('assets/login_background.jpg');
+

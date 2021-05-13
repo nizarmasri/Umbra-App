@@ -203,11 +203,14 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
           }
         },
         child: Container(
-          width: 300,
+          width: 200,
           height: 50,
-          decoration: BoxDecoration(border: Border.all(color: Colors.white)),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10), color: Colors.white10),
           child: Center(
-            child: Text("SUBMIT", style: TextStyle(color: Colors.white)),
+            child: Text("Save",
+                style: TextStyle(
+                    fontFamily: globals.montserrat, color: Colors.white)),
           ),
         ),
       ),

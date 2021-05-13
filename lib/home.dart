@@ -2,6 +2,7 @@ import 'package:awesome_loader/awesome_loader.dart';
 import 'package:events/navigator.dart';
 import 'package:events/nearyouItem.dart';
 import 'package:events/searchResultItem.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +14,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:events/libOrg/eventDetails.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import  'package:string_similarity/string_similarity.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -94,19 +97,121 @@ class _HomePageState extends State<HomePage> {
         time;
   }
 
+  int countSimilarOccurrences(List<String> list, String wordB) {
+    if (list == null || list.isEmpty) {
+      return 0;
+    }
+
+    // If wordB is at least 80% similar to wordA, increment foundElements
+    var foundElements = list.where((wordA) => wordA.toUpperCase().similarityTo(wordB.toUpperCase()) >= 0.8);
+    return foundElements.length;
+  }
+
+  bool forYouAlgorithm(List<QueryDocumentSnapshot> eventsA, QueryDocumentSnapshot eventB) {
+    // Description of event to be analyzed
+    String eventB_Desc = eventB['description'];
+
+    // List of descriptions of events to compare to
+    // (events user attended)
+    List<String> eventsA_Desc = [];
+    eventsA.forEach((event) {
+      eventsA_Desc.add(event['description']);
+    });
+
+    // counter for number of words eventB has in common with eventA
+    int eventB_localCounter = 0;
+    // counter for number of eventA's eventB is similar to
+    int eventB_counter = 0;
+
+    // Compare each eventA to the eventB
+    eventsA_Desc.forEach((eventA) {
+      eventB_localCounter = 0;
+
+      // Create list of individual words for each event description
+      List<String> eventA_words = eventA.split(" ");
+      List<String> eventB_words = eventB_Desc.split(" ");
+
+      // Calculate 20% of the number of words in eventA
+      int twentyPercent = (eventA_words.length * 0.2).toInt();
+
+      // Check if words in eventB description are 80% similar to words in eventA description
+      // Increment eventB_localCounter if it is similar
+      eventB_words.forEach((wordB) {
+        if(countSimilarOccurrences(eventA_words, wordB) == 1)
+          eventB_localCounter++;
+      });
+
+      // if the number of similar words in eventB to eventA is greater than 20% of total words in eventA
+      // increment eventB_counter
+      if(eventB_localCounter >= twentyPercent)
+        eventB_counter++;
+    });
+
+    // if eventB is similar to at least 2 eventA's, return true
+    if(eventB_counter >= 2)
+      return true;
+    else return false;
+  }
+
   List<SearchResultItem> foryouItems = [];
   FirebaseFirestore fb = FirebaseFirestore.instance;
+  String uid = FirebaseAuth.instance.currentUser.uid;
 
   Future<List<QueryDocumentSnapshot>> getForyouEvents() async {
-    List<QueryDocumentSnapshot> events = [];
+    // All posted events that user is not attending
+    List<QueryDocumentSnapshot> allEvents = [];
+    // Latest 5 attending events
+    List<QueryDocumentSnapshot> latestAttendingEvents = [];
+    // Final list of events on for you
+    List<QueryDocumentSnapshot> foryouEvents = [];
 
-    await fb.collection("events").get().then((value) {
+    // Get the IDs of all events user is attending
+    List<dynamic> attendingEventsIds = [];
+    await fb.collection("users").doc(uid).get().then((value) {
+      attendingEventsIds = value.data()['attending'];
+    });
+
+    // Get all events user is not attending
+    await fb.collection("events").where('__name__', whereNotIn: attendingEventsIds).get().then((value) {
       value.docs.forEach((event) {
-        events.add(event);
+        allEvents.add(event);
       });
     });
 
-    return events;
+    // Get the documents of all events user is attending
+    List<dynamic> attendingEvents = [];
+    await fb
+        .collection("events")
+        .where('__name__', whereIn: attendingEventsIds)
+        .get()
+        .then((value) {
+      value.docs.forEach((event) {
+        attendingEvents.add(event);
+      });
+
+      // Sort events from newest to oldest
+      attendingEvents.sort((a,b) => b['date'].compareTo(a['date']));
+
+      // Sets number of latest event to 5 or lower
+      int numberOfLatest = 0;
+      if(attendingEvents.length >= 5)
+        numberOfLatest = 5;
+      else numberOfLatest = attendingEvents.length;
+
+      // Add the latest 5 or less events to latest events list
+      for(int i = 0; i < numberOfLatest; i++)
+        latestAttendingEvents.add(attendingEvents[i]);
+    });
+
+    // compares all events to the 5 latest events
+    // if true, add event to for you events list
+    allEvents.forEach((event) {
+      if(forYouAlgorithm(latestAttendingEvents, event) == true)
+        foryouEvents.add(event);
+    });
+
+    // return the for you events
+    return allEvents;
   }
 
   RefreshController _refreshController =
@@ -376,7 +481,8 @@ class _HomePageState extends State<HomePage> {
                               ));
                             });
 
-                            print(foryouItems.length);
+                            print(snapshot.data[0]['date']);
+                            print(Timestamp.now());
 
                             return Container(
                               height: height,

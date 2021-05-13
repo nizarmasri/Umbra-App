@@ -8,12 +8,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:intl/intl.dart';
 
-class EventsPage extends StatefulWidget {
+class AttendingEventsPage extends StatefulWidget {
   @override
-  _EventsPageState createState() => _EventsPageState();
+  _AttendingEventsPageState createState() => _AttendingEventsPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _AttendingEventsPageState extends State<AttendingEventsPage> {
   navigateToAddEventForm() {
     Navigator.push(
             context, MaterialPageRoute(builder: (context) => AddEventForm()))
@@ -56,7 +56,9 @@ class _EventsPageState extends State<EventsPage> {
           .get()
           .then((value) {
         value.docs.forEach((event) {
-          events.add(event);
+          DateTime dateChecker = event.data()['date'].toDate();
+          print(dateChecker.isAfter(DateTime.now()));
+          if (dateChecker.isAfter(DateTime.now())) events.add(event);
         });
       });
 
@@ -75,19 +77,20 @@ class _EventsPageState extends State<EventsPage> {
             .get()
             .then((value) {
           value.docs.forEach((event) {
-            events.add(event);
+            DateTime dateChecker = event.data()['date'].toDate();
+            if (dateChecker.isAfter(DateTime.now())) events.add(event);
           });
         });
       }
-    }
-    else {
+    } else {
       await fb
           .collection("events")
           .where('__name__', whereIn: eventIds)
           .get()
           .then((value) {
         value.docs.forEach((event) {
-          events.add(event);
+          DateTime dateChecker = event.data()['date'].toDate();
+          if (dateChecker.isAfter(DateTime.now())) events.add(event);
         });
       });
     }
@@ -118,7 +121,7 @@ class _EventsPageState extends State<EventsPage> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double listHeight = height * 0.8;
+    double listHeight = height * 0.83;
 
     eventItems = [];
 
@@ -148,18 +151,6 @@ class _EventsPageState extends State<EventsPage> {
                   child: Container(
                       child: Column(
                     children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 15, top: 15),
-                        margin: EdgeInsets.only(bottom: 10),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Attending Events",
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontSize: 30,
-                              color: Colors.white),
-                        ),
-                      ),
                       Container(
                         height: listHeight,
                         child: ListView.builder(

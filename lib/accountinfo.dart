@@ -8,6 +8,7 @@ import 'globals.dart' as globals;
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import  'package:string_similarity/string_similarity.dart';
 
 class AccountInfo extends StatefulWidget {
   @override
@@ -69,43 +70,46 @@ class _AccountInfoState extends State<AccountInfo> {
   Container avatar({String letter, String existingPicture}) {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
-      child: Column(
-        children: [
-          Center(
-            child: CircleAvatar(
-              radius: 75,
-              backgroundColor: Colors.brown.shade800,
-              backgroundImage: images.isNotEmpty
-                  ? AssetThumbImageProvider(
-                      images[0],
-                      width: 200,
-                      height: 200,
-                      quality: 100,
-                    )
-                  : existingPicture != ''
-                      ? NetworkImage(existingPicture)
-                      : null,
-              child: Text(
-                images.isEmpty && existingPicture == '' ? letter : "",
-                style: TextStyle(fontSize: 80),
+      child: GestureDetector(
+        onTap: (){ forYouAlgorithm();},
+        child: Column(
+          children: [
+            Center(
+              child: CircleAvatar(
+                radius: 75,
+                backgroundColor: Colors.brown.shade800,
+                backgroundImage: images.isNotEmpty
+                    ? AssetThumbImageProvider(
+                        images[0],
+                        width: 200,
+                        height: 200,
+                        quality: 100,
+                      )
+                    : existingPicture != ''
+                        ? NetworkImage(existingPicture)
+                        : null,
+                child: Text(
+                  images.isEmpty && existingPicture == '' ? letter : "",
+                  style: TextStyle(fontSize: 80),
+                ),
               ),
             ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 10),
-            child: Center(
-                child: IconButton(
-              onPressed: () {
-                loadAssets();
-              },
-              icon: Icon(
-                Icons.edit,
-                color: Colors.white,
-                size: 30,
-              ),
-            )),
-          ),
-        ],
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              child: Center(
+                  child: IconButton(
+                onPressed: () {
+                  loadAssets();
+                },
+                icon: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              )),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -209,6 +213,53 @@ class _AccountInfoState extends State<AccountInfo> {
         ),
       ),
     );
+  }
+
+  int countSimilarOccurrences(List<String> list, String wordB) {
+    if (list == null || list.isEmpty) {
+      return 0;
+    }
+    var foundElements = list.where((wordA) => wordA.toUpperCase().similarityTo(wordB.toUpperCase()) >= 0.8);
+    return foundElements.length;
+  }
+
+  void forYouAlgorithm() {
+    String eventA1 = "Best pub in Mar Mikhael, happy hour this Friday from 10 to 12!! Great RNB music from DJ Bobert.";
+    String eventA2 = "this is the coolest pub in town if you come here you will have the best time of your life and drink so much that all you will think about is drinking so much";
+    String eventA3 = "The national Lebanese Orchestra is performing at the Byblos music festival.";
+    String eventA4 = "Come down and watch the big match with us this weekend down in Mar Mkhayel!";
+    String eventA5 = "Lebanon will witness the sickest house party in decades welcome to Villa Saad, a party where everybody is welcome and there are opened drinks the whole night, free entry just come and enjoy";
+    String eventB = "One of the most nostalgic pubs in MK, very chill and welcoming. Affordable prices with great quality!";
+
+    int eventB_localCounter = 0;
+    int eventB_counter = 0;
+
+    List<String> attending = [eventA1, eventA2, eventA3, eventA4, eventA5];
+
+    attending.forEach((eventA) {
+      eventB_localCounter = 0;
+      List<String> eventA_words = eventA.split(" ");
+      List<String> eventB_words = eventB.split(" ");
+
+      int twentyPercent = (eventA_words.length * 0.2).toInt();
+      print("20% = " + twentyPercent.toString());
+
+      eventB_words.forEach((wordB) {
+        if(countSimilarOccurrences(eventA_words, wordB) == 1) {
+          print(wordB);
+          eventB_localCounter++;
+        }
+      });
+
+      print("local = " + eventB_localCounter.toString());
+      print("counter = " + eventB_counter.toString());
+
+      if(eventB_localCounter >= twentyPercent)
+        eventB_counter++;
+    });
+
+    if(eventB_counter >= 2)
+      print("Add to for you");
   }
 
   @override

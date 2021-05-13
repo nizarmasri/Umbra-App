@@ -45,11 +45,13 @@ class _LoginPageState extends State<LoginPage> {
       fontFamily: "Montserrat",
       fontWeight: FontWeight.w300);
   bool loader = true;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.height;
-    double btnWidth = width * 0.5;
+    double width = MediaQuery.of(context).size.width;
+    double body = height * 0.9;
+    double btnWidth = width * 0.9;
 
     return loader
         ? GestureDetector(
@@ -62,30 +64,48 @@ class _LoginPageState extends State<LoginPage> {
               appBar: AppBar(
                 backgroundColor: Colors.black,
               ),
-              body: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: height * 0.05, bottom: height * 0.05),
-                        child: Text(
-                          "myEvents",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: schedulerSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                        ),
-                      ),
-                      Column(
+              body: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    image: DecorationImage(
+                      image: globals.background,
+                      fit: BoxFit.fill,
+                    )),
+                child: Container(
+                  color: Colors.black87,
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: [
+                          // Logo
+                          Container(
+                            margin: EdgeInsets.only(bottom: height * 0.1),
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(children: <TextSpan>[
+                                TextSpan(
+                                    text: "u",
+                                    style: TextStyle(
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight,
+                                        fontSize: 110,
+                                        color: Colors.white24)),
+                                TextSpan(
+                                    text: "mbra",
+                                    style: TextStyle(
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight,
+                                        fontSize: 30,
+                                        color: Colors.white70)),
+                              ]),
+                            ),
+                          ),
                           // email field
                           Container(
                             height: btnHeight,
                             width: btnWidth,
                             decoration: BoxDecoration(
-                                color: Colors.white12,
+                                color: Colors.white10,
                                 borderRadius: BorderRadius.circular(10)),
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
@@ -122,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: btnWidth,
                             margin: EdgeInsets.only(bottom: 15),
                             decoration: BoxDecoration(
-                                color: Colors.white12,
+                                color: Colors.white10,
                                 borderRadius: BorderRadius.circular(10)),
                             child: Center(
                               child: ListTile(
@@ -220,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

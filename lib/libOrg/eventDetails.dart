@@ -1,5 +1,6 @@
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/libOrg/addEventForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,12 +62,12 @@ class _EventDetailsState extends State<EventDetails> {
 
   double titleTextSize = 25;
   double descTextSize = 16;
-  double ageTextSize = 23;
-  double typeTextSize = 18;
-  double feeTextSize = 24;
-  double currencyTextSize = 12;
-  double dateTextSize = 20;
-  double timeTextSize = 22.5;
+  double ageTextSize = 20;
+  double typeTextSize = 15;
+  double feeTextSize = 21;
+  double currencyTextSize = 10;
+  double dateTextSize = 17;
+  double timeTextSize = 19.5;
 
   LatLng markerPos;
   Marker marker;
@@ -119,21 +120,28 @@ class _EventDetailsState extends State<EventDetails> {
   Icon notAttendIcon = Icon(
     Icons.add_circle_outline_rounded,
     color: Colors.green,
+    size: 20,
+
   );
   Icon isAttendIcon = Icon(
     Icons.add_circle_rounded,
     color: Colors.green,
+    size: 20,
+
   );
   bool isAttend = false;
 
   Icon notBookedIcon = Icon(
     Icons.bookmark_border,
     color: Colors.blue,
+    size: 20,
+
   );
 
   Icon isBookedIcon = Icon(
     Icons.bookmark,
     color: Colors.blue,
+    size: 20,
   );
 
   bool isBooked = false;
@@ -161,15 +169,22 @@ class _EventDetailsState extends State<EventDetails> {
         MaterialPageRoute(builder: (context) => EventStatistics(data: data)));
   }
 
+  navigateToEdit(QueryDocumentSnapshot data) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => AddEventForm(data: data,)));
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    double infoSquaresSize = height * 0.114;
-    double infoRectsHeight = height * 0.114;
+    double infoSquaresSize = height * 0.1;
+    double infoRectsHeight = height * 0.1;
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
     double imagesHeight = height * 0.3;
+    double btnsHeight = height* 0.057;
+    double btnsWidth = height * 0.171;
     int _tickets = 0;
 
     String feeCheck = "";
@@ -217,6 +232,19 @@ class _EventDetailsState extends State<EventDetails> {
                 onPressed: () {
                   navigateToEventStatistics(data);
                 }),
+          if (isOrg)
+            IconButton(
+                icon: Icon(Icons.edit_outlined, color: Colors.white),
+                onPressed: () {
+                  navigateToEdit(data);
+                }),
+          if (isOrg)
+            IconButton(
+                icon: Icon(Icons.delete_outline, color: Colors.white),
+                onPressed: () {
+                  navigateToEventStatistics(data);
+                }),
+
         ],
         leading: GestureDetector(
           onTap: () {
@@ -295,8 +323,8 @@ class _EventDetailsState extends State<EventDetails> {
                                       child: Container(
                                         margin: EdgeInsets.only(
                                             bottom: 20, right: 10),
-                                        height: infoSquaresSize / 2,
-                                        width: infoSquaresSize * 1.5,
+                                        height: btnsHeight,
+                                        width: btnsWidth,
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -311,6 +339,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                   style: TextStyle(
                                                       fontFamily:
                                                           globals.montserrat,
+                                                      fontWeight: globals.fontWeight,
                                                       fontSize: 15,
                                                       color: Colors.red)),
                                               Icon(
@@ -448,8 +477,8 @@ class _EventDetailsState extends State<EventDetails> {
                                               children: [
                                                 Text(
                                                     (isAttend)
-                                                        ? "Attending"
-                                                        : "Attend",
+                                                        ? "Attending "
+                                                        : "Attend ",
                                                     style: TextStyle(
                                                         fontFamily:
                                                             globals.montserrat,
@@ -485,7 +514,7 @@ class _EventDetailsState extends State<EventDetails> {
                                     margin:
                                         EdgeInsets.only(bottom: 20, left: 10),
                                     height: infoSquaresSize / 2,
-                                    // width: infoSquaresSize * 1.5,
+                                    width: infoSquaresSize * 1.5,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.white12,
@@ -497,8 +526,8 @@ class _EventDetailsState extends State<EventDetails> {
                                         children: [
                                           Text(
                                               (isBooked)
-                                                  ? "Bookmarked"
-                                                  : "Bookmark",
+                                                  ? "Saved "
+                                                  : "Save ",
                                               style: TextStyle(
                                                   fontFamily:
                                                       globals.montserrat,
