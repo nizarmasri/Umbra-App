@@ -442,7 +442,7 @@ class _HomePageState extends State<HomePage> {
                               }
                               return Container(
                                 child: GFCarousel(
-                                  height: nearyouCarouselHeight,
+                                  // height: nearyouCarouselHeight,
                                   enableInfiniteScroll: true,
                                   viewportFraction: 0.8,
                                   activeIndicator: Colors.white,

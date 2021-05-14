@@ -136,7 +136,6 @@ class _EventItemState extends State<EventItem> {
                             fontSize: 13,
                             fontWeight: globals.fontWeight,
                             color: Colors.white)),
-
                   ]),
                 ),
               )),

@@ -19,12 +19,13 @@ class _AllEventsPageState extends State<AllEventsPage> {
         .then((value) => setState(() {}));
   }
 
-
   navigateToEventDetailsPage(QueryDocumentSnapshot data) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(data: data,)));
+            builder: (context) => EventDetails(
+                  data: data,
+                )));
   }
 
   List<EventItem> eventItems = [];
@@ -43,13 +44,12 @@ class _AllEventsPageState extends State<AllEventsPage> {
         events.add(event);
       });
     });
-    events.sort((a,b) => b['date'].compareTo(a['date']));
+    events.sort((a, b) => b['date'].compareTo(a['date']));
 
     return events;
   }
 
   String _sortBy = 'Descending';
-
 
   @override
   Widget build(BuildContext context) {
@@ -119,10 +119,10 @@ class _AllEventsPageState extends State<AllEventsPage> {
                                   color: Colors.white),
                             ),
                             Container(
-                              //margin: EdgeInsets.only(left: 5),
+                                //margin: EdgeInsets.only(left: 5),
                                 padding: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  //color: Colors.white12,
+                                    //color: Colors.white12,
                                     borderRadius: BorderRadius.circular(10)),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
@@ -139,12 +139,12 @@ class _AllEventsPageState extends State<AllEventsPage> {
                                       'Ascending',
                                       'Descending',
                                     ].map<DropdownMenuItem<String>>(
-                                            (String sorting) {
-                                          return DropdownMenuItem<String>(
-                                            value: sorting,
-                                            child: Text(sorting),
-                                          );
-                                        }).toList(),
+                                        (String sorting) {
+                                      return DropdownMenuItem<String>(
+                                        value: sorting,
+                                        child: Text(sorting),
+                                      );
+                                    }).toList(),
                                     hint: Text(
                                       _sortBy,
                                       style: TextStyle(
@@ -164,9 +164,10 @@ class _AllEventsPageState extends State<AllEventsPage> {
                         ),
                       ),
                       Container(
-                        height: listHeight,
                         child: ListView.builder(
+                          shrinkWrap: true,
                           itemCount: eventItems.length,
+                          physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               child: eventItems[index],

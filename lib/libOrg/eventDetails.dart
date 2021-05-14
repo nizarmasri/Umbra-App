@@ -121,13 +121,11 @@ class _EventDetailsState extends State<EventDetails> {
     Icons.add_circle_outline_rounded,
     color: Colors.green,
     size: 20,
-
   );
   Icon isAttendIcon = Icon(
     Icons.add_circle_rounded,
     color: Colors.green,
     size: 20,
-
   );
   bool isAttend = false;
 
@@ -135,7 +133,6 @@ class _EventDetailsState extends State<EventDetails> {
     Icons.bookmark_border,
     color: Colors.blue,
     size: 20,
-
   );
 
   Icon isBookedIcon = Icon(
@@ -170,8 +167,12 @@ class _EventDetailsState extends State<EventDetails> {
   }
 
   navigateToEdit(QueryDocumentSnapshot data) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => AddEventForm(data: data,)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddEventForm(
+                  data: data,
+                )));
   }
 
   @override
@@ -183,7 +184,7 @@ class _EventDetailsState extends State<EventDetails> {
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
     double imagesHeight = height * 0.3;
-    double btnsHeight = height* 0.057;
+    double btnsHeight = height * 0.057;
     double btnsWidth = height * 0.171;
     int _tickets = 0;
 
@@ -244,7 +245,6 @@ class _EventDetailsState extends State<EventDetails> {
                 onPressed: () {
                   navigateToEventStatistics(data);
                 }),
-
         ],
         leading: GestureDetector(
           onTap: () {
@@ -339,7 +339,8 @@ class _EventDetailsState extends State<EventDetails> {
                                                   style: TextStyle(
                                                       fontFamily:
                                                           globals.montserrat,
-                                                      fontWeight: globals.fontWeight,
+                                                      fontWeight:
+                                                          globals.fontWeight,
                                                       fontSize: 15,
                                                       color: Colors.red)),
                                               Icon(
@@ -461,10 +462,12 @@ class _EventDetailsState extends State<EventDetails> {
                                       child: Align(
                                         alignment: Alignment.centerLeft,
                                         child: Container(
+                                          padding:
+                                              EdgeInsets.fromLTRB(10, 7, 10, 7),
                                           margin: EdgeInsets.only(
                                               bottom: 20, right: 10),
-                                          height: infoSquaresSize / 2,
-                                          width: infoSquaresSize * 1.5,
+                                          //    height: infoSquaresSize / 2,
+                                          //    width: infoSquaresSize * 1.5,
                                           decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(10),
@@ -511,10 +514,11 @@ class _EventDetailsState extends State<EventDetails> {
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Container(
+                                    padding: EdgeInsets.fromLTRB(10, 7, 10, 7),
                                     margin:
                                         EdgeInsets.only(bottom: 20, left: 10),
-                                    height: infoSquaresSize / 2,
-                                    width: infoSquaresSize * 1.5,
+                                    //   height: infoSquaresSize / 2,
+                                    //   width: infoSquaresSize * 1.5,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.white12,
@@ -524,10 +528,7 @@ class _EventDetailsState extends State<EventDetails> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                              (isBooked)
-                                                  ? "Saved "
-                                                  : "Save ",
+                                          Text((isBooked) ? "Saved " : "Save ",
                                               style: TextStyle(
                                                   fontFamily:
                                                       globals.montserrat,

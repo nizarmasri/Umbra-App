@@ -173,8 +173,9 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                       ),
 
                       Container(
-                        height: listHeight,
                         child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
                           itemCount: eventItems.length,
                           itemBuilder: (context, index) {
                             return GestureDetector(
@@ -198,6 +199,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 ),
                 backgroundColor: Colors.white10,
                 onPressed: () {
+                  //setState(() {});
                   navigateToAddEventForm();
                 },
               ),

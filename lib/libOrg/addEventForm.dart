@@ -1,6 +1,7 @@
 import 'package:events/libOrg/eventLocation.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -96,7 +97,8 @@ class _AddEventFormState extends State<AddEventForm> {
       selectedDate.toString(),
       selectedTimeFormatted,
       location.toString(),
-      feeController.text
+      feeController.text,
+      ticketsLeftController.text,
     ];
 
     print(values.toString());
@@ -144,7 +146,7 @@ class _AddEventFormState extends State<AddEventForm> {
       GeoFirePoint myLocation = geo.point(
           latitude: location[0].position.latitude,
           longitude: location[0].position.longitude);
-      if(hasData){
+      if (hasData) {
         await fb.collection('events').doc(data.id).update({
           'title': titleController.text,
           'description': descController.text,
@@ -155,7 +157,7 @@ class _AddEventFormState extends State<AddEventForm> {
           'location': myLocation.data,
           'locationName': locationName,
           'fee': feeController.text,
-          'ticketseft': titleController.text
+          'ticketsleft': int.parse(ticketsLeftController.text)
         }).then((value) async {
           final id = data.id;
           List<String> ids = [id];
@@ -166,11 +168,11 @@ class _AddEventFormState extends State<AddEventForm> {
           for (var entry in images.asMap().entries) {
             int entryIndex = entry.key;
             final firebaseStorageRef =
-            FirebaseStorage.instance.ref().child('$id/$entryIndex');
+                FirebaseStorage.instance.ref().child('$id/$entryIndex');
             final upload = await firebaseStorageRef
                 .putData((await entry.value.getByteData(quality: 50))
-                .buffer
-                .asUint8List())
+                    .buffer
+                    .asUint8List())
                 .then((value) async {
               urls.add(await firebaseStorageRef.getDownloadURL());
             });
@@ -180,10 +182,11 @@ class _AddEventFormState extends State<AddEventForm> {
           await fb.collection('events').doc(data.id).update({
             'urls': FieldValue.arrayUnion(value["urls"]),
           });
+          return false;
+        }).then((value) {
           Navigator.pop(context);
         });
-      }
-      else {
+      } else {
         await fb.collection('events').add({
           'title': titleController.text,
           'description': descController.text,
@@ -195,7 +198,7 @@ class _AddEventFormState extends State<AddEventForm> {
           'location': myLocation.data,
           'locationName': locationName,
           'fee': feeController.text,
-          'ticketseft': titleController.text
+          'ticketsleft': int.parse(ticketsLeftController.text)
         }).then((value) async {
           final id = value.id;
           List<String> ids = [id];
@@ -206,11 +209,11 @@ class _AddEventFormState extends State<AddEventForm> {
           for (var entry in images.asMap().entries) {
             int entryIndex = entry.key;
             final firebaseStorageRef =
-            FirebaseStorage.instance.ref().child('$id/$entryIndex');
+                FirebaseStorage.instance.ref().child('$id/$entryIndex');
             final upload = await firebaseStorageRef
                 .putData((await entry.value.getByteData(quality: 50))
-                .buffer
-                .asUint8List())
+                    .buffer
+                    .asUint8List())
                 .then((value) async {
               urls.add(await firebaseStorageRef.getDownloadURL());
             });
@@ -220,10 +223,11 @@ class _AddEventFormState extends State<AddEventForm> {
           await fb.collection('events').doc(value["id"]).update({
             'urls': FieldValue.arrayUnion(value["urls"]),
           });
+          return false;
+        }).then((value) {
           Navigator.pop(context);
         });
       }
-
     }
   }
 
@@ -312,18 +316,20 @@ class _AddEventFormState extends State<AddEventForm> {
   bool isFree = true;
 
   void checkEdit() {
-    if(data != null)
+    if (data != null)
       hasData = true;
-    else hasData = false;
+    else
+      hasData = false;
 
-    if(hasData){
+    if (hasData) {
       DateTime dateFormatted = data['date'].toDate();
       changedDate = true;
       changedTime = true;
 
-      if(data['fee'] == 'Free')
+      if (data['fee'] == 'Free')
         isFree = true;
-      else isFree = false;
+      else
+        isFree = false;
 
       location = [];
 
@@ -334,20 +340,15 @@ class _AddEventFormState extends State<AddEventForm> {
       selectedDate = dateFormatted;
       selectedTimeFormatted = data['time'];
       location.add(Marker(
-        markerId: MarkerId(data['location']['geohash']),
-        position: LatLng(
-            data['location']['geopoint'].latitude,
-            data['location']['geopoint'].longitude
-        )
-      ));
+          markerId: MarkerId(data['location']['geohash']),
+          position: LatLng(data['location']['geopoint'].latitude,
+              data['location']['geopoint'].longitude)));
       locationName = data['locationName'];
       feeController.text = data['fee'];
     }
   }
 
-  void deleteEvent() {
-
-  }
+  void deleteEvent() {}
 
   @override
   void initState() {
@@ -863,6 +864,37 @@ class _AddEventFormState extends State<AddEventForm> {
                         color: dividerColor,
                         thickness: 1,
                       ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15),
+                        child: TextField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(3),
+                          ],
+                          keyboardType: TextInputType.number,
+                          controller: ticketsLeftController,
+                          cursorColor: Colors.white,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: titleSize,
+                              fontFamily: globals.montserrat,
+                              fontWeight: globals.fontWeight),
+                          decoration: InputDecoration(
+                              hintText: "Tickets/Capacity",
+                              hintStyle: TextStyle(
+                                  color: Colors.white38,
+                                  fontSize: inputSize,
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                              border: InputBorder.none,
+                              focusColor: Colors.black,
+                              fillColor: Colors.black),
+                        ),
+                      ),
+                      Divider(
+                        color: dividerColor,
+                        thickness: 1,
+                      ),
+
                       // Maps
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -904,6 +936,7 @@ class _AddEventFormState extends State<AddEventForm> {
                         color: dividerColor,
                         thickness: 1,
                       ),
+
                       // Pick images button
                       GestureDetector(
                         onTap: () async {
