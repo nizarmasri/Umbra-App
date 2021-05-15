@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/attendNavigator.dart';
 import 'package:events/attendingEvents.dart';
 import 'package:events/search.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'account.dart';
 import 'home.dart';
@@ -35,6 +38,22 @@ class _NavigatorPageState extends State<NavigatorPage> {
     });
   }
 
+  Future<void> saveTokenToDatabase(Future<String> token) async {
+    // Assume user is logged in for this example
+    String newToken = await token;
+    String userId = uid;
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'tokens': FieldValue.arrayUnion([newToken]),
+    });
+  }
+
+  void initState() {
+    super.initState();
+    Future<String> token = FirebaseMessaging.instance.getToken();
+    saveTokenToDatabase(token);
+  }
+
   Widget currentScreen;
   @override
   Widget build(BuildContext context) {
@@ -47,10 +66,8 @@ class _NavigatorPageState extends State<NavigatorPage> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.black,
-
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-
               activeIcon: Icon(
                 Icons.home,
                 color: Colors.white,

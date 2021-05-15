@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'Notifications.dart';
+
 class OrganizerPage extends StatefulWidget {
   final organizeruid;
 
@@ -41,7 +43,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                   physics: const BouncingScrollPhysics(),
                   children: <Widget>[
                     Container(
-                      height: 200,
+                      height: 225,
                       margin: EdgeInsets.only(bottom: 5.0),
                       color: Colors.purple,
                       child: Column(
@@ -70,14 +72,23 @@ class _OrganizerPageState extends State<OrganizerPage> {
                                   TextStyle(fontSize: 25, color: Colors.white),
                             ),
                           ),
-                          Container(
-                            child: Text(
-                              "Organizer",
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                  fontStyle: FontStyle.italic),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Text(
+                                  "Organizer",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                              Notifications(
+                                tokenlist: snapshot.data.data()["subscribers"],
+                                organizerUid: organizeruid,
+                              )
+                            ],
                           ),
                         ],
                       ),

@@ -299,6 +299,8 @@ class _NewUserFormState extends State<NewUserForm> {
                 'dp': '',
                 'instagram': '',
                 'twitter': '',
+                'tokens': [],
+                'subscribers': []
               });
             },
             child: Text(

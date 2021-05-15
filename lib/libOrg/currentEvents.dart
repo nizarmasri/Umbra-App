@@ -35,6 +35,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
   String uid = FirebaseAuth.instance.currentUser.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
+
   DateTime dateChecker;
 
   Future<List<QueryDocumentSnapshot>> getEvents() async {
@@ -180,7 +181,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               child: eventItems[index],
-                              onTap: () {
+                              onTap: () async {
                                 navigateToEventDetailsPage(
                                     eventItems[index].data);
                               },
@@ -198,9 +199,12 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                   color: Colors.white,
                 ),
                 backgroundColor: Colors.white10,
-                onPressed: () {
+                onPressed: () async {
                   //setState(() {});
-                  navigateToAddEventForm();
+                  await fb
+                      .collection("events")
+                      .add({"test": true, "etp": "WE", "poster": uid});
+                  //navigateToAddEventForm();
                 },
               ),
             );
