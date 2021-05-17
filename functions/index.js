@@ -15,22 +15,25 @@ exports.onEventEdit = functions.firestore
 	.document('events/{docId}')
 	.onUpdate(async (change, context) => {
 		const previousData = change.before.data();
+		const newData = change.after.data();
 
-		const tokens = previousData['tokens'];
-		const notificationText =
-			'Event details for ' + previousData['title'] + ' have changed.';
-		await admin.messaging().sendToDevice(
-			tokens, // ['token_1', 'token_2', ...]
-			{
-				data: {
-					title: 'Event update',
-					text: notificationText,
+		if (previousData['ticketsleft'] == newData['ticketsleft']) {
+			const tokens = previousData['tokens'];
+			const notificationText =
+				'Event details for ' + previousData['title'] + ' have changed.';
+			await admin.messaging().sendToDevice(
+				tokens, // ['token_1', 'token_2', ...]
+				{
+					data: {
+						title: 'Event update',
+						text: notificationText,
+					},
 				},
-			},
-			{
-				priority: 'high',
-			},
-		);
+				{
+					priority: 'high',
+				},
+			);
+		}
 	});
 
 async function sendNotifications(uid) {
