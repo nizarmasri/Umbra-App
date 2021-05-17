@@ -23,6 +23,7 @@ exports.onEventEdit = functions.firestore
 			tokens, // ['token_1', 'token_2', ...]
 			{
 				data: {
+					title: 'Event update',
 					text: notificationText,
 				},
 			},
@@ -46,6 +47,7 @@ async function sendNotifications(uid) {
 				ownerNew['subscribers'], // ['token_1', 'token_2', ...]
 				{
 					data: {
+						title: 'New event!',
 						text: notificationText,
 					},
 				},

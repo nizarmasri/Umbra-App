@@ -25,7 +25,9 @@ class _BookmarksState extends State<Bookmarks> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(data: data,)));
+            builder: (context) => EventDetails(
+                  data: data,
+                )));
   }
 
   List<EventItem> eventItems = [];
@@ -64,7 +66,7 @@ class _BookmarksState extends State<Bookmarks> {
     return FutureBuilder(
         future: getEvents(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: AwesomeLoader(
                 loaderType: AwesomeLoader.AwesomeLoader2,
@@ -76,7 +78,9 @@ class _BookmarksState extends State<Bookmarks> {
           if (snapshot.data != null && snapshot.data.length != 0) {
             snapshot.data.forEach((event) {
               DateTime date = event['date'].toDate();
-              eventItems.add(EventItem(data: event,));
+              eventItems.add(EventItem(
+                data: event,
+              ));
             });
 
             return Scaffold(
@@ -104,7 +108,8 @@ class _BookmarksState extends State<Bookmarks> {
                             return GestureDetector(
                               child: eventItems[index],
                               onTap: () {
-                                navigateToEventDetailsPage(eventItems[index].data);
+                                navigateToEventDetailsPage(
+                                    eventItems[index].data);
                               },
                             );
                           },

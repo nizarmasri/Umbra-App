@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:events/authentication_service.dart';
@@ -16,10 +17,28 @@ import 'package:events/newUserForm.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message");
-  print("WE");
-  print(message.data);
+  flutterLocalNotificationsPlugin.show(
+      message.data.hashCode,
+      message.data['title'],
+      message.data['text'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+            channel.id, channel.name, channel.description,
+            playSound: true,
+            importance: Importance.max,
+            priority: Priority.high),
+      ));
 }
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.high,
+);
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   SystemChrome.setPreferredOrientations(
@@ -27,10 +46,56 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings("@mipmap/ic_launcher");
+    var initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+
+      // If `onMessage` is triggered with a notification, construct our own
+      // local notification to show to users using the created channel.
+      flutterLocalNotificationsPlugin.show(
+          message.data.hashCode,
+          message.data['title'],
+          message.data['text'],
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+                channel.id, channel.name, channel.description,
+                icon: android?.smallIcon,
+                playSound: true,
+                importance: Importance.max,
+                priority: Priority.high
+                // other properties...
+                ),
+          ));
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

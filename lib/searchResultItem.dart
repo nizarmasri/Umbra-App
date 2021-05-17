@@ -94,11 +94,14 @@ class _SearchResultItemState extends State<SearchResultItem>
   String uid = FirebaseAuth.instance.currentUser.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
 
+  List<dynamic> tokens;
+
   Future<void> checkIsAttendOrBooked() async {
     await fb.collection("users").doc(uid).get().then((value) {
       setState(() {
         if (value.data()['attending'].contains(id)) isAttend = true;
         if (value.data()['booked'].contains(id)) isBooked = true;
+        tokens = value.data()['tokens'];
       });
     });
   }
@@ -336,6 +339,7 @@ class _SearchResultItemState extends State<SearchResultItem>
                                 fb.collection("events").doc(id).update({
                                   'attending': FieldValue.arrayUnion(uids),
                                   'ticketsleft': FieldValue.increment(-value),
+                                  'tokens': FieldValue.arrayUnion(tokens)
                                 });
                               }
                             });
@@ -365,6 +369,7 @@ class _SearchResultItemState extends State<SearchResultItem>
                                   'attending': FieldValue.arrayRemove(uids),
                                   'ticketsleft': FieldValue.increment(
                                       reservation['amount']),
+                                  'tokens': FieldValue.arrayRemove(tokens)
                                 });
 
                                 fb
