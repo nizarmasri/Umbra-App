@@ -39,7 +39,7 @@ class _outerLoginState extends State<outerLogin> {
     double width = MediaQuery.of(context).size.width;
     double body = height * 0.9;
     double btnWidth = width * 0.85;
-    double btnHeight = height * 0.08;
+    double btnHeight = height * 0.07;
 
     return Scaffold(
         backgroundColor: Colors.black,
@@ -118,37 +118,6 @@ class _outerLoginState extends State<outerLogin> {
                                 fontWeight: globals.fontWeight),
                           ),
                         )),
-                    // facebook
-                    Container(
-                        height: btnHeight,
-                        width: btnWidth,
-                        margin: EdgeInsets.only(bottom: 15),
-                        child: ElevatedButton.icon(
-                          icon: FaIcon(
-                            FontAwesomeIcons.facebook,
-                            color: Colors.blueGrey,
-                          ),
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(
-                                      Colors.black),
-                              shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(18.0),
-                                      side: BorderSide(
-                                          color: Colors.white12)))),
-                          onPressed: () {},
-                          label: Text(
-                            "Sign in with Facebook",
-                            style: TextStyle(
-                                color: Colors.white,
-                                //  fontSize: loginSize,
-                                fontFamily: globals.montserrat,
-                                fontWeight: globals.fontWeight),
-                          ),
-                        )),
                     // google
                     Container(
                         height: btnHeight,
@@ -161,13 +130,13 @@ class _outerLoginState extends State<outerLogin> {
                           ),
                           style: ButtonStyle(
                               backgroundColor:
-                                  MaterialStateProperty.all<Color>(
-                                      Colors.black),
+                              MaterialStateProperty.all<Color>(
+                                  Colors.black),
                               shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius:
-                                          BorderRadius.circular(18.0),
+                                      BorderRadius.circular(18.0),
                                       side: BorderSide(
                                           color: Colors.white12)))),
                           onPressed: () {
@@ -188,6 +157,8 @@ class _outerLoginState extends State<outerLogin> {
                                 fontWeight: globals.fontWeight),
                           ),
                         )),
+                    // facebook
+
                     // login
                     Container(
                         alignment: Alignment.center,

@@ -19,7 +19,35 @@ class AuthenticationService {
           await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
-      await _firebaseAuth.signInWithCredential(credential);
+
+      print(googleAuth.accessToken);
+      print(googleAuth.idToken);
+      print(credential.idToken);
+      print(credential.accessToken);
+      print(credential.providerId);
+
+      await _firebaseAuth.signInWithCredential(credential).then((value) async {
+        String uid = value.user.uid;
+        String email = value.user.email;
+        bool isNewUser;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .get()
+            .then((value) {
+          if (value.exists)
+            isNewUser = false;
+          else
+            isNewUser = true;
+        });
+
+        if (isNewUser)
+          await FirebaseFirestore.instance.collection('users').doc(uid).set({
+            'email': email,
+            'new': isNewUser,
+            'organizer': false,
+          });
+      });
       print("Signed in");
       return "Signed in";
     } catch (e) {

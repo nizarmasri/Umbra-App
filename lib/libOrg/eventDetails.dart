@@ -38,6 +38,8 @@ class _EventDetailsState extends State<EventDetails> {
   List<dynamic> urls;
   String id;
   String posteruid;
+  int tickets;
+  List<dynamic> attendees = [];
 
   final QueryDocumentSnapshot data;
 
@@ -58,6 +60,8 @@ class _EventDetailsState extends State<EventDetails> {
     urls = data['urls'];
     id = data.id;
     posteruid = data['poster'];
+    tickets = data['ticketsleft'];
+    attendees = data['attending'];
   }
 
   double titleTextSize = 25;
@@ -175,11 +179,18 @@ class _EventDetailsState extends State<EventDetails> {
                 )));
   }
 
+  navigateToAttendees(var id) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AttendeeList(id: id,)));
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    double infoSquaresSize = height * 0.1;
+    double infoSquaresSize = height * 0.11;
     double infoRectsHeight = height * 0.1;
     double infoRectsWidth = height * 0.171;
     double mapHeight = height * 0.2;
@@ -189,7 +200,7 @@ class _EventDetailsState extends State<EventDetails> {
     int _tickets = 0;
 
     String feeCheck = "";
-    if (fee == "")
+    if (fee == "" || fee == "Free")
       feeCheck = "-";
     else
       feeCheck = fee;
@@ -227,6 +238,12 @@ class _EventDetailsState extends State<EventDetails> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         actions: <Widget>[
+          if (isOrg)
+            IconButton(
+                icon: Icon(Icons.group_outlined, color: Colors.white),
+                onPressed: () {
+                  navigateToAttendees(data.id);
+                }),
           if (isOrg)
             IconButton(
                 icon: Icon(Icons.equalizer, color: Colors.white),
@@ -275,10 +292,7 @@ class _EventDetailsState extends State<EventDetails> {
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return Center(
-                        child: AwesomeLoader(
-                          loaderType: AwesomeLoader.AwesomeLoader2,
-                          color: Colors.white,
-                        ),
+                        child: globals.spinner
                       );
                     }
                     return Column(
@@ -298,19 +312,20 @@ class _EventDetailsState extends State<EventDetails> {
                                     color: Colors.white),
                               ),
                             ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 20, right: 20, bottom: 20),
-                              width: width,
-                              child: Text(
-                                snapshot.data.data()["ticketsleft"].toString() +
-                                    " tickets left",
-                                style: TextStyle(
-                                    fontFamily: globals.montserrat,
-                                    fontSize: 16,
-                                    color: Colors.white),
+                            if(snapshot.data.data()["ticketsleft"] != -1)
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 20, right: 20, bottom: 0),
+                                width: width,
+                                child: Text(
+                                  snapshot.data.data()["ticketsleft"].toString() +
+                                      " tickets left",
+                                  style: TextStyle(
+                                      fontFamily: globals.montserrat,
+                                      fontSize: 16,
+                                      color: Colors.white),
+                                ),
                               ),
-                            ),
                           ],
                         ),
                         if (!isOrg)
@@ -319,183 +334,226 @@ class _EventDetailsState extends State<EventDetails> {
                             children: [
                               snapshot.data.data()["ticketsleft"] == 0
                                   ? Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            bottom: 20, right: 10),
-                                        height: btnsHeight,
-                                        width: btnsWidth,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white12,
-                                        ),
-                                        child: Center(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text("SOLD OUT",
-                                                  style: TextStyle(
-                                                      fontFamily:
-                                                          globals.montserrat,
-                                                      fontWeight:
-                                                          globals.fontWeight,
-                                                      fontSize: 15,
-                                                      color: Colors.red)),
-                                              Icon(
-                                                Icons.cancel_outlined,
-                                                color: Colors.red,
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                      bottom: 20, right: 10),
+                                  height: btnsHeight,
+                                  width: btnsWidth,
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                    BorderRadius.circular(10),
+                                    color: Colors.white12,
+                                  ),
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        Text("SOLD OUT",
+                                            style: TextStyle(
+                                                fontFamily:
+                                                globals.montserrat,
+                                                fontWeight:
+                                                globals.fontWeight,
+                                                fontSize: 15,
+                                                color: Colors.red)),
+                                        Icon(
+                                          Icons.cancel_outlined,
+                                          color: Colors.red,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
                                   : GestureDetector(
-                                      onTap: () {
-                                        TicketAlert alert = TicketAlert(
-                                            limit: snapshot.data
-                                                .data()["ticketsleft"]);
-                                        TicketCancelAlert cancelAlert =
-                                            TicketCancelAlert();
+                                onTap: () {
+                                  TicketAlert alert = TicketAlert(
+                                      limit: snapshot.data
+                                          .data()["ticketsleft"]);
+                                  TicketCancelAlert cancelAlert =
+                                  TicketCancelAlert();
+                                  if (!isAttend && snapshot.data.data()["ticketsleft"] != -1) {
+                                    return showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return alert;
+                                        }).then((value) async {
+                                      if (value != null) {
+                                        setState(() {
+                                          isAttend = !isAttend;
+                                        });
+                                        List<String> ids = [id];
+                                        List<String> uids = [uid];
+                                        DocumentSnapshot user = await fb
+                                            .collection("users")
+                                            .doc(uid)
+                                            .get();
 
-                                        if (!isAttend) {
-                                          return showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return alert;
-                                              }).then((value) async {
-                                            if (value != null) {
-                                              setState(() {
-                                                isAttend = !isAttend;
-                                              });
-                                              List<String> ids = [id];
-                                              List<String> uids = [uid];
-                                              DocumentSnapshot user = await fb
-                                                  .collection("users")
-                                                  .doc(uid)
-                                                  .get();
+                                        fb
+                                            .collection("reservations")
+                                            .doc(id)
+                                            .collection("attendees")
+                                            .doc(uid)
+                                            .set({
+                                          'amount': value,
+                                          'name': user['name'],
+                                          'dp': user['dp'],
+                                          'confirmed': 0
+                                        });
 
-                                              fb
-                                                  .collection("reservations")
-                                                  .doc(id)
-                                                  .collection("attendees")
-                                                  .doc(uid)
-                                                  .set({
-                                                'amount': value,
-                                                'name': user['name'],
-                                                'dp': user['dp'],
-                                                'confirmed': 0
-                                              });
+                                        fb
+                                            .collection("users")
+                                            .doc(uid)
+                                            .update({
+                                          'attending':
+                                          FieldValue.arrayUnion(ids)
+                                        });
+                                        fb
+                                            .collection("events")
+                                            .doc(id)
+                                            .update({
+                                          'attending':
+                                          FieldValue.arrayUnion(uids),
+                                          'ticketsleft':
+                                          FieldValue.increment(
+                                              -value),
+                                        });
+                                      }
+                                    });
+                                  }
+                                  else if(isAttend && snapshot.data.data()["ticketsleft"] != -1){
 
-                                              fb
-                                                  .collection("users")
-                                                  .doc(uid)
-                                                  .update({
-                                                'attending':
-                                                    FieldValue.arrayUnion(ids)
-                                              });
-                                              fb
-                                                  .collection("events")
-                                                  .doc(id)
-                                                  .update({
-                                                'attending':
-                                                    FieldValue.arrayUnion(uids),
-                                                'ticketsleft':
-                                                    FieldValue.increment(
-                                                        -value),
-                                              });
-                                            }
-                                          });
-                                        } else {
-                                          return showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return cancelAlert;
-                                              }).then((value) async {
-                                            if (value == true) {
-                                              setState(() {
-                                                isAttend = !isAttend;
-                                              });
-                                              List<String> ids = [id];
-                                              List<String> uids = [uid];
+                                    return showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return cancelAlert;
+                                        }).then((value) async {
+                                      if (value == true) {
+                                        setState(() {
+                                          isAttend = !isAttend;
+                                        });
+                                        List<String> ids = [id];
+                                        List<String> uids = [uid];
 
-                                              dynamic reservation = await fb
-                                                  .collection("reservations")
-                                                  .doc(id)
-                                                  .collection("attendees")
-                                                  .doc(uid)
-                                                  .get();
+                                        dynamic reservation = await fb
+                                            .collection("reservations")
+                                            .doc(id)
+                                            .collection("attendees")
+                                            .doc(uid)
+                                            .get();
 
-                                              print(reservation['amount']);
+                                        fb
+                                            .collection("users")
+                                            .doc(uid)
+                                            .update({
+                                          'attending':
+                                          FieldValue.arrayRemove(ids)
+                                        });
+                                        fb
+                                            .collection("events")
+                                            .doc(id)
+                                            .update({
+                                          'attending':
+                                          FieldValue.arrayRemove(
+                                              uids),
+                                          'ticketsleft':
+                                          FieldValue.increment(
+                                              reservation['amount']),
+                                        });
 
-                                              fb
-                                                  .collection("users")
-                                                  .doc(uid)
-                                                  .update({
-                                                'attending':
-                                                    FieldValue.arrayRemove(ids)
-                                              });
-                                              fb
-                                                  .collection("events")
-                                                  .doc(id)
-                                                  .update({
-                                                'attending':
-                                                    FieldValue.arrayRemove(
-                                                        uids),
-                                                'ticketsleft':
-                                                    FieldValue.increment(
-                                                        reservation['amount']),
-                                              });
+                                        fb
+                                            .collection("reservations")
+                                            .doc(id)
+                                            .collection("attendees")
+                                            .doc(uid)
+                                            .delete();
+                                      }
+                                    });
+                                  }
+                                  else if (!isAttend && snapshot.data.data()["ticketsleft"] == -1){
+                                    setState(() {
+                                      isAttend = !isAttend;
+                                    });
+                                    List<String> ids = [id];
+                                    List<String> uids = [uid];
+                                    fb
+                                        .collection("users")
+                                        .doc(uid)
+                                        .update({
+                                      'attending':
+                                      FieldValue.arrayUnion(ids)
+                                    });
+                                    fb
+                                        .collection("events")
+                                        .doc(id)
+                                        .update({
+                                      'attending':
+                                      FieldValue.arrayUnion(uids),
+                                    });
+                                  }
+                                  else if (isAttend && snapshot.data.data()["ticketsleft"] == -1){
+                                    setState(() {
+                                      isAttend = !isAttend;
+                                    });
+                                    List<String> ids = [id];
+                                    List<String> uids = [uid];
 
-                                              fb
-                                                  .collection("reservations")
-                                                  .doc(id)
-                                                  .collection("attendees")
-                                                  .doc(uid)
-                                                  .delete();
-                                            }
-                                          });
-                                        }
-                                      },
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Container(
-                                          padding:
-                                              EdgeInsets.fromLTRB(10, 7, 10, 7),
-                                          margin: EdgeInsets.only(
-                                              bottom: 20, right: 10),
-                                          //    height: infoSquaresSize / 2,
-                                          //    width: infoSquaresSize * 1.5,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: Colors.white12,
-                                          ),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                    (isAttend)
-                                                        ? "Attending "
-                                                        : "Attend ",
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            globals.montserrat,
-                                                        fontSize: 15,
-                                                        color: Colors.green)),
-                                                (isAttend)
-                                                    ? isAttendIcon
-                                                    : notAttendIcon
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                    fb
+                                        .collection("users")
+                                        .doc(uid)
+                                        .update({
+                                      'attending':
+                                      FieldValue.arrayRemove(ids)
+                                    });
+                                    fb
+                                        .collection("events")
+                                        .doc(id)
+                                        .update({
+                                      'attending':
+                                      FieldValue.arrayRemove(
+                                          uids)
+                                    });
+                                  }
+                                },
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    padding:
+                                    EdgeInsets.fromLTRB(18, 15, 18, 15),
+                                    margin: EdgeInsets.only(
+                                        bottom: 20, right: 10, top: 10),
+                                    //    height: infoSquaresSize / 2,
+                                    //    width: infoSquaresSize * 1.5,
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius.circular(10),
+                                      color: Colors.white12,
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              (isAttend)
+                                                  ? "Attending "
+                                                  : "Attend ",
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                  globals.montserrat,
+                                                  fontSize: 15,
+                                                  color: Colors.green)),
+                                          (isAttend)
+                                              ? isAttendIcon
+                                              : notAttendIcon
+                                        ],
                                       ),
                                     ),
+                                  ),
+                                ),
+                              ),
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
@@ -514,9 +572,10 @@ class _EventDetailsState extends State<EventDetails> {
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Container(
-                                    padding: EdgeInsets.fromLTRB(10, 7, 10, 7),
+                                    padding:
+                                        EdgeInsets.fromLTRB(18, 15, 18, 15),
                                     margin:
-                                        EdgeInsets.only(bottom: 20, left: 10),
+                                        EdgeInsets.only(bottom: 20, left: 10, top: 10),
                                     //   height: infoSquaresSize / 2,
                                     //   width: infoSquaresSize * 1.5,
                                     decoration: BoxDecoration(
@@ -717,29 +776,6 @@ class _EventDetailsState extends State<EventDetails> {
                     );
                   }),
             ),
-            if (isOrg)
-              Align(
-                alignment: Alignment.center,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AttendeeList(id: id)));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration:
-                        BoxDecoration(border: Border.all(color: Colors.white)),
-                    margin: EdgeInsets.only(top: 20),
-                    child: Text("Attendees",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: globals.montserrat,
-                            fontSize: 20)),
-                  ),
-                ),
-              ),
             // Location
             Container(
               child: Column(
@@ -834,10 +870,7 @@ class _EventDetailsState extends State<EventDetails> {
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(
-                          child: AwesomeLoader(
-                            loaderType: AwesomeLoader.AwesomeLoader2,
-                            color: Colors.white,
-                          ),
+                          child: globals.spinner
                         );
                       }
 

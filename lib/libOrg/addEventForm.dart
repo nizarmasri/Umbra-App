@@ -26,7 +26,8 @@ class _AddEventFormState extends State<AddEventForm> {
   bool hasData = false;
 
   final geo = Geoflutterfire();
-  double inputSize = 17;
+  double inputSize = 16;
+  double italicTextSize = 14;
   double titleSize = 25;
   double feeText = 14.5;
   Color boxesColor = Colors.black;
@@ -101,8 +102,6 @@ class _AddEventFormState extends State<AddEventForm> {
       ticketsLeftController.text,
     ];
 
-    print(values.toString());
-
     bool tempCheck = true;
 
     for (int i = 0; i < values.length; i++) {
@@ -128,24 +127,39 @@ class _AddEventFormState extends State<AddEventForm> {
             submitError += "Please pick a time\n";
           else if (i == 6)
             submitError += "Please pick a location\n";
-          else if (i == 7) feeController.text = "Free";
+          else if (i == 7)
+            feeController.text = "Free";
+          else if (i == 8) ticketsLeftController.text = " ";
         } else if (tempCheck == true) filledForm = true;
       });
     }
+    print(filledForm);
     return filledForm;
   }
 
   Future<void> submitEvent() async {
     submitError = "";
 
+    int reservations;
+    if (!needsReservation || ticketsLeftController.text == "") {
+      reservations = -1;
+      ticketsLeftController.text = " ";
+    }
+    else
+      reservations = int.parse(ticketsLeftController.text);
+
     if (checkSubmit()) {
       setState(() {
         loading = true;
       });
       FirebaseFirestore fb = FirebaseFirestore.instance;
+
       GeoFirePoint myLocation = geo.point(
           latitude: location[0].position.latitude,
           longitude: location[0].position.longitude);
+
+
+
       if (hasData) {
         await fb.collection('events').doc(data.id).update({
           'title': titleController.text,
@@ -157,7 +171,7 @@ class _AddEventFormState extends State<AddEventForm> {
           'location': myLocation.data,
           'locationName': locationName,
           'fee': feeController.text,
-          'ticketsleft': int.parse(ticketsLeftController.text)
+          'ticketsleft': reservations
         }).then((value) async {
           final id = data.id;
           List<String> ids = [id];
@@ -187,10 +201,12 @@ class _AddEventFormState extends State<AddEventForm> {
           Navigator.pop(context);
         });
       } else {
+        List<dynamic> attending = [];
         await fb.collection('events').add({
           'title': titleController.text,
           'description': descController.text,
           'age': _age,
+          'attending': attending,
           'type': _type,
           'date': selectedDate,
           'time': selectedTime.toString().substring(10, 15),
@@ -198,7 +214,7 @@ class _AddEventFormState extends State<AddEventForm> {
           'location': myLocation.data,
           'locationName': locationName,
           'fee': feeController.text,
-          'ticketsleft': int.parse(ticketsLeftController.text)
+          'ticketsleft': reservations
         }).then((value) async {
           final id = value.id;
           List<String> ids = [id];
@@ -314,6 +330,7 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   bool isFree = true;
+  bool needsReservation = true;
 
   void checkEdit() {
     if (data != null)
@@ -345,6 +362,8 @@ class _AddEventFormState extends State<AddEventForm> {
               data['location']['geopoint'].longitude)));
       locationName = data['locationName'];
       feeController.text = data['fee'];
+
+      if (data['ticketsleft'] == -1) ticketsLeftController.text = "";
     }
   }
 
@@ -503,16 +522,10 @@ class _AddEventFormState extends State<AddEventForm> {
                             color: Colors.black,
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: Text(
-                                "Type:",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
-                              ),
-                            ),
+                                child: Icon(
+                              Icons.liquor,
+                              color: Colors.white70,
+                            )),
                           ),
                           // Type picker
                           Container(
@@ -523,12 +536,17 @@ class _AddEventFormState extends State<AddEventForm> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 dropdownColor: Colors.grey[900],
+                                icon: Icon(
+                                  Icons.arrow_downward_outlined,
+                                  size: 0,
+                                  color: Colors.transparent,
+                                ),
                                 value: _type,
                                 style: TextStyle(
                                   fontFamily: globals.montserrat,
                                   fontSize: 16,
                                   fontWeight: globals.fontWeight,
-                                  color: Colors.white,
+                                  color: Colors.white70,
                                 ),
                                 //elevation: 5,
                                 items: <String>[
@@ -547,11 +565,12 @@ class _AddEventFormState extends State<AddEventForm> {
                                   );
                                 }).toList(),
                                 hint: Text(
-                                  "Choose a type",
+                                  "Pick a type",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
+                                      color: Colors.white70,
+                                      fontSize: italicTextSize,
                                       fontWeight: globals.fontWeight,
+                                      fontStyle: FontStyle.italic,
                                       fontFamily: globals.montserrat),
                                 ),
                                 onChanged: (String value) {
@@ -579,16 +598,17 @@ class _AddEventFormState extends State<AddEventForm> {
                             decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10)),
-                            margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: Text(
-                                "Date:",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
+                              child: Container(
+                                height: btnsHeight,
+                                width: btnsTextWidth,
+                                color: Colors.black,
+                                margin: EdgeInsets.only(bottom: 15),
+                                child: Center(
+                                    child: Icon(
+                                  Icons.calendar_today_outlined,
+                                  color: Colors.white70,
+                                )),
                               ),
                             ),
                           ),
@@ -605,10 +625,14 @@ class _AddEventFormState extends State<AddEventForm> {
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: !changedDate
-                                    ? Icon(
-                                        Icons.calendar_today_outlined,
-                                        color: Colors.white,
-                                        size: 25,
+                                    ? Text(
+                                        "Pick a date",
+                                        style: TextStyle(
+                                            fontFamily: globals.montserrat,
+                                            fontWeight: globals.fontWeight,
+                                            fontStyle: FontStyle.italic,
+                                            fontSize: italicTextSize,
+                                            color: Colors.white70),
                                       )
                                     : Text(
                                         selectedDate
@@ -618,7 +642,7 @@ class _AddEventFormState extends State<AddEventForm> {
                                             fontFamily: globals.montserrat,
                                             fontWeight: globals.fontWeight,
                                             fontSize: inputSize,
-                                            color: Colors.white),
+                                            color: Colors.white70),
                                       ),
                               ),
                             ),
@@ -640,16 +664,17 @@ class _AddEventFormState extends State<AddEventForm> {
                             decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10)),
-                            margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: Text(
-                                "Time:",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
+                              child: Container(
+                                height: btnsHeight,
+                                width: btnsTextWidth,
+                                color: Colors.black,
+                                margin: EdgeInsets.only(bottom: 15),
+                                child: Center(
+                                    child: Icon(
+                                      Icons.access_time,
+                                      color: Colors.white70,
+                                    )),
                               ),
                             ),
                           ),
@@ -666,18 +691,22 @@ class _AddEventFormState extends State<AddEventForm> {
                               child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: !changedTime
-                                      ? Icon(
-                                          Icons.access_time,
-                                          color: Colors.white,
-                                          size: 25,
-                                        )
+                                      ? Text(
+                                    "Pick a time",
+                                    style: TextStyle(
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: italicTextSize,
+                                        color: Colors.white70),
+                                  )
                                       : Text(
                                           selectedTimeFormatted,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
                                               fontWeight: globals.fontWeight,
                                               fontSize: inputSize,
-                                              color: Colors.white),
+                                              color: Colors.white70),
                                         )),
                             ),
                           ),
@@ -695,21 +724,13 @@ class _AddEventFormState extends State<AddEventForm> {
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10)),
+                            color: Colors.black,
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
-                              child: Text(
-                                "Age:",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
-                              ),
-                            ),
+                                child: Icon(
+                                  Icons.security_outlined,
+                                  color: Colors.white70,
+                                )),
                           ),
                           // Age picker
                           Container(
@@ -724,12 +745,13 @@ class _AddEventFormState extends State<AddEventForm> {
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
                                     dropdownColor: Colors.grey[900],
+                                    icon: Icon(Icons.arrow_downward, size: 0, color: Colors.transparent,),
                                     value: _age,
                                     style: TextStyle(
                                       fontFamily: globals.montserrat,
-                                      fontSize: 16,
+                                      fontSize: inputSize,
                                       fontWeight: globals.fontWeight,
-                                      color: Colors.white,
+                                      color: Colors.white70,
                                     ),
                                     //elevation: 5,
                                     items: <String>[
@@ -747,11 +769,12 @@ class _AddEventFormState extends State<AddEventForm> {
                                       );
                                     }).toList(),
                                     hint: Text(
-                                      "Choose an age",
+                                      "Pick an age",
                                       style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                          color: Colors.white70,
+                                          fontSize: italicTextSize,
                                           fontWeight: globals.fontWeight,
+                                          fontStyle: FontStyle.italic,
                                           fontFamily: globals.montserrat),
                                     ),
                                     onChanged: (String value) {
@@ -775,24 +798,17 @@ class _AddEventFormState extends State<AddEventForm> {
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10)),
+                            color: Colors.black,
                             child: Center(
-                              child: Text(
-                                "Price",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: inputSize,
-                                    fontFamily: globals.montserrat,
-                                    fontWeight: globals.fontWeight),
-                              ),
-                            ),
+                                child: Icon(
+                                  Icons.attach_money_outlined,
+                                  color: Colors.white70,
+                                )),
                           ),
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
+                            padding: EdgeInsets.only(right: width*0.11),
                             decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10)),
@@ -801,8 +817,9 @@ class _AddEventFormState extends State<AddEventForm> {
                                 "Free",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
-                                    color: Colors.white38,
+                                    color: Colors.white70,
                                     fontSize: inputSize,
+                                    fontStyle: FontStyle.italic,
                                     fontFamily: globals.montserrat,
                                     fontWeight: globals.fontWeight),
                               ),
@@ -842,7 +859,7 @@ class _AddEventFormState extends State<AddEventForm> {
                                     fontFamily: globals.montserrat,
                                     fontWeight: globals.fontWeight),
                                 decoration: InputDecoration(
-                                    hintText: "Fee",
+                                    hintText: "Price",
                                     icon: Icon(
                                       Icons.attach_money,
                                       color: Colors.white,
@@ -864,32 +881,92 @@ class _AddEventFormState extends State<AddEventForm> {
                         color: dividerColor,
                         thickness: 1,
                       ),
-                      Container(
-                        margin: EdgeInsets.only(left: 15),
-                        child: TextField(
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(3),
-                          ],
-                          keyboardType: TextInputType.number,
-                          controller: ticketsLeftController,
-                          cursorColor: Colors.white,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: titleSize,
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight),
-                          decoration: InputDecoration(
-                              hintText: "Tickets/Capacity",
-                              hintStyle: TextStyle(
-                                  color: Colors.white38,
-                                  fontSize: inputSize,
-                                  fontFamily: globals.montserrat,
-                                  fontWeight: globals.fontWeight),
-                              border: InputBorder.none,
-                              focusColor: Colors.black,
-                              fillColor: Colors.black),
-                        ),
+                      // Reservations
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: btnsHeight,
+                            width: btnsTextWidth,
+                            color: Colors.black,
+                            child: Center(
+                                child: Icon(
+                                  Icons.event_seat_outlined,
+                                  color: Colors.white70,
+                                )),
+                          ),
+                          Container(
+                            height: btnsHeight,
+                            width: btnsTextWidth*1.8,
+                            padding: EdgeInsets.only(right: width*0.11),
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Text(
+                                "Reservations",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: inputSize,
+                                    fontStyle: FontStyle.italic,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            child: Switch(
+                              value: needsReservation,
+                              onChanged: (value) {
+                                setState(() {
+                                  needsReservation = !needsReservation;
+                                });
+                              },
+                              activeColor: Colors.red,
+                              inactiveTrackColor: Colors.blue,
+                            ),
+                          )
+                        ],
                       ),
+                      if (!needsReservation)
+                        Container(
+                          height: btnsHeight,
+                          width: textFieldWidth,
+                          decoration: BoxDecoration(
+                              color: Colors.white12,
+                              borderRadius: BorderRadius.circular(10)),
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: Center(
+                            child: ListTile(
+                              title: TextField(
+                                keyboardType: TextInputType.number,
+                                controller: ticketsLeftController,
+                                cursorColor: Colors.white,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: inputSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                                decoration: InputDecoration(
+                                    hintText: "Capacity",
+                                    icon: Icon(
+                                      Icons.group_outlined,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                    hintStyle: TextStyle(
+                                        color: Colors.white38,
+                                        fontSize: feeText,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                    border: InputBorder.none,
+                                    focusColor: Colors.black,
+                                    fillColor: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ),
                       Divider(
                         color: dividerColor,
                         thickness: 1,

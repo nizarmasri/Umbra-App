@@ -65,7 +65,7 @@ class _NearyouItemState extends State<NearyouItem> {
     double width = MediaQuery.of(context).size.width;
     double itemHeight = height * 0.2;
     double itemWidth = width * 0.8;
-    double shadedHeight = height * 0.085;
+    double shadedHeight = height * 0.075;
 
     getData();
 

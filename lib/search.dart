@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/searchItem.dart';
 import 'package:flutter/material.dart';
 import 'package:events/searchResults.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'globals.dart' as globals;
 
 class SearchPage extends StatefulWidget {
@@ -33,7 +34,11 @@ class _SearchPageState extends State<SearchPage> {
   Future<List<QueryDocumentSnapshot>> getEvents() async {
     List<QueryDocumentSnapshot> events = [];
 
-    await fb.collection("events").get().then((value) {
+    await fb
+        .collection("events")
+        .where('date', isGreaterThanOrEqualTo: Timestamp.now())
+        .get()
+        .then((value) {
       value.docs.forEach((event) {
         events.add(event);
       });
@@ -51,6 +56,18 @@ class _SearchPageState extends State<SearchPage> {
             builder: (context) => SearchResultsPage(
                   searchString: searchString,
                 )));
+  }
+
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  Future<Null> _onRefresh() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
+
+    setState(() {   });
   }
 
   @override
@@ -172,17 +189,22 @@ class _SearchPageState extends State<SearchPage> {
                         Container(
                             height: height * 0.7,
                             margin: EdgeInsets.all(13),
-                            child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      mainAxisSpacing: 5,
-                                      crossAxisSpacing: 5,
-                                      childAspectRatio: 2 / 2.9),
-                              itemCount: searchItems.length,
-                              itemBuilder: (BuildContext context, index) {
-                                return searchItems[index];
-                              },
+                            child: SmartRefresher(
+                              enablePullDown: true,
+                              controller: _refreshController,
+                              onRefresh: _onRefresh,
+                              child: GridView.builder(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        mainAxisSpacing: 5,
+                                        crossAxisSpacing: 5,
+                                        childAspectRatio: 2 / 2.9),
+                                itemCount: searchItems.length,
+                                itemBuilder: (BuildContext context, index) {
+                                  return searchItems[index];
+                                },
+                              ),
                             ))
                       ],
                     )),

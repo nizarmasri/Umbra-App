@@ -9,12 +9,14 @@ class AttendeeList extends StatefulWidget {
   final id;
 
   const AttendeeList({Key key, this.id}) : super(key: key);
+
   _AttendeeListState createState() => _AttendeeListState(id);
 }
 
 class _AttendeeListState extends State<AttendeeList> {
   @override
   final id;
+
   _AttendeeListState(this.id);
 
   TextStyle temp = TextStyle(
@@ -43,20 +45,17 @@ class _AttendeeListState extends State<AttendeeList> {
                   color: Colors.white,
                 ),
               );
-            } else {
-              if (snapshot != null) {
-                return ListView.builder(
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    return Attendee(
-                      data: snapshot.data.docs[index],
-                      width: MediaQuery.of(context).size.width,
-                      id: id,
-                    );
-                  },
-                );
-              }
             }
+            return ListView.builder(
+              itemCount: snapshot.data.docs.length,
+              itemBuilder: (context, index) {
+                return Attendee(
+                  data: snapshot.data.docs[index],
+                  width: MediaQuery.of(context).size.width,
+                  id: id,
+                );
+              },
+            );
           },
         ),
       ),

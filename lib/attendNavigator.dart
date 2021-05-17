@@ -61,7 +61,7 @@ class _AttendNavigatorPageState extends State<AttendNavigatorPage> {
             bottom: PreferredSize(
               preferredSize: Size(width, height * 0.02),
               child: Container(
-                margin: EdgeInsets.only(bottom: 20),
+                margin: EdgeInsets.only(bottom: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [

@@ -10,7 +10,7 @@ class TicketCancelAlert extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[900],
       title: Text('Reservation Cancelling', style: temp),
       content: SingleChildScrollView(
         child: ListBody(

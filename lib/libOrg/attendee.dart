@@ -31,7 +31,11 @@ class _AttendeeState extends State<Attendee> {
         margin: EdgeInsets.only(top: 15),
         //color: Colors.red,
         padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
-        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white10,
+          borderRadius: BorderRadius.circular(10)
+        ),
+        width: width * 0.9,
         child: Row(children: [
           GestureDetector(
             onTap: () {
@@ -102,8 +106,8 @@ class _AttendeeState extends State<Attendee> {
                             });
                           },
                           icon: Icon(
-                            Icons.check_circle_outline,
-                            size: 35,
+                            Icons.check,
+                            size: 30,
                             color: Colors.green,
                           )),
                     ),
@@ -122,8 +126,8 @@ class _AttendeeState extends State<Attendee> {
                             });
                           },
                           icon: Icon(
-                            Icons.cancel_outlined,
-                            size: 35,
+                            Icons.cancel_sharp,
+                            size: 30,
                             color: Colors.red,
                           )),
                     ),

@@ -69,10 +69,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-              child: AwesomeLoader(
-                loaderType: AwesomeLoader.AwesomeLoader2,
-                color: Colors.white,
-              ),
+              child: globals.spinner
             );
           }
 

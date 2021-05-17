@@ -142,11 +142,9 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
                 .snapshots(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
+              print(firebaseUser.uid);
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return SpinKitFadingCircle(
-                  color: Colors.white,
-                  size: 50.0,
-                );
+                return globals.spinner;
               }
               if (snapshot.data.data()["new"]) {
                 return NewUserForm(uid: firebaseUser.uid);
@@ -164,21 +162,3 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
     return outerLogin();
   }
 }
-
-/*     final FirebaseAuth auth = FirebaseAuth.instance;
-      final User user = auth.currentUser;
-      final uid = user.uid;
-      bool newUser = true;
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .get()
-          .then((query) {
-        newUser = query.data()["new"];
-      });
-      if (newUser) {
-        return NewUserForm(function: increment);
-      } else {
-        return NavigatorPage(uid: uid);
-      }
-    }*/

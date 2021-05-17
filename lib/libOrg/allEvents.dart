@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:awesome_loader/awesome_loader.dart';
 
 class AllEventsPage extends StatefulWidget {
   @override
@@ -63,10 +62,7 @@ class _AllEventsPageState extends State<AllEventsPage> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-              child: AwesomeLoader(
-                loaderType: AwesomeLoader.AwesomeLoader2,
-                color: Colors.white,
-              ),
+              child: globals.spinner
             );
           }
 

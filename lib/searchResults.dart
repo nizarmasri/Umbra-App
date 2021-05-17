@@ -42,7 +42,6 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
   void searchStringFormat() {
     searchStringFormatted = searchString.trim().toUpperCase();
-    if (searchStringFormatted == 'FREE') searchStringFormatted = '';
   }
 
   String uid = FirebaseAuth.instance.currentUser.uid;
@@ -72,9 +71,6 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
         typeSearch = event.data()['type'].toUpperCase();
         locationSearch = event.data()['locationName'].toUpperCase();
         feeSearch = event.data()['fee'].toUpperCase();
-
-        /*if(searchStringFormatted == "" && feeSearch.contains(searchStringFormatted))
-          events.add(event);*/
 
         if (event.data().containsValue(searchString) ||
             descSearch.contains(searchStringFormatted) ||

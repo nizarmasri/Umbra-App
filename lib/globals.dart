@@ -34,9 +34,9 @@ String uid;
   color: Colors.white,
 );*/
 
-SpinKitFadingCircle spinner = SpinKitFadingCircle(
+SpinKitFoldingCube spinner = SpinKitFoldingCube(
   color: Colors.white,
-  size: 50.0,
+  size: 40.0,
 );
 
 AssetImage background = AssetImage('assets/login_background.jpg');

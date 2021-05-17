@@ -1,3 +1,4 @@
+import 'package:events/attendNavigator.dart';
 import 'package:events/libOrg/addEventForm.dart';
 import 'package:events/libOrg/eventItem.dart';
 import 'package:events/libOrg/eventDetails.dart';
@@ -7,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:intl/intl.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class AttendingEventsPage extends StatefulWidget {
   @override
@@ -57,7 +59,6 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
           .then((value) {
         value.docs.forEach((event) {
           DateTime dateChecker = event.data()['date'].toDate();
-          print(dateChecker.isAfter(DateTime.now()));
           if (dateChecker.isAfter(DateTime.now())) events.add(event);
         });
       });
@@ -82,7 +83,10 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
           });
         });
       }
-    } else {
+      events.sort((a, b) => b['date'].compareTo(a['date']));
+
+    }
+    else if(eventIds.length > 0){
       await fb
           .collection("events")
           .where('__name__', whereIn: eventIds)
@@ -93,10 +97,17 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
           if (dateChecker.isAfter(DateTime.now())) events.add(event);
         });
       });
+      events.sort((a, b) => b['date'].compareTo(a['date']));
     }
+    else {
+      events = null;
+    }
+
 
     return events;
   }
+
+  String _sortBy = 'Ascending';
 
   List<List<dynamic>> listDivisions(List<dynamic> list) {
     List<List<dynamic>> dividedList;
@@ -118,31 +129,50 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
     }
   }
 
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
+  Future<Null> _onRefresh() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
+
+    setState(() {   });
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double listHeight = height * 0.83;
+    double listHeight = height * 0.75;
 
     eventItems = [];
 
     return FutureBuilder(
         future: getEvents(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: AwesomeLoader(
-                loaderType: AwesomeLoader.AwesomeLoader2,
-                color: Colors.white,
-              ),
-            );
-          }
 
-          if (snapshot.data != null && snapshot.data.length != 0) {
+
+          if (snapshot.data != null) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: globals.spinner,
+              );
+            }
+            eventItems = [];
             snapshot.data.forEach((event) {
               eventItems.add(EventItem(
                 data: event,
+                key: Key(event['title'] + event['date'].toString()),
               ));
             });
+
+            if (_sortBy == 'Descending')
+              eventItems
+                  .sort((a, b) => b.data['date'].compareTo(a.data['date']));
+            else if (_sortBy == 'Ascending')
+              eventItems
+                  .sort((a, b) => a.data['date'].compareTo(b.data['date']));
 
             return Scaffold(
               backgroundColor: Colors.black,
@@ -152,18 +182,80 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                       child: Column(
                     children: [
                       Container(
+                        padding: EdgeInsets.only(left: 20),
+                        margin: EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Sort by ",
+                              style: TextStyle(
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight,
+                                  fontSize: 15,
+                                  color: Colors.white),
+                            ),
+                            Container(
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  //color: Colors.white12,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    dropdownColor: Colors.grey[900],
+                                    value: _sortBy,
+                                    style: TextStyle(
+                                      fontFamily: globals.montserrat,
+                                      fontSize: 15,
+                                      fontWeight: globals.fontWeight,
+                                      color: Colors.white,
+                                    ),
+                                    //elevation: 5,
+                                    items: <String>[
+                                      'Ascending',
+                                      'Descending',
+                                    ].map<DropdownMenuItem<String>>(
+                                            (String sorting) {
+                                          return DropdownMenuItem<String>(
+                                            value: sorting,
+                                            child: Text(sorting),
+                                          );
+                                        }).toList(),
+                                    hint: Text(
+                                      _sortBy,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: globals.fontWeight,
+                                          fontFamily: globals.montserrat),
+                                    ),
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        _sortBy = value;
+                                      });
+                                    },
+                                  ),
+                                ))
+                          ],
+                        ),
+                      ),
+                      Container(
                         height: listHeight,
-                        child: ListView.builder(
-                          itemCount: eventItems.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              child: eventItems[index],
-                              onTap: () {
-                                navigateToEventDetailsPage(
-                                    eventItems[index].data);
-                              },
-                            );
-                          },
+                        child: SmartRefresher(
+                          enablePullDown: true,
+                          controller: _refreshController,
+                          onRefresh: _onRefresh,
+                          child: ListView.builder(
+                            itemCount: eventItems.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                child: eventItems[index],
+                                onTap: () {
+                                  navigateToEventDetailsPage(
+                                      eventItems[index].data);
+                                },
+                              );
+                            },
+                          ),
                         ),
                       )
                     ],
@@ -171,37 +263,27 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                 ),
               ),
             );
-          } else
+          }
+          else
             return Scaffold(
               body: SafeArea(
-                child: Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 15, top: 15),
-                        margin: EdgeInsets.only(bottom: 10),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Attending Events",
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontSize: 30,
-                              color: Colors.white),
-                        ),
+                child: SmartRefresher(
+                  enablePullDown: true,
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  child: Center(
+                    child: Container(
+                      margin: EdgeInsets.all(30),
+                      child: Text(
+                        "You are not attending any events",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: globals.montserrat,
+                            fontWeight: globals.fontWeight,
+                            fontSize: 20,
+                            color: Colors.white),
                       ),
-                      Container(
-                        margin: EdgeInsets.all(30),
-                        child: Text(
-                          "You are not attending any events",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: globals.montserrat,
-                              fontWeight: globals.fontWeight,
-                              fontSize: 25,
-                              color: Colors.white),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

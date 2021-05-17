@@ -245,9 +245,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ))
-        : SpinKitFadingCircle(
-            color: Colors.white,
-            size: 50.0,
-          );
+        : globals.spinner;
   }
 }

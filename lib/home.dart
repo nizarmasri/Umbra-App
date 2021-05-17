@@ -142,11 +142,13 @@ class _HomePageState extends State<HomePage> {
           eventB_localCounter++;
       });
 
+
       // if the number of similar words in eventB to eventA is greater than 20% of total words in eventA
       // increment eventB_counter
       if (eventB_localCounter >= twentyPercent) eventB_counter++;
     });
 
+    print("here");
     // if eventB is similar to at least 2 eventA's, return true
     if (eventB_counter >= 2)
       return true;
@@ -172,52 +174,74 @@ class _HomePageState extends State<HomePage> {
       attendingEventsIds = value.data()['attending'];
     });
 
-    // Get all events user is not attending
-    await fb
-        .collection("events")
-        .where('__name__', whereNotIn: attendingEventsIds)
-        .get()
-        .then((value) {
-      value.docs.forEach((event) {
-        allEvents.add(event);
-      });
-    });
+    if(attendingEventsIds.length > 0){
+      // Get all events user is not attending
+      await fb
+          .collection("events")
+          .where('__name__', whereNotIn: attendingEventsIds)
+          .get()
+          .then((value) {
+        value.docs.forEach((event) {
+          DateTime dateChecker = event.data()['date'].toDate();
+          if (dateChecker.isAfter(DateTime.now())) allEvents.add(event);
 
-    // Get the documents of all events user is attending
-    List<dynamic> attendingEvents = [];
-    await fb
-        .collection("events")
-        .where('__name__', whereIn: attendingEventsIds)
-        .get()
-        .then((value) {
-      value.docs.forEach((event) {
-        attendingEvents.add(event);
+        });
       });
 
-      // Sort events from newest to oldest
-      attendingEvents.sort((a, b) => b['date'].compareTo(a['date']));
+      // Get the documents of all events user is attending
+      List<dynamic> attendingEvents = [];
+      await fb
+          .collection("events")
+          .where('__name__', whereIn: attendingEventsIds)
+          .get()
+          .then((value) {
+        value.docs.forEach((event) {
+          attendingEvents.add(event);
+        });
 
-      // Sets number of latest event to 5 or lower
-      int numberOfLatest = 0;
-      if (attendingEvents.length >= 5)
-        numberOfLatest = 5;
-      else
-        numberOfLatest = attendingEvents.length;
 
-      // Add the latest 5 or less events to latest events list
-      for (int i = 0; i < numberOfLatest; i++)
-        latestAttendingEvents.add(attendingEvents[i]);
-    });
+        // Sort events from newest to oldest
+        attendingEvents.sort((a, b) => b['date'].compareTo(a['date']));
 
-    // compares all events to the 5 latest events
-    // if true, add event to for you events list
-    allEvents.forEach((event) {
-      if (forYouAlgorithm(latestAttendingEvents, event) == true)
-        foryouEvents.add(event);
-    });
+        // Sets number of latest event to 5 or lower
+        int numberOfLatest = 0;
+        if (attendingEvents.length >= 5)
+          numberOfLatest = 5;
+        else
+          numberOfLatest = attendingEvents.length;
 
-    // return the for you events
-    return allEvents;
+        // Add the latest 5 or less events to latest events list
+        for (int i = 0; i < numberOfLatest; i++) {
+          latestAttendingEvents.add(attendingEvents[i]);
+        }
+      });
+
+      // compares all events to the 5 latest events
+      // if true, add event to for you events list
+      allEvents.forEach((event) {
+        if (forYouAlgorithm(latestAttendingEvents, event) == true)
+          foryouEvents.add(event);
+
+      });
+    }
+    else {
+      // Get all events user is not attending
+      await fb
+          .collection("events")
+          .get()
+          .then((value) {
+        value.docs.forEach((event) {
+          DateTime dateChecker = event.data()['date'].toDate();
+          if (dateChecker.isAfter(DateTime.now())) allEvents.add(event);
+
+        });
+      });
+    }
+
+
+    foryouEvents += allEvents;
+    // return the for you events concatinated with the rest of the events
+    return foryouEvents;
   }
 
   RefreshController _refreshController =
@@ -246,11 +270,27 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       items = items + 3;
     });
-    print("ima gay");
     _refreshController.loadComplete();
   }
 
   int items = 4;
+
+  Future<void> update() async {
+    FirebaseFirestore fb = FirebaseFirestore.instance;
+
+    List<dynamic> names = [];
+    await fb.collection('events').get().then((value){
+      value.docs.forEach((element) {
+        names.add(element.id);
+      });
+    });
+
+    names.forEach((element) async {
+      await fb.collection('events').doc(element).update({
+        'ticketsleft' : 100
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,252 +305,245 @@ class _HomePageState extends State<HomePage> {
         ? Scaffold(
             backgroundColor: Colors.black,
             body: SafeArea(
-              child: Container(
-                child: SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: true,
-                  controller: _refreshController,
-                  onRefresh: _onRefresh,
-                  onLoading: _onLoading,
-                  child: ListView(
-                    children: [
-                      // Featured carousel
-                      FutureBuilder<QuerySnapshot>(
-                        future: FirebaseFirestore.instance
-                            .collection("events")
-                            .where('featured', isEqualTo: true)
-                            .limit(5)
-                            .get(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                              child: AwesomeLoader(
-                                loaderType: AwesomeLoader.AwesomeLoader2,
-                                color: Colors.white,
-                              ),
-                            );
-                          }
+              child: SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: true,
+                controller: _refreshController,
+                onRefresh: _onRefresh,
+                onLoading: _onLoading,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    // Featured carousel
+                    FutureBuilder<QuerySnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection("events")
+                          .where('featured', isEqualTo: true)
+                          .limit(5)
+                          .get(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                              child: globals.spinner
+                          );
+                        }
 
-                          List<Container> featuredEvents = [];
+                        List<Container> featuredEvents = [];
 
-                          snapshot.data.docs.forEach((var doc) {
-                            featuredEvents.add(Container(
-                              key: Key(doc['title'] + doc.id),
-                              margin: EdgeInsets.all(5.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  navigateToEventDetailsPage(doc);
-                                },
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5.0)),
-                                  child: Stack(children: [
-                                    Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.white10,
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                  !doc["urls"].isEmpty
-                                                      ? doc["urls"][0]
-                                                      : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
-                                                ),
-                                                fit: BoxFit.cover)),
-                                        child: Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Container(
-                                            padding: EdgeInsets.all(20),
-                                            width: width,
-                                            // height: featureCarouselHeight * 0.33,
-                                            decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                    colors: <Color>[
-                                                  Colors.black87,
-                                                  Colors.transparent
-                                                ])),
-                                            child: RichText(
-                                              textAlign: TextAlign.start,
-                                              text:
-                                                  TextSpan(children: <TextSpan>[
-                                                TextSpan(
-                                                  text: doc["title"],
+                        snapshot.data.docs.forEach((var doc) {
+                          featuredEvents.add(Container(
+                            key: Key(doc['title'] + doc.id),
+                            //margin: EdgeInsets.all(5.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                navigateToEventDetailsPage(doc);
+                              },
+                              child: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0)),
+                                child: Stack(children: [
+                                  Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white10,
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                !doc["urls"].isEmpty
+                                                    ? doc["urls"][0]
+                                                    : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
+                                              ),
+                                              fit: BoxFit.cover)),
+                                      child: Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Container(
+                                          padding: EdgeInsets.all(20),
+                                          width: width,
+                                          height: featureCarouselHeight * 0.33,
+                                          decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: <Color>[
+                                                Colors.black,
+                                                Colors.transparent
+                                              ])),
+                                          child: RichText(
+                                            textAlign: TextAlign.start,
+                                            text:
+                                                TextSpan(children: <TextSpan>[
+                                              TextSpan(
+                                                text: doc["title"],
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily:
+                                                        globals.montserrat,
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                    fontSize: 33),
+                                              ),
+                                              TextSpan(
+                                                  text: '\n' +
+                                                      dateConverter(
+                                                          doc["date"],
+                                                          doc["time"]),
                                                   style: TextStyle(
                                                       color: Colors.white,
                                                       fontFamily:
                                                           globals.montserrat,
                                                       fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 30),
-                                                ),
-                                                TextSpan(
-                                                    text: '\n' +
-                                                        dateConverter(
-                                                            doc["date"],
-                                                            doc["time"]),
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontFamily:
-                                                            globals.montserrat,
-                                                        fontWeight:
-                                                            globals.fontWeight,
-                                                        fontSize: 15)),
-                                                TextSpan(
-                                                    text: '\n' +
-                                                        doc["locationName"]
-                                                            .split(",")[0],
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontFamily:
-                                                            globals.montserrat,
-                                                        fontWeight:
-                                                            globals.fontWeight,
-                                                        fontSize: 15))
-                                              ]),
-                                            ),
+                                                          globals.fontWeight,
+                                                      fontSize: 18)),
+                                              TextSpan(
+                                                  text: '\n' +
+                                                      doc["locationName"]
+                                                          .split(",")[0],
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontFamily:
+                                                          globals.montserrat,
+                                                      fontWeight:
+                                                          globals.fontWeight,
+                                                      fontSize: 18))
+                                            ]),
                                           ),
-                                        )),
-                                  ]),
-                                ),
-                              ),
-                            ));
-                          });
-
-                          return Container(
-                            height: foryouCarouselHeight,
-                            child: CarouselSlider(
-                              items: featuredEvents,
-                              options: CarouselOptions(
-                                autoPlay: true,
-                                initialPage: 0,
-                                enableInfiniteScroll: true,
-                                viewportFraction: 1,
-                                height: foryouCarouselHeight,
-                                enlargeCenterPage: true,
-                                pauseAutoPlayOnTouch: true,
+                                        ),
+                                      )),
+                                ]),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                      // Near you text
-                      Container(
-                        margin: EdgeInsets.only(top: 5, left: 10, bottom: 10),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Near You",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontFamily: globals.montserrat,
-                                //fontWeight: globals.fontWeight,
-                                fontSize: 25,
-                                color: Colors.white),
+                          ));
+                        });
+
+                        return Container(
+                          height: foryouCarouselHeight,
+                          child: CarouselSlider(
+                            items: featuredEvents,
+                            options: CarouselOptions(
+                              autoPlay: true,
+                              initialPage: 0,
+                              enableInfiniteScroll: true,
+                              viewportFraction: 1,
+                              height: foryouCarouselHeight,
+                              enlargeCenterPage: true,
+                              pauseAutoPlayOnTouch: true,
+                            ),
                           ),
+                        );
+                      },
+                    ),
+                    // Near you text
+                    Container(
+                      margin: EdgeInsets.only(top: 5, left: 10, bottom: 10),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Near You",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              //fontWeight: globals.fontWeight,
+                              fontSize: 25,
+                              color: Colors.white),
                         ),
                       ),
-                      // Near You carousel
-                      StreamBuilder(
-                          stream: geo
-                              .collection(
-                                  collectionRef: FirebaseFirestore.instance
-                                      .collection('events'))
-                              .within(
-                                  center: geo.point(
-                                      latitude: _currentPosition.latitude,
-                                      longitude: _currentPosition.longitude),
-                                  radius: 10,
-                                  field: "location"),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.data == null) {
-                              return Text(
-                                "No events near you",
-                                style: TextStyle(color: Colors.white),
-                              );
-                            } else {
-                              List<NearyouItem> ads = [];
-                              var j;
-                              if (snapshot.data.length > 5) {
-                                j = 5;
-                              } else {
-                                j = snapshot.data.length;
-                              }
-                              for (var i = 0; i < j; i++) {
-                                ads.add(NearyouItem(data: snapshot.data[i]));
-                              }
-                              return Container(
-                                child: GFCarousel(
-                                  // height: nearyouCarouselHeight,
-                                  enableInfiniteScroll: true,
-                                  viewportFraction: 0.8,
-                                  activeIndicator: Colors.white,
-                                  items: ads.map(
-                                    (con) {
-                                      return Container(child: con);
-                                    },
-                                  ).toList(),
-                                  onPageChanged: (index) {},
-                                ),
-                              );
-                            }
-                          }),
-                      // For you text
-                      Container(
-                        margin: EdgeInsets.only(top: 10, left: 10, bottom: 10),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "For You",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontFamily: globals.montserrat,
-                                //fontWeight: globals.fontWeight,
-                                fontSize: 25,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      // For You carousel
-                      FutureBuilder(
-                        future: getForyouEvents(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
+                    ),
+                    // Near You carousel
+                    StreamBuilder(
+                        stream: geo
+                            .collection(
+                                collectionRef: FirebaseFirestore.instance
+                                    .collection('events'))
+                            .within(
+                                center: geo.point(
+                                    latitude: _currentPosition.latitude,
+                                    longitude: _currentPosition.longitude),
+                                radius: 10,
+                                field: "location"),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.data == null) {
                             return Center(
-                              child: AwesomeLoader(
-                                loaderType: AwesomeLoader.AwesomeLoader2,
-                                color: Colors.white,
+                              child: Text(
+                                "No events near you",
+                                style: TextStyle(
+                                  fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight,
+                                    fontSize: 20,
+                                    color: Colors.white
+                                ),
+                              ),
+                            );
+                          } else {
+                            List<NearyouItem> events = [];
+                            for (var i = 0; i < snapshot.data.length; i++) {
+                              DateTime dateChecker = snapshot.data[i]['date'].toDate();
+                              if (dateChecker.isAfter(DateTime.now()))
+                                events.add(NearyouItem(data: snapshot.data[i]));
+                            }
+                            return Container(
+                              child: GFCarousel(
+                                enableInfiniteScroll: true,
+                                viewportFraction: 0.8,
+                                activeIndicator: Colors.white,
+                                items: events.map(
+                                  (con) {
+                                    return Container(child: con);
+                                  },
+                                ).toList(),
+                                onPageChanged: (index) {},
                               ),
                             );
                           }
+                        }),
+                    // For you text
+                    Container(
+                      margin: EdgeInsets.only(top: 10, left: 10, bottom: 10),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "For You",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              //fontWeight: globals.fontWeight,
+                              fontSize: 25,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    // For You List
+                    FutureBuilder(
+                      future: getForyouEvents(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: globals.spinner
+                          );
+                        }
 
-                          if (snapshot.data != null &&
-                              snapshot.data.length != 0) {
-                            snapshot.data.forEach((event) {
-                              foryouItems.add(SearchResultItem(
-                                data: event,
-                                key: Key(event['title'] + event.id),
-                              ));
-                            });
+                        if (snapshot.data != null &&
+                            snapshot.data.length != 0) {
+                          snapshot.data.forEach((event) {
+                            foryouItems.add(SearchResultItem(
+                              data: event,
+                              key: Key(event['title'] + event.id),
+                            ));
+                          });
 
-                            print(snapshot.data[0]['date']);
-                            print(Timestamp.now());
-
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: items,
-                              itemBuilder: (context, index) {
-                                return foryouItems[index];
-                              },
-                            );
-                          } else
-                            return Container();
-                        },
-                      )
-                    ],
-                  ),
+                          items = foryouItems.length ~/ 4;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: items,
+                            itemBuilder: (context, index) {
+                              return foryouItems[index];
+                            },
+                          );
+                        } else
+                          return Container();
+                      },
+                    )
+                  ],
                 ),
               ),
             ),
