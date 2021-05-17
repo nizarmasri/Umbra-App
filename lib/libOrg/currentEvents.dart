@@ -200,12 +200,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 ),
                 backgroundColor: Colors.white10,
                 onPressed: () async {
-                  //setState(() {});
-                  print("Wsfs");
-                  await fb
-                      .collection("events")
-                      .add({"test": true, "etp": "WE", "poster": uid});
-                  //navigateToAddEventForm();
+                  navigateToAddEventForm();
                 },
               ),
             );
