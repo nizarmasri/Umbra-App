@@ -68,9 +68,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
         future: getEvents(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(
-              child: globals.spinner
-            );
+            return Center(child: globals.spinner);
           }
 
           if (snapshot.data != null && snapshot.data.length != 0) {

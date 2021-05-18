@@ -112,11 +112,14 @@ class _EventDetailsState extends State<EventDetails> {
     return isOrg;
   }
 
+  List<dynamic> tokens;
+
   Future<void> checkIsAttendOrBooked() async {
     await fb.collection("users").doc(uid).get().then((value) {
       setState(() {
         if (value.data()['attending'].contains(id)) isAttend = true;
         if (value.data()['booked'].contains(id)) isBooked = true;
+        tokens = value.data()['tokens'];
       });
     });
   }
@@ -183,7 +186,9 @@ class _EventDetailsState extends State<EventDetails> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => AttendeeList(id: id,)));
+            builder: (context) => AttendeeList(
+                  id: id,
+                )));
   }
 
   @override
@@ -291,9 +296,7 @@ class _EventDetailsState extends State<EventDetails> {
                   stream: fb.collection("events").doc(id).snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return Center(
-                        child: globals.spinner
-                      );
+                      return Center(child: globals.spinner);
                     }
                     return Column(
                       children: [
@@ -312,13 +315,15 @@ class _EventDetailsState extends State<EventDetails> {
                                     color: Colors.white),
                               ),
                             ),
-                            if(snapshot.data.data()["ticketsleft"] != -1)
+                            if (snapshot.data.data()["ticketsleft"] != -1)
                               Container(
                                 margin: EdgeInsets.only(
                                     left: 20, right: 20, bottom: 0),
                                 width: width,
                                 child: Text(
-                                  snapshot.data.data()["ticketsleft"].toString() +
+                                  snapshot.data
+                                          .data()["ticketsleft"]
+                                          .toString() +
                                       " tickets left",
                                   style: TextStyle(
                                       fontFamily: globals.montserrat,
@@ -334,226 +339,238 @@ class _EventDetailsState extends State<EventDetails> {
                             children: [
                               snapshot.data.data()["ticketsleft"] == 0
                                   ? Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      bottom: 20, right: 10),
-                                  height: btnsHeight,
-                                  width: btnsWidth,
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                    color: Colors.white12,
-                                  ),
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      children: [
-                                        Text("SOLD OUT",
-                                            style: TextStyle(
-                                                fontFamily:
-                                                globals.montserrat,
-                                                fontWeight:
-                                                globals.fontWeight,
-                                                fontSize: 15,
-                                                color: Colors.red)),
-                                        Icon(
-                                          Icons.cancel_outlined,
-                                          color: Colors.red,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        margin: EdgeInsets.only(
+                                            bottom: 20, right: 10),
+                                        height: btnsHeight,
+                                        width: btnsWidth,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white12,
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text("SOLD OUT",
+                                                  style: TextStyle(
+                                                      fontFamily:
+                                                          globals.montserrat,
+                                                      fontWeight:
+                                                          globals.fontWeight,
+                                                      fontSize: 15,
+                                                      color: Colors.red)),
+                                              Icon(
+                                                Icons.cancel_outlined,
+                                                color: Colors.red,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
                                   : GestureDetector(
-                                onTap: () {
-                                  TicketAlert alert = TicketAlert(
-                                      limit: snapshot.data
-                                          .data()["ticketsleft"]);
-                                  TicketCancelAlert cancelAlert =
-                                  TicketCancelAlert();
-                                  if (!isAttend && snapshot.data.data()["ticketsleft"] != -1) {
-                                    return showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return alert;
-                                        }).then((value) async {
-                                      if (value != null) {
-                                        setState(() {
-                                          isAttend = !isAttend;
-                                        });
-                                        List<String> ids = [id];
-                                        List<String> uids = [uid];
-                                        DocumentSnapshot user = await fb
-                                            .collection("users")
-                                            .doc(uid)
-                                            .get();
+                                      onTap: () {
+                                        TicketAlert alert = TicketAlert(
+                                            limit: snapshot.data
+                                                .data()["ticketsleft"]);
+                                        TicketCancelAlert cancelAlert =
+                                            TicketCancelAlert();
+                                        if (!isAttend &&
+                                            snapshot.data
+                                                    .data()["ticketsleft"] !=
+                                                -1) {
+                                          return showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return alert;
+                                              }).then((value) async {
+                                            if (value != null) {
+                                              setState(() {
+                                                isAttend = !isAttend;
+                                              });
+                                              List<String> ids = [id];
+                                              List<String> uids = [uid];
+                                              DocumentSnapshot user = await fb
+                                                  .collection("users")
+                                                  .doc(uid)
+                                                  .get();
 
-                                        fb
-                                            .collection("reservations")
-                                            .doc(id)
-                                            .collection("attendees")
-                                            .doc(uid)
-                                            .set({
-                                          'amount': value,
-                                          'name': user['name'],
-                                          'dp': user['dp'],
-                                          'confirmed': 0
-                                        });
+                                              fb
+                                                  .collection("reservations")
+                                                  .doc(id)
+                                                  .collection("attendees")
+                                                  .doc(uid)
+                                                  .set({
+                                                'amount': value,
+                                                'name': user['name'],
+                                                'dp': user['dp'],
+                                                'confirmed': 0
+                                              });
 
-                                        fb
-                                            .collection("users")
-                                            .doc(uid)
-                                            .update({
-                                          'attending':
-                                          FieldValue.arrayUnion(ids)
-                                        });
-                                        fb
-                                            .collection("events")
-                                            .doc(id)
-                                            .update({
-                                          'attending':
-                                          FieldValue.arrayUnion(uids),
-                                          'ticketsleft':
-                                          FieldValue.increment(
-                                              -value),
-                                        });
-                                      }
-                                    });
-                                  }
-                                  else if(isAttend && snapshot.data.data()["ticketsleft"] != -1){
+                                              fb
+                                                  .collection("users")
+                                                  .doc(uid)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayUnion(ids)
+                                              });
+                                              fb
+                                                  .collection("events")
+                                                  .doc(id)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayUnion(uids),
+                                                'ticketsleft':
+                                                    FieldValue.increment(
+                                                        -value),
+                                                'tokens': FieldValue.arrayUnion(
+                                                    tokens)
+                                              });
+                                            }
+                                          });
+                                        } else if (isAttend &&
+                                            snapshot.data
+                                                    .data()["ticketsleft"] !=
+                                                -1) {
+                                          return showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return cancelAlert;
+                                              }).then((value) async {
+                                            if (value == true) {
+                                              setState(() {
+                                                isAttend = !isAttend;
+                                              });
+                                              List<String> ids = [id];
+                                              List<String> uids = [uid];
 
-                                    return showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return cancelAlert;
-                                        }).then((value) async {
-                                      if (value == true) {
-                                        setState(() {
-                                          isAttend = !isAttend;
-                                        });
-                                        List<String> ids = [id];
-                                        List<String> uids = [uid];
+                                              dynamic reservation = await fb
+                                                  .collection("reservations")
+                                                  .doc(id)
+                                                  .collection("attendees")
+                                                  .doc(uid)
+                                                  .get();
 
-                                        dynamic reservation = await fb
-                                            .collection("reservations")
-                                            .doc(id)
-                                            .collection("attendees")
-                                            .doc(uid)
-                                            .get();
+                                              fb
+                                                  .collection("users")
+                                                  .doc(uid)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayRemove(ids)
+                                              });
+                                              fb
+                                                  .collection("events")
+                                                  .doc(id)
+                                                  .update({
+                                                'attending':
+                                                    FieldValue.arrayRemove(
+                                                        uids),
+                                                'ticketsleft':
+                                                    FieldValue.increment(
+                                                        reservation['amount']),
+                                                'tokens':
+                                                    FieldValue.arrayRemove(
+                                                        tokens)
+                                              });
 
-                                        fb
-                                            .collection("users")
-                                            .doc(uid)
-                                            .update({
-                                          'attending':
-                                          FieldValue.arrayRemove(ids)
-                                        });
-                                        fb
-                                            .collection("events")
-                                            .doc(id)
-                                            .update({
-                                          'attending':
-                                          FieldValue.arrayRemove(
-                                              uids),
-                                          'ticketsleft':
-                                          FieldValue.increment(
-                                              reservation['amount']),
-                                        });
+                                              fb
+                                                  .collection("reservations")
+                                                  .doc(id)
+                                                  .collection("attendees")
+                                                  .doc(uid)
+                                                  .delete();
+                                            }
+                                          });
+                                        } else if (!isAttend &&
+                                            snapshot.data
+                                                    .data()["ticketsleft"] ==
+                                                -1) {
+                                          setState(() {
+                                            isAttend = !isAttend;
+                                          });
+                                          List<String> ids = [id];
+                                          List<String> uids = [uid];
+                                          fb
+                                              .collection("users")
+                                              .doc(uid)
+                                              .update({
+                                            'attending':
+                                                FieldValue.arrayUnion(ids)
+                                          });
+                                          fb
+                                              .collection("events")
+                                              .doc(id)
+                                              .update({
+                                            'attending':
+                                                FieldValue.arrayUnion(uids),
+                                          });
+                                        } else if (isAttend &&
+                                            snapshot.data
+                                                    .data()["ticketsleft"] ==
+                                                -1) {
+                                          setState(() {
+                                            isAttend = !isAttend;
+                                          });
+                                          List<String> ids = [id];
+                                          List<String> uids = [uid];
 
-                                        fb
-                                            .collection("reservations")
-                                            .doc(id)
-                                            .collection("attendees")
-                                            .doc(uid)
-                                            .delete();
-                                      }
-                                    });
-                                  }
-                                  else if (!isAttend && snapshot.data.data()["ticketsleft"] == -1){
-                                    setState(() {
-                                      isAttend = !isAttend;
-                                    });
-                                    List<String> ids = [id];
-                                    List<String> uids = [uid];
-                                    fb
-                                        .collection("users")
-                                        .doc(uid)
-                                        .update({
-                                      'attending':
-                                      FieldValue.arrayUnion(ids)
-                                    });
-                                    fb
-                                        .collection("events")
-                                        .doc(id)
-                                        .update({
-                                      'attending':
-                                      FieldValue.arrayUnion(uids),
-                                    });
-                                  }
-                                  else if (isAttend && snapshot.data.data()["ticketsleft"] == -1){
-                                    setState(() {
-                                      isAttend = !isAttend;
-                                    });
-                                    List<String> ids = [id];
-                                    List<String> uids = [uid];
-
-                                    fb
-                                        .collection("users")
-                                        .doc(uid)
-                                        .update({
-                                      'attending':
-                                      FieldValue.arrayRemove(ids)
-                                    });
-                                    fb
-                                        .collection("events")
-                                        .doc(id)
-                                        .update({
-                                      'attending':
-                                      FieldValue.arrayRemove(
-                                          uids)
-                                    });
-                                  }
-                                },
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    padding:
-                                    EdgeInsets.fromLTRB(18, 15, 18, 15),
-                                    margin: EdgeInsets.only(
-                                        bottom: 20, right: 10, top: 10),
-                                    //    height: infoSquaresSize / 2,
-                                    //    width: infoSquaresSize * 1.5,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                      BorderRadius.circular(10),
-                                      color: Colors.white12,
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                              (isAttend)
-                                                  ? "Attending "
-                                                  : "Attend ",
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                  globals.montserrat,
-                                                  fontSize: 15,
-                                                  color: Colors.green)),
-                                          (isAttend)
-                                              ? isAttendIcon
-                                              : notAttendIcon
-                                        ],
+                                          fb
+                                              .collection("users")
+                                              .doc(uid)
+                                              .update({
+                                            'attending':
+                                                FieldValue.arrayRemove(ids)
+                                          });
+                                          fb
+                                              .collection("events")
+                                              .doc(id)
+                                              .update({
+                                            'attending':
+                                                FieldValue.arrayRemove(uids)
+                                          });
+                                        }
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          padding: EdgeInsets.fromLTRB(
+                                              18, 15, 18, 15),
+                                          margin: EdgeInsets.only(
+                                              bottom: 20, right: 10, top: 10),
+                                          //    height: infoSquaresSize / 2,
+                                          //    width: infoSquaresSize * 1.5,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.white12,
+                                          ),
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                    (isAttend)
+                                                        ? "Attending "
+                                                        : "Attend ",
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            globals.montserrat,
+                                                        fontSize: 15,
+                                                        color: Colors.green)),
+                                                (isAttend)
+                                                    ? isAttendIcon
+                                                    : notAttendIcon
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
@@ -574,8 +591,8 @@ class _EventDetailsState extends State<EventDetails> {
                                   child: Container(
                                     padding:
                                         EdgeInsets.fromLTRB(18, 15, 18, 15),
-                                    margin:
-                                        EdgeInsets.only(bottom: 20, left: 10, top: 10),
+                                    margin: EdgeInsets.only(
+                                        bottom: 20, left: 10, top: 10),
                                     //   height: infoSquaresSize / 2,
                                     //   width: infoSquaresSize * 1.5,
                                     decoration: BoxDecoration(
@@ -869,9 +886,7 @@ class _EventDetailsState extends State<EventDetails> {
                         .get(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return Center(
-                          child: globals.spinner
-                        );
+                        return Center(child: globals.spinner);
                       }
 
                       return Container(

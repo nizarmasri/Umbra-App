@@ -73,6 +73,7 @@ class _MyAppState extends State<MyApp> {
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("WEQWQE");
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
 
