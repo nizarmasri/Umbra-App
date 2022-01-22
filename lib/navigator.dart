@@ -6,7 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'account.dart';
-import 'home.dart';
+import 'controllers/consumer/home_controller.dart';
+import 'views/home/home.dart';
+import 'package:get/get.dart';
 
 class NavigatorPage extends StatefulWidget {
   final uid;
@@ -22,7 +24,6 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
   _NavigatorPageState(this.uid);
 
-  static const String montserrat = "Montserrat";
   int _selectedIndex = 0;
 
   static List<Widget> _widgetOptions = <Widget>[
@@ -40,25 +41,25 @@ class _NavigatorPageState extends State<NavigatorPage> {
 
   Future<void> saveTokenToDatabase(Future<String> token) async {
     // Assume user is logged in for this example
-    String newToken = await token;
+    /*String newToken = await token;
     String userId = uid;
 
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
       'tokens': FieldValue.arrayUnion([newToken]),
-    });
+    });*/
   }
 
   void initState() {
     super.initState();
-    Future<String> token = FirebaseMessaging.instance.getToken();
-    saveTokenToDatabase(token);
+    /*Future<String> token = FirebaseMessaging.instance.getToken();
+    saveTokenToDatabase(token);*/
   }
 
   Widget currentScreen;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //   body: _widgetOptions.elementAt(_selectedIndex),
       body: IndexedStack(
         index: _selectedIndex,
         children: _widgetOptions,

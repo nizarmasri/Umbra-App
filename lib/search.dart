@@ -1,10 +1,11 @@
-import 'package:awesome_loader/awesome_loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/searchItem.dart';
 import 'package:flutter/material.dart';
 import 'package:events/searchResults.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'globals.dart' as globals;
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
+
 
 class SearchPage extends StatefulWidget {
   @override
@@ -78,18 +79,22 @@ class _SearchPageState extends State<SearchPage> {
     double width = MediaQuery.of(context).size.width;
     double searchFieldWidth = width * 0.9;
     double searchFieldHeight = height * 0.07;
-    double gridHeight = height * 0.1;
-    double keyWordsWidth = width * 0.2;
 
     return FutureBuilder(
         future: getEvents(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-              child: AwesomeLoader(
-                loaderType: AwesomeLoader.AwesomeLoader2,
-                color: Colors.white,
-              ),
+              child: LiquidLinearProgressIndicator(
+                value: 0.25, // Defaults to 0.5.
+                valueColor: AlwaysStoppedAnimation(Colors.pink), // Defaults to the current Theme's accentColor.
+                backgroundColor: Colors.white, // Defaults to the current Theme's backgroundColor.
+                borderColor: Colors.red,
+                borderWidth: 5.0,
+                borderRadius: 12.0,
+                direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
+                center: Text("Loading..."),
+              )
             );
           }
 

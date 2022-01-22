@@ -2,7 +2,6 @@ library events.globals;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:awesome_loader/awesome_loader.dart';
 
 TextStyle style = TextStyle(
     fontSize: 35,
@@ -28,11 +27,6 @@ TextStyle infoSectionStyle = TextStyle(
 bool isOrg = false;
 
 String uid;
-
-/*AwesomeLoader spinner = AwesomeLoader(
-  loaderType: AwesomeLoader.AwesomeLoader2,
-  color: Colors.white,
-);*/
 
 SpinKitFoldingCube spinner = SpinKitFoldingCube(
   color: Colors.white,

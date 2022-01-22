@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/routes.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:events/authentication_service.dart';
 import 'package:events/globals.dart' as globals;
@@ -14,7 +13,10 @@ import 'package:events/navigator.dart';
 import 'package:events/libOrg/navigator.dart';
 import 'package:events/libOrg/blocs/application_bloc.dart';
 import 'package:events/newUserForm.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+
+import 'controllers/consumer/home_controller.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   flutterLocalNotificationsPlugin.show(
@@ -22,8 +24,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       message.data['title'],
       message.data['text'],
       NotificationDetails(
-        android: AndroidNotificationDetails(
-            channel.id, channel.name, channel.description,
+        android: AndroidNotificationDetails(channel.id, channel.name,
+            channelDescription: channel.description,
             playSound: true,
             importance: Importance.max,
             priority: Priority.high),
@@ -33,7 +35,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
-  'This channel is used for important notifications.', // description
+  description: 'This channel is used for important notifications.',
+  // description
   importance: Importance.high,
 );
 
@@ -41,8 +44,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  /*SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);*/
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -55,6 +58,7 @@ Future<void> main() async {
     badge: true,
     sound: true,
   );
+  LocationPermission permission = await Geolocator.requestPermission();
   runApp(MyApp());
 }
 
@@ -73,8 +77,6 @@ class _MyAppState extends State<MyApp> {
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("WEQWQE");
-      RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
 
       // If `onMessage` is triggered with a notification, construct our own
@@ -84,8 +86,8 @@ class _MyAppState extends State<MyApp> {
           message.data['title'],
           message.data['text'],
           NotificationDetails(
-            android: AndroidNotificationDetails(
-                channel.id, channel.name, channel.description,
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                channelDescription: channel.description,
                 icon: android?.smallIcon,
                 playSound: true,
                 importance: Importance.max,
@@ -105,17 +107,20 @@ class _MyAppState extends State<MyApp> {
           create: (_) => AuthenticationService(FirebaseAuth.instance),
         ),
         StreamProvider(
-            create: (context) =>
-                context.read<AuthenticationService>().authStateChanges)
+          create: (context) =>
+              context.read<AuthenticationService>().authStateChanges,
+          initialData: null,
+        )
       ],
       child: ChangeNotifierProvider(
         create: (context) => ApplicationBloc(),
-        child: MaterialApp(
+        child: GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             fontFamily: 'Montserrat',
             canvasColor: Colors.black,
           ),
+          getPages: Routes.routes,
           home: AuthenticationWrapper(),
         ),
       ),
@@ -147,10 +152,10 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return globals.spinner;
               }
-              if (snapshot.data.data()["new"]) {
+              if (snapshot.data["new"]) {
                 return NewUserForm(uid: firebaseUser.uid);
               } else {
-                if (snapshot.data.data()["organizer"]) {
+                if (snapshot.data["organizer"]) {
                   return NavigatorOrgPage(uid: firebaseUser.uid);
                 } else {
                   return NavigatorPage(uid: firebaseUser.uid);
@@ -160,6 +165,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
       }
     }
 
-    return outerLogin();
+    return OuterLogin();
   }
 }

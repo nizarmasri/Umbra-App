@@ -1,4 +1,3 @@
-import 'package:awesome_loader/awesome_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,9 +6,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'globals.dart' as globals;
 import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:string_similarity/string_similarity.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class AccountInfo extends StatefulWidget {
   @override
@@ -173,7 +172,7 @@ class _AccountInfoState extends State<AccountInfo> {
           if (images.isNotEmpty) {
             final firebaseStorageRef =
                 FirebaseStorage.instance.ref().child('profilepictures/$uid');
-            final upload = await firebaseStorageRef
+            await firebaseStorageRef
                 .putData((await images[0].getByteData(quality: 50))
                     .buffer
                     .asUint8List())
@@ -280,24 +279,43 @@ class _AccountInfoState extends State<AccountInfo> {
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (!snapshot.hasData) {
                 return Center(
-                  child: AwesomeLoader(
-                    loaderType: AwesomeLoader.AwesomeLoader2,
-                    color: Colors.white,
-                  ),
-                );
+                    child: LiquidLinearProgressIndicator(
+                  value: 0.25,
+                  // Defaults to 0.5.
+                  valueColor: AlwaysStoppedAnimation(Colors.pink),
+                  // Defaults to the current Theme's accentColor.
+                  backgroundColor: Colors.white,
+                  // Defaults to the current Theme's backgroundColor.
+                  borderColor: Colors.red,
+                  borderWidth: 5.0,
+                  borderRadius: 12.0,
+                  direction: Axis.vertical,
+                  // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
+                  center: Text("Loading..."),
+                ));
               } else {
                 _namecontroller =
-                    TextEditingController(text: snapshot.data.data()["name"]);
+                    TextEditingController(text: snapshot.data["name"]);
                 _numbercontroller =
-                    TextEditingController(text: snapshot.data.data()["number"]);
-                _twittercontroller = TextEditingController(
-                    text: snapshot.data.data()["twitter"]);
-                _instagramcontroller = TextEditingController(
-                    text: snapshot.data.data()["instagram"]);
+                    TextEditingController(text: snapshot.data["number"]);
+                _twittercontroller =
+                    TextEditingController(text: snapshot.data["twitter"]);
+                _instagramcontroller =
+                    TextEditingController(text: snapshot.data["instagram"]);
                 return snapshot.data == null
-                    ? AwesomeLoader(
-                        loaderType: AwesomeLoader.AwesomeLoader2,
-                        color: Colors.white,
+                    ? LiquidLinearProgressIndicator(
+                        value: 0.25,
+                        // Defaults to 0.5.
+                        valueColor: AlwaysStoppedAnimation(Colors.pink),
+                        // Defaults to the current Theme's accentColor.
+                        backgroundColor: Colors.white,
+                        // Defaults to the current Theme's backgroundColor.
+                        borderColor: Colors.red,
+                        borderWidth: 5.0,
+                        borderRadius: 12.0,
+                        direction: Axis.vertical,
+                        // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
+                        center: Text("Loading..."),
                       )
                     : Scaffold(
                         backgroundColor: Colors.black,
@@ -313,19 +331,18 @@ class _AccountInfoState extends State<AccountInfo> {
                             child: Column(
                               children: [
                                 avatar(
-                                    letter: snapshot.data
-                                        .data()["name"][0]
+                                    letter: snapshot.data["name"][0]
                                         .toString()
                                         .toUpperCase(),
                                     existingPicture:
-                                        snapshot.data.data()['dp'].toString()),
+                                        snapshot.data['dp'].toString()),
                                 newInput(
                                     hint: "Name",
                                     icon: Icon(
                                       Icons.person,
                                       color: Colors.white,
                                     ),
-                                    defvalue: snapshot.data.data()["name"],
+                                    defvalue: snapshot.data["name"],
                                     controller: _namecontroller,
                                     mask: maskTextInputFormatter2),
                                 newInput(
@@ -334,7 +351,7 @@ class _AccountInfoState extends State<AccountInfo> {
                                       Icons.phone,
                                       color: Colors.white,
                                     ),
-                                    defvalue: snapshot.data.data()["number"],
+                                    defvalue: snapshot.data["number"],
                                     controller: _numbercontroller,
                                     type: TextInputType.phone,
                                     mask: maskTextInputFormatter),
@@ -344,7 +361,7 @@ class _AccountInfoState extends State<AccountInfo> {
                                       FontAwesomeIcons.twitter,
                                       color: Colors.white,
                                     ),
-                                    defvalue: snapshot.data.data()["twitter"],
+                                    defvalue: snapshot.data["twitter"],
                                     controller: _twittercontroller,
                                     mask: maskTextInputFormatter2),
                                 newInput(
@@ -353,7 +370,7 @@ class _AccountInfoState extends State<AccountInfo> {
                                       FontAwesomeIcons.instagram,
                                       color: Colors.white,
                                     ),
-                                    defvalue: snapshot.data.data()["instagram"],
+                                    defvalue: snapshot.data["instagram"],
                                     controller: _instagramcontroller,
                                     mask: maskTextInputFormatter2),
                                 button(uid: uid),

@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:awesome_loader/awesome_loader.dart';
-import 'package:intl/intl.dart';
 
 class CurrentEventsPage extends StatefulWidget {
   @override
@@ -59,9 +57,6 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double listHeight = height * 0.75;
-
     eventItems = [];
 
     return FutureBuilder(

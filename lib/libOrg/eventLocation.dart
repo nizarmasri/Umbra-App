@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:flutter/services.dart';
 import 'package:getwidget/components/toast/gf_toast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +20,7 @@ class _EventLocationState extends State<EventLocation> {
   List<Marker> location = [];
 
   String locationName = "";
+
   _updateLocation(LatLng chosenLoc) {
     setState(() {
       locationName = "";
@@ -71,15 +71,7 @@ class _EventLocationState extends State<EventLocation> {
     super.dispose();
   }
 
-  GFToast toast = GFToast(
-    text: "Select location",
-    textStyle: TextStyle(
-        fontFamily: globals.montserrat,
-        fontWeight: globals.fontWeight,
-        color: Colors.white,
-        fontSize: 15),
-    duration: Duration(seconds: 3),
-  );
+  GFToast toast = GFToast();
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +81,14 @@ class _EventLocationState extends State<EventLocation> {
     double textFieldHeight = height * 0.07;
     double mapHeight = height * 0.8;
     final applicationBloc = Provider.of<ApplicationBloc>(context);
+
+    toast.text = "Select location";
+    toast.textStyle = TextStyle(
+        fontFamily: globals.montserrat,
+        fontWeight: globals.fontWeight,
+        color: Colors.white,
+        fontSize: 15);
+    toast.toastDuration = 3;
 
     return Scaffold(
       appBar: CustomAppBar(

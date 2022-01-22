@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:awesome_loader/awesome_loader.dart';
-import 'package:intl/intl.dart';
 
 class AttendedEventsPage extends StatefulWidget {
   @override
@@ -106,7 +104,6 @@ class _AttendedEventsPageState extends State<AttendedEventsPage> {
   String _sortBy = 'Descending';
 
   List<List<dynamic>> listDivisions(List<dynamic> list) {
-    List<List<dynamic>> dividedList;
     if (list.length >= 10) {
       int arraySize = list.length - 10;
       int divisions = 1;

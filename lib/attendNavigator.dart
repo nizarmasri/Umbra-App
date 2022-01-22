@@ -5,7 +5,7 @@ import 'package:events/search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'account.dart';
-import 'home.dart';
+import 'views/home/home.dart';
 
 class AttendNavigatorPage extends StatefulWidget {
   final uid;

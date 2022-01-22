@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:awesome_loader/awesome_loader.dart';
-import 'package:intl/intl.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class Bookmarks extends StatefulWidget {
   @override
@@ -68,16 +67,21 @@ class _BookmarksState extends State<Bookmarks> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: AwesomeLoader(
-                loaderType: AwesomeLoader.AwesomeLoader2,
-                color: Colors.white,
-              ),
+              child: LiquidLinearProgressIndicator(
+                value: 0.25, // Defaults to 0.5.
+                valueColor: AlwaysStoppedAnimation(Colors.pink), // Defaults to the current Theme's accentColor.
+                backgroundColor: Colors.white, // Defaults to the current Theme's backgroundColor.
+                borderColor: Colors.red,
+                borderWidth: 5.0,
+                borderRadius: 12.0,
+                direction: Axis.vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
+                center: Text("Loading..."),
+              )
             );
           }
 
           if (snapshot.data != null && snapshot.data.length != 0) {
             snapshot.data.forEach((event) {
-              DateTime date = event['date'].toDate();
               eventItems.add(EventItem(
                 data: event,
               ));

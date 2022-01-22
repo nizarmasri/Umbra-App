@@ -1,59 +1,16 @@
-import 'globals.dart' as globals;
+import 'package:events/controllers/consumer/login_controller.dart';
+import 'package:events/globals.dart' as globals;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_button/progress_button.dart';
-import 'package:events/authentication_service.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:progress_state_button/progress_button.dart';
+import 'package:get/get.dart';
 
-import 'package:events/signup.dart';
-
-class LoginPage extends StatefulWidget {
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  double schedulerSize = 32;
-  double inputSize = 17;
-  double loginSize = 17;
-  double googleSize = 15;
-  double btnHeight = 60;
-
-  //AssetImage icon = AssetImage('assets/icon/logo.png');
-
-  navigateToSignUpPage() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SignUpPage()));
-  }
-
-  String msg = "";
-
-  TextStyle signUpStyle1 = TextStyle(
-      color: Colors.white,
-      fontSize: 15,
-      fontFamily: "Montserrat",
-      fontWeight: FontWeight.w300);
-  TextStyle signUpStyle2 = TextStyle(
-      color: Colors.red,
-      fontSize: 15,
-      fontFamily: "Montserrat",
-      fontWeight: FontWeight.w300);
-  bool loader = true;
+class LoginPage extends StatelessWidget {
+  final controller = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-    double body = height * 0.9;
-    double btnWidth = width * 0.9;
-
-    return loader
+    return Obx(() => controller.loader.value
         ? GestureDetector(
             onTap: () {
               FocusScope.of(context).requestFocus(new FocusNode());
@@ -79,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           // Logo
                           Container(
-                            margin: EdgeInsets.only(bottom: height * 0.1),
+                            margin: EdgeInsets.only(bottom: Get.height * 0.1),
                             child: RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(children: <TextSpan>[
@@ -102,8 +59,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           // email field
                           Container(
-                            height: btnHeight,
-                            width: btnWidth,
+                            height: controller.btnHeight,
+                            width: Get.width * 0.9,
                             decoration: BoxDecoration(
                                 color: Colors.white10,
                                 borderRadius: BorderRadius.circular(10)),
@@ -115,18 +72,18 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.white,
                                 ),
                                 title: TextField(
-                                  controller: emailController,
+                                  controller: controller.emailController,
                                   cursorColor: Colors.white,
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: inputSize,
+                                      fontSize: controller.inputSize,
                                       fontFamily: globals.montserrat,
                                       fontWeight: globals.fontWeight),
                                   decoration: InputDecoration(
                                       hintText: "Email",
                                       hintStyle: TextStyle(
                                           color: Colors.white38,
-                                          fontSize: inputSize,
+                                          fontSize: controller.inputSize,
                                           fontFamily: globals.montserrat,
                                           fontWeight: globals.fontWeight),
                                       border: InputBorder.none,
@@ -138,8 +95,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           // password field
                           Container(
-                            height: btnHeight,
-                            width: btnWidth,
+                            height: controller.btnHeight,
+                            width: Get.width * 0.9,
                             margin: EdgeInsets.only(bottom: 15),
                             decoration: BoxDecoration(
                                 color: Colors.white10,
@@ -151,18 +108,18 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.white,
                                 ),
                                 title: TextField(
-                                  controller: passwordController,
+                                  controller: controller.passwordController,
                                   cursorColor: Colors.white,
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: inputSize,
+                                      fontSize: controller.inputSize,
                                       fontFamily: globals.montserrat,
                                       fontWeight: globals.fontWeight),
                                   decoration: InputDecoration(
                                       hintText: "Password",
                                       hintStyle: TextStyle(
                                           color: Colors.white38,
-                                          fontSize: inputSize,
+                                          fontSize: controller.inputSize,
                                           fontFamily: globals.montserrat,
                                           fontWeight: globals.fontWeight),
                                       border: InputBorder.none,
@@ -174,62 +131,62 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           // login button
                           Container(
-                              height: btnHeight,
-                              width: btnWidth,
+                              height: controller.btnHeight,
+                              width: Get.width * 0.9,
                               margin: EdgeInsets.only(bottom: 15),
                               decoration: BoxDecoration(
                                   border: Border.all(color: Colors.white12),
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(10)),
                               child: ProgressButton(
-                                buttonState: ButtonState.normal,
-                                progressColor: Colors.white12,
-                                backgroundColor: Colors.blue[700],
-                                onPressed: () {
-                                  setState(() {
-                                    loader = false;
-                                  });
-                                  Future<List<String>> temp = context
-                                      .read<AuthenticationService>()
-                                      .signIn(
-                                          email: emailController.text.trim(),
-                                          password:
-                                              passwordController.text.trim());
-
-                                  temp.then((List<String> result) {
-                                    setState(() {
-                                      msg = result[1];
-                                    });
-                                    print(msg);
-                                    print(result);
-
-                                    if (result[0] == "Signed in") {
-                                      msg = " ";
-                                      globals.isOrg = false;
-                                      Navigator.pop(context);
-                                    }
-                                    if (result[0] == "Invalid email") {
-                                      setState(() {
-                                        loader = true;
-                                      });
-                                    }
-                                  });
+                                stateWidgets: {
+                                  ButtonState.idle: Text(
+                                    "Login",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: controller.loginSize,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                  ),
+                                  ButtonState.loading: Text(
+                                    "loading...",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: controller.loginSize,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                  ),
+                                  ButtonState.success: Text(
+                                    "Logged in",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: controller.loginSize,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                  ),
+                                  ButtonState.fail: Text(
+                                    "failed",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: controller.loginSize,
+                                        fontFamily: globals.montserrat,
+                                        fontWeight: globals.fontWeight),
+                                  ),
                                 },
-                                child: Text(
-                                  "Login",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: loginSize,
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight),
-                                ),
+                                stateColors: {
+                                  ButtonState.idle: Colors.black,
+                                  ButtonState.loading: Colors.white12,
+                                  ButtonState.success: Colors.green,
+                                  ButtonState.fail: Colors.red,
+                                },
+                                onPressed: () => controller.login(context),
                               )),
                           Container(
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.only(top: 10),
                             child: Center(
                               child: Text(
-                                msg,
+                                controller.msg.value,
                                 style: TextStyle(
                                     color: Colors.red,
                                     fontSize: 13,
@@ -245,6 +202,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ))
-        : globals.spinner;
+        : globals.spinner);
   }
 }

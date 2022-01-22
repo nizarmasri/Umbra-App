@@ -6,7 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class AccountInfoOrg extends StatefulWidget {
@@ -169,7 +168,7 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
           if (images.isNotEmpty) {
             final firebaseStorageRef =
                 FirebaseStorage.instance.ref().child('profilepictures/$uid');
-            final upload = await firebaseStorageRef
+            await firebaseStorageRef
                 .putData((await images[0].getByteData(quality: 50))
                     .buffer
                     .asUint8List())
@@ -226,13 +225,13 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               _namecontroller =
-                  new TextEditingController(text: snapshot.data.data()["name"]);
+                  new TextEditingController(text: snapshot.data["name"]);
               _numbercontroller = new TextEditingController(
-                  text: snapshot.data.data()["number"]);
+                  text: snapshot.data["number"]);
               _twittercontroller = new TextEditingController(
-                  text: snapshot.data.data()["twitter"]);
+                  text: snapshot.data["twitter"]);
               _instagramcontroller = new TextEditingController(
-                  text: snapshot.data.data()["instagram"]);
+                  text: snapshot.data["instagram"]);
               return Scaffold(
                 backgroundColor: Colors.black,
                 appBar: AppBar(
@@ -248,12 +247,11 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                     child: Column(
                       children: [
                         avatar(
-                            letter: snapshot.data
-                                .data()["name"][0]
+                            letter: snapshot.data["name"][0]
                                 .toString()
                                 .toUpperCase(),
                             existingPicture:
-                                snapshot.data.data()['dp'].toString()),
+                                snapshot.data['dp'].toString()),
                         newInput(
                           hint: "Name",
                           icon: Icon(

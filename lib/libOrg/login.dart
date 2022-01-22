@@ -2,7 +2,7 @@ import 'package:events/globals.dart' as globals;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_button/progress_button.dart';
+import 'package:progress_state_button/progress_button.dart';
 import 'package:events/authentication_service.dart';
 import 'package:provider/provider.dart';
 
@@ -171,9 +171,20 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
                               color: Colors.black,
                               borderRadius: BorderRadius.circular(10)),
                           child: ProgressButton(
-                            buttonState: ButtonState.normal,
-                            progressColor: Colors.white12,
-                            backgroundColor: Colors.blue[700],
+                            stateWidgets: {
+                              ButtonState.idle: Text(
+                                "Login",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: loginSize,
+                                    fontFamily: globals.montserrat,
+                                    fontWeight: globals.fontWeight),
+                              )
+                            },
+                            stateColors: {
+                              ButtonState.loading: Colors.white12,
+                              ButtonState.idle: Colors.black
+                            },
                             onPressed: () {
                               Future<List<String>> temp = context
                                   .read<AuthenticationService>()
@@ -194,14 +205,6 @@ class _LoginOrgPageState extends State<LoginOrgPage> {
                                 }
                               });
                             },
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: loginSize,
-                                  fontFamily: globals.montserrat,
-                                  fontWeight: globals.fontWeight),
-                            ),
                           )),
                       Container(
                         alignment: Alignment.centerLeft,

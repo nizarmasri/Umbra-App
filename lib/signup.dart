@@ -1,8 +1,7 @@
 import 'globals.dart' as globals;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_button/progress_button.dart';
+import 'package:progress_state_button/progress_button.dart';
 import 'package:events/authentication_service.dart';
 import 'package:provider/provider.dart';
 
@@ -202,9 +201,22 @@ class _SignUpPageState extends State<SignUpPage> {
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(10)),
                         child: ProgressButton(
-                          buttonState: ButtonState.normal,
-                          progressColor: Colors.white12,
-                          backgroundColor: Colors.black,
+                          stateWidgets: {
+                            ButtonState.idle: Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: loginSize,
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight),
+                            )
+                          },
+                          stateColors: {
+                            ButtonState.loading: Colors.white12,
+                            ButtonState.idle: Colors.black
+                          },
+                          //progressColor: Colors.white12,
+                          //backgroundColor: Colors.black,
                           onPressed: () {
                             if (passwordController.text !=
                                 confirmPasswordController.text)
@@ -216,8 +228,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   .read<AuthenticationService>()
                                   .signUp(
                                       email: emailController.text.trim(),
-                                      password:
-                                          passwordController.text.trim(),
+                                      password: passwordController.text.trim(),
                                       organizer: false);
 
                               temp.then((String result) {
@@ -230,14 +241,6 @@ class _SignUpPageState extends State<SignUpPage> {
                               });
                             }
                           },
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: loginSize,
-                                fontFamily: globals.montserrat,
-                                fontWeight: globals.fontWeight),
-                          ),
                         )),
                     // Email error message
                     Container(

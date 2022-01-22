@@ -8,14 +8,14 @@ import 'package:provider/provider.dart';
 import 'package:events/libOrg/signup.dart';
 
 import 'package:events/signup.dart';
-import 'login.dart';
+import 'views/login.dart';
 
-class outerLogin extends StatefulWidget {
+class OuterLogin extends StatefulWidget {
   @override
-  _outerLoginState createState() => _outerLoginState();
+  _OuterLoginState createState() => _OuterLoginState();
 }
 
-class _outerLoginState extends State<outerLogin> {
+class _OuterLoginState extends State<OuterLogin> {
 
   navigateToSignUpPage() {
     Navigator.push(

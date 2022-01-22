@@ -1,4 +1,3 @@
-import 'package:awesome_loader/awesome_loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/libOrg/addEventForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import 'package:events/organizeraccount.dart';
 import 'package:events/libOrg/eventStatistics.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'ticketAlert.dart';
 import 'TicketCancelAlert.dart';
 import 'attendeeList.dart';
@@ -83,16 +81,6 @@ class _EventDetailsState extends State<EventDetails> {
         Marker(markerId: MarkerId(markerPos.toString()), position: markerPos);
     setMarker = [];
     setMarker.add(marker);
-  }
-
-  static Future<void> openMaps(double lat, double lng) async {
-    String mapsUrl =
-        "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
-    if (await canLaunch(mapsUrl)) {
-      await launch(mapsUrl);
-    } else {
-      throw 'Could not open maps.';
-    }
   }
 
   List<Container> images = [];
@@ -202,7 +190,6 @@ class _EventDetailsState extends State<EventDetails> {
     double imagesHeight = height * 0.3;
     double btnsHeight = height * 0.057;
     double btnsWidth = height * 0.171;
-    int _tickets = 0;
 
     String feeCheck = "";
     if (fee == "" || fee == "Free")

@@ -1,4 +1,3 @@
-import 'package:events/attendNavigator.dart';
 import 'package:events/libOrg/addEventForm.dart';
 import 'package:events/libOrg/eventItem.dart';
 import 'package:events/libOrg/eventDetails.dart';
@@ -6,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:awesome_loader/awesome_loader.dart';
-import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class AttendingEventsPage extends StatefulWidget {
@@ -84,9 +81,7 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
         });
       }
       events.sort((a, b) => b['date'].compareTo(a['date']));
-
-    }
-    else if(eventIds.length > 0){
+    } else if (eventIds.length > 0) {
       await fb
           .collection("events")
           .where('__name__', whereIn: eventIds)
@@ -98,11 +93,9 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
         });
       });
       events.sort((a, b) => b['date'].compareTo(a['date']));
-    }
-    else {
+    } else {
       events = null;
     }
-
 
     return events;
   }
@@ -110,7 +103,6 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
   String _sortBy = 'Ascending';
 
   List<List<dynamic>> listDivisions(List<dynamic> list) {
-    List<List<dynamic>> dividedList;
     if (list.length >= 10) {
       int arraySize = list.length - 10;
       int divisions = 1;
@@ -123,22 +115,7 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
         } else
           isLessThanTen = true;
       }
-
-      for (int i = 0; i < divisions; i++) {}
-      print(divisions);
     }
-  }
-
-  RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
-
-  Future<Null> _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
-    _refreshController.refreshCompleted();
-
-    setState(() {   });
   }
 
   @override
@@ -151,8 +128,6 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
     return FutureBuilder(
         future: getEvents(),
         builder: (context, snapshot) {
-
-
           if (snapshot.data != null) {
             if (!snapshot.hasData) {
               return Center(
@@ -174,6 +149,8 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
               eventItems
                   .sort((a, b) => a.data['date'].compareTo(b.data['date']));
 
+            RefreshController _refreshController =
+                RefreshController(initialRefresh: false);
             return Scaffold(
               backgroundColor: Colors.black,
               body: SafeArea(
@@ -197,7 +174,7 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                             Container(
                                 padding: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  //color: Colors.white12,
+                                    //color: Colors.white12,
                                     borderRadius: BorderRadius.circular(10)),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
@@ -214,12 +191,12 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                                       'Ascending',
                                       'Descending',
                                     ].map<DropdownMenuItem<String>>(
-                                            (String sorting) {
-                                          return DropdownMenuItem<String>(
-                                            value: sorting,
-                                            child: Text(sorting),
-                                          );
-                                        }).toList(),
+                                        (String sorting) {
+                                      return DropdownMenuItem<String>(
+                                        value: sorting,
+                                        child: Text(sorting),
+                                      );
+                                    }).toList(),
                                     hint: Text(
                                       _sortBy,
                                       style: TextStyle(
@@ -243,7 +220,14 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                         child: SmartRefresher(
                           enablePullDown: true,
                           controller: _refreshController,
-                          onRefresh: _onRefresh,
+                          onRefresh: () async {
+                            // monitor network fetch
+                            await Future.delayed(Duration(milliseconds: 1000));
+                            // if failed,use refreshFailed()
+                            _refreshController.refreshCompleted();
+
+                            setState(() {});
+                          },
                           child: ListView.builder(
                             itemCount: eventItems.length,
                             itemBuilder: (context, index) {
@@ -263,14 +247,22 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                 ),
               ),
             );
-          }
-          else
+          } else {
+            RefreshController _refreshController =
+                RefreshController(initialRefresh: false);
             return Scaffold(
               body: SafeArea(
                 child: SmartRefresher(
                   enablePullDown: true,
                   controller: _refreshController,
-                  onRefresh: _onRefresh,
+                  onRefresh: () async {
+                    // monitor network fetch
+                    await Future.delayed(Duration(milliseconds: 1000));
+                    // if failed,use refreshFailed()
+                    _refreshController.refreshCompleted();
+
+                    setState(() {});
+                  },
                   child: Center(
                     child: Container(
                       margin: EdgeInsets.all(30),
@@ -288,6 +280,7 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                 ),
               ),
             );
+          }
         });
   }
 }
