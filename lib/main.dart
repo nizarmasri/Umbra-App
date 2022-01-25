@@ -8,15 +8,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:events/authentication_service.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:events/outerLogin.dart';
+import 'package:events/views/entry_screen.dart';
 import 'package:events/navigator.dart';
 import 'package:events/libOrg/navigator.dart';
 import 'package:events/libOrg/blocs/application_bloc.dart';
 import 'package:events/newUserForm.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-
-import 'controllers/consumer/home_controller.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   flutterLocalNotificationsPlugin.show(
@@ -165,6 +163,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
       }
     }
 
-    return OuterLogin();
+    return EntryScreen();
   }
 }

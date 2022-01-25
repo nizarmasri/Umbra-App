@@ -1,12 +1,11 @@
-import 'package:events/controllers/consumer/login_controller.dart';
+import 'package:events/controllers/consumer/login_signup_controller.dart';
 import 'package:events/globals.dart' as globals;
 
 import 'package:flutter/material.dart';
 import 'package:progress_state_button/progress_button.dart';
 import 'package:get/get.dart';
 
-class LoginPage extends StatelessWidget {
-  final controller = Get.put(LoginController());
+class LoginPage extends GetView<LoginAndSignupController> {
 
   @override
   Widget build(BuildContext context) {

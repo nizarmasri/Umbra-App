@@ -14,17 +14,10 @@ class AuthenticationService {
   Future<String> signInWithGoogle() async {
     googleUser = await GoogleSignIn().signIn();
     try {
-      //final googleAuth = await user.authentication;
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
-
-      print(googleAuth.accessToken);
-      print(googleAuth.idToken);
-      print(credential.idToken);
-      print(credential.accessToken);
-      print(credential.providerId);
 
       await _firebaseAuth.signInWithCredential(credential).then((value) async {
         String uid = value.user.uid;
@@ -48,10 +41,8 @@ class AuthenticationService {
             'organizer': false,
           });
       });
-      print("Signed in");
       return "Signed in";
     } catch (e) {
-      print("Error signing in: " + e.message);
       return "Error signing in";
     }
   }

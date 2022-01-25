@@ -1,36 +1,13 @@
-import 'globals.dart' as globals;
-
+import '../controllers/consumer/login_signup_controller.dart';
+import '../globals.dart' as globals;
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_state_button/progress_button.dart';
-import 'package:events/authentication_service.dart';
-import 'package:provider/provider.dart';
 
-class SignUpPage extends StatefulWidget {
-  @override
-  _SignUpPageState createState() => _SignUpPageState();
-}
-
-class _SignUpPageState extends State<SignUpPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-
-  String msg = "";
-  String msgPassword = "";
-
-  double schedulerSize = 35;
-  double inputSize = 17;
-  double loginSize = 15;
-  double btnHeight = 60;
+class SignUpPage extends GetView<LoginAndSignupController> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-
-    double btnWidth = width * 0.9;
-
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(new FocusNode());
@@ -56,7 +33,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     // Logo
                     Container(
-                      margin: EdgeInsets.only(bottom: height * 0.1),
+                      margin: EdgeInsets.only(bottom: Get.height * 0.1),
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(children: <TextSpan>[
@@ -79,8 +56,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     // Email
                     Container(
-                      height: btnHeight,
-                      width: btnWidth,
+                      height: controller.btnHeight,
+                      width: Get.width * 0.9,
                       decoration: BoxDecoration(
                           color: Colors.white12,
                           borderRadius: BorderRadius.circular(10)),
@@ -92,18 +69,18 @@ class _SignUpPageState extends State<SignUpPage> {
                             color: Colors.white,
                           ),
                           title: TextField(
-                            controller: emailController,
+                            controller: controller.emailController,
                             cursorColor: Colors.white,
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: inputSize,
+                                fontSize: controller.inputSize,
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight),
                             decoration: InputDecoration(
                                 hintText: "Email",
                                 hintStyle: TextStyle(
                                     color: Colors.white38,
-                                    fontSize: inputSize,
+                                    fontSize: controller.inputSize,
                                     fontFamily: globals.montserrat,
                                     fontWeight: globals.fontWeight),
                                 border: InputBorder.none,
@@ -115,8 +92,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     // Password
                     Container(
-                      height: btnHeight,
-                      width: btnWidth,
+                      height: controller.btnHeight,
+                      width: Get.width * 0.9,
                       decoration: BoxDecoration(
                           color: Colors.white12,
                           borderRadius: BorderRadius.circular(10)),
@@ -128,21 +105,21 @@ class _SignUpPageState extends State<SignUpPage> {
                             color: Colors.white,
                           ),
                           title: TextField(
-                            controller: passwordController,
+                            controller: controller.passwordController,
                             cursorColor: Colors.white,
                             obscureText: true,
                             enableSuggestions: false,
                             autocorrect: false,
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: inputSize,
+                                fontSize: controller.inputSize,
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight),
                             decoration: InputDecoration(
                                 hintText: "Password",
                                 hintStyle: TextStyle(
                                     color: Colors.white38,
-                                    fontSize: inputSize,
+                                    fontSize: controller.inputSize,
                                     fontFamily: globals.montserrat,
                                     fontWeight: globals.fontWeight),
                                 border: InputBorder.none,
@@ -154,8 +131,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     // Confirm Password
                     Container(
-                      height: btnHeight,
-                      width: btnWidth,
+                      height: controller.btnHeight,
+                      width: Get.width * 0.9,
                       decoration: BoxDecoration(
                           color: Colors.white12,
                           borderRadius: BorderRadius.circular(10)),
@@ -167,21 +144,21 @@ class _SignUpPageState extends State<SignUpPage> {
                             color: Colors.white,
                           ),
                           title: TextField(
-                            controller: confirmPasswordController,
+                            controller: controller.confirmPasswordController,
                             cursorColor: Colors.white,
                             obscureText: true,
                             enableSuggestions: false,
                             autocorrect: false,
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: inputSize,
+                                fontSize: controller.inputSize,
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight),
                             decoration: InputDecoration(
                                 hintText: "Confirm password",
                                 hintStyle: TextStyle(
                                     color: Colors.white38,
-                                    fontSize: inputSize,
+                                    fontSize: controller.inputSize,
                                     fontFamily: globals.montserrat,
                                     fontWeight: globals.fontWeight),
                                 border: InputBorder.none,
@@ -193,62 +170,59 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     // Sign up
                     Container(
-                        height: btnHeight,
-                        width: btnWidth,
+                        height: controller.btnHeight,
+                        width: Get.width * 0.9,
                         margin: EdgeInsets.only(bottom: 15),
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.white12),
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(10)),
-                        child: ProgressButton(
-                          stateWidgets: {
-                            ButtonState.idle: Text(
-                              "Sign Up",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: loginSize,
-                                  fontFamily: globals.montserrat,
-                                  fontWeight: globals.fontWeight),
-                            )
-                          },
-                          stateColors: {
-                            ButtonState.loading: Colors.white12,
-                            ButtonState.idle: Colors.black
-                          },
-                          //progressColor: Colors.white12,
-                          //backgroundColor: Colors.black,
-                          onPressed: () {
-                            if (passwordController.text !=
-                                confirmPasswordController.text)
-                              setState(() {
-                                msgPassword = "Passwords don't match";
-                              });
-                            else {
-                              Future<String> temp = context
-                                  .read<AuthenticationService>()
-                                  .signUp(
-                                      email: emailController.text.trim(),
-                                      password: passwordController.text.trim(),
-                                      organizer: false);
-
-                              temp.then((String result) {
-                                if (result == "Invalid email")
-                                  setState(() {
-                                    msg = result;
-                                  });
-                                else
-                                  Navigator.pop(context);
-                              });
-                            }
-                          },
-                        )),
+                        child: ProgressButton(stateWidgets: {
+                          ButtonState.idle: Text(
+                            "Sign Up",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: controller.loginSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                          ButtonState.loading: Text(
+                            "loading...",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: controller.loginSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                          ButtonState.success: Text(
+                            "Signed in",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: controller.loginSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                          ButtonState.fail: Text(
+                            "Failed",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: controller.loginSize,
+                                fontFamily: globals.montserrat,
+                                fontWeight: globals.fontWeight),
+                          ),
+                        }, stateColors: {
+                          ButtonState.idle: Colors.black,
+                          ButtonState.loading: Colors.white12,
+                          ButtonState.success: Colors.green,
+                          ButtonState.fail: Colors.red,
+                        }, onPressed: () => controller.signup(context))),
                     // Email error message
                     Container(
                       alignment: Alignment.centerLeft,
                       margin: EdgeInsets.only(top: 10),
                       child: Center(
                         child: Text(
-                          msg,
+                          controller.msg.value,
                           style: TextStyle(
                               color: Colors.red,
                               fontSize: 13,
@@ -263,7 +237,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       margin: EdgeInsets.only(top: 5),
                       child: Center(
                         child: Text(
-                          msgPassword,
+                          controller.msgPassword.value,
                           style: TextStyle(
                               color: Colors.red,
                               fontSize: 13,

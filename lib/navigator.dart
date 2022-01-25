@@ -1,14 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:events/attendNavigator.dart';
-import 'package:events/attendingEvents.dart';
+import 'package:events/views/attend/attendNavigator.dart';
 import 'package:events/search.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'account.dart';
-import 'controllers/consumer/home_controller.dart';
 import 'views/home/home.dart';
-import 'package:get/get.dart';
 
 class NavigatorPage extends StatefulWidget {
   final uid;
