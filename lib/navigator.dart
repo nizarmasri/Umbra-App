@@ -1,8 +1,8 @@
-import 'package:events/views/attend/attendNavigator.dart';
-import 'package:events/search.dart';
+import 'package:events/views/consumer/attend/attend_navigator.dart';
+import 'package:events/views/consumer/search/search.dart';
 import 'package:flutter/material.dart';
-import 'account.dart';
-import 'views/home/home.dart';
+import 'views/consumer/profile/settings.dart';
+import 'package:events/views/consumer/home/home.dart';
 
 class NavigatorPage extends StatefulWidget {
   final uid;
@@ -24,7 +24,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
     HomePage(),
     AttendNavigatorPage(),
     SearchPage(),
-    AccountPage()
+    SettingsPage()
   ];
 
   void _onItemTapped(int index) {

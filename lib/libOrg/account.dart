@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'accountInfoOrg.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
-import 'package:events/authentication_service.dart';
+import 'package:events/views/authentication/authentication_service.dart';
 import 'package:events/globals.dart' as globals;
 
 class AccountOrgPage extends StatefulWidget {
