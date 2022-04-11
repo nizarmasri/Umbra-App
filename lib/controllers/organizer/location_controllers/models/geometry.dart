@@ -1,4 +1,4 @@
-import 'package:events/libOrg/models/location.dart';
+import 'package:events/controllers/organizer/location_controllers/models/location.dart';
 
 class Geometry {
   final Location location;

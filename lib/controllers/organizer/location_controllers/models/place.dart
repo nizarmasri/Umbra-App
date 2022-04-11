@@ -1,4 +1,5 @@
-import 'package:events/libOrg/models/geometry.dart';
+
+import 'geometry.dart';
 
 class Place {
   final Geometry geometry;

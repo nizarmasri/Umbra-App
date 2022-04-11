@@ -71,28 +71,28 @@ class _NavigatorPageState extends State<NavigatorPage> {
                 Icons.home_outlined,
                 color: Colors.white38,
               ),
-              title: Text("")),
+              label: ''),
           BottomNavigationBarItem(
               activeIcon: Icon(
                 Icons.view_list,
                 color: Colors.white,
               ),
               icon: Icon(Icons.view_list_outlined, color: Colors.white38),
-              title: Text("")),
+              label: ''),
           BottomNavigationBarItem(
               activeIcon: Icon(
                 Icons.search,
                 color: Colors.white,
               ),
               icon: Icon(Icons.search, color: Colors.white38),
-              title: Text("")),
+              label: ''),
           BottomNavigationBarItem(
               activeIcon: Icon(
                 Icons.person,
                 color: Colors.white,
               ),
               icon: Icon(Icons.person_outline, color: Colors.white38),
-              title: Text(""))
+              label: '')
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,

@@ -1,5 +1,5 @@
-import 'package:events/libOrg/models/place.dart';
-import 'package:events/libOrg/models/place_search.dart';
+import 'package:events/controllers/organizer/location_controllers/models/place.dart';
+import 'package:events/controllers/organizer/location_controllers/models/place_search.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 

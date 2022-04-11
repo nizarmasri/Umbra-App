@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:events/libOrg/eventDetails.dart';
 import 'package:events/globals.dart' as globals;
 
-class NearyouItem extends StatefulWidget {
+class NearYouItem extends StatefulWidget {
   final QueryDocumentSnapshot data;
 
-  NearyouItem(
+  NearYouItem(
       {Key key,
         this.data})
       : super(key: key);
 
   @override
-  _NearyouItemState createState() => _NearyouItemState(data);
+  _NearYouItemState createState() => _NearYouItemState(data);
 }
 
-class _NearyouItemState extends State<NearyouItem> {
+class _NearYouItemState extends State<NearYouItem> {
   final QueryDocumentSnapshot data;
 
   String title;
@@ -56,7 +56,7 @@ class _NearyouItemState extends State<NearyouItem> {
             builder: (context) => EventDetails(data: data,)));
   }
 
-  _NearyouItemState(this.data);
+  _NearYouItemState(this.data);
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
-import 'package:events/libOrg/signup.dart';
+import 'package:events/views/entry/signup_organizer.dart';
 import 'package:events/views/entry/login.dart';
-import 'package:events/views/entry/signup.dart';
+import 'package:events/views/entry/signup_consumer.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;

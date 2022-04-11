@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:events/libOrg/models/place.dart';
-import 'package:events/libOrg/services/geolocator_service.dart';
-import 'package:events/libOrg/services/places_service.dart';
+import 'package:events/controllers/organizer/location_controllers/models/place.dart';
+import 'package:events/controllers/organizer/location_controllers/models/place_search.dart';
+import 'package:events/controllers/organizer/location_controllers/services/geolocator_service.dart';
+import 'package:events/controllers/organizer/location_controllers/services/places_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:events/libOrg/models/place_search.dart';
 
 class ApplicationBloc with ChangeNotifier {
   final geoLocatorService = GeolocatorService();

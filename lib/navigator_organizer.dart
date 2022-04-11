@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:events/libOrg/account.dart';
-import 'package:events/libOrg/currentEvents.dart';
-import 'package:events/libOrg/allEvents.dart';
+import 'package:events/views/organizer/profile/account.dart';
+import 'package:events/views/organizer/events/current_events.dart';
+import 'package:events/views/organizer/events/all_events.dart';
 
 class NavigatorOrgPage extends StatefulWidget {
   final uid;
@@ -44,29 +44,32 @@ class _NavigatorOrgPageState extends State<NavigatorOrgPage> {
         backgroundColor: Colors.black,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              activeIcon: Icon(
-                Icons.home,
-                color: Colors.white,
-              ),
-              icon: Icon(
-                Icons.home_outlined,
-                color: Colors.white,
-              ),
-              title: Text("")),
+            activeIcon: Icon(
+              Icons.home,
+              color: Colors.white,
+            ),
+            icon: Icon(
+              Icons.home_outlined,
+              color: Colors.white,
+            ),
+            label: '',
+          ),
           BottomNavigationBarItem(
-              activeIcon: Icon(
-                Icons.view_list,
-                color: Colors.white,
-              ),
-              icon: Icon(Icons.view_list_outlined, color: Colors.white),
-              title: Text("")),
+            activeIcon: Icon(
+              Icons.view_list,
+              color: Colors.white,
+            ),
+            icon: Icon(Icons.view_list_outlined, color: Colors.white),
+            label: '',
+          ),
           BottomNavigationBarItem(
-              activeIcon: Icon(
-                Icons.person,
-                color: Colors.white,
-              ),
-              icon: Icon(Icons.person_outline, color: Colors.white),
-              title: Text(""))
+            activeIcon: Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            icon: Icon(Icons.person_outline, color: Colors.white),
+            label: '',
+          )
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,

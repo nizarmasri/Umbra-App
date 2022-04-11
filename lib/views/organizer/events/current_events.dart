@@ -1,31 +1,28 @@
-import 'package:events/controllers/consumer/attend/attend_controller.dart';
+import 'package:events/controllers/organizer/events_controllers/current_and_all_events_controller.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:get/get.dart';
 
-class AttendingEventsPage extends StatefulWidget {
+class CurrentEventsPage extends StatefulWidget {
   @override
-  State<AttendingEventsPage> createState() => _AttendingEventsPageState();
+  State<CurrentEventsPage> createState() => _CurrentEventsPageState();
 }
 
-class _AttendingEventsPageState extends State<AttendingEventsPage> {
-  final controller = Get.put(AttendController());
+class _CurrentEventsPageState extends State<CurrentEventsPage> {
+  final controller = Get.put(CurrentAndAllEventsController());
 
   @override
   Widget build(BuildContext context) {
     controller.eventItems.value = [];
-
     return FutureBuilder(
-        future: controller.fetchAttendingEvents(),
+        future: controller.fetchCurrentEvents(),
         builder: (context, snapshot) {
-          if (snapshot.data != null) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: globals.spinner,
-              );
-            }
+          if (!snapshot.hasData) {
+            return Center(child: globals.spinner);
+          }
+
+          if (snapshot.data != null && snapshot.data.length != 0) {
             controller.eventItems.value = [];
             snapshot.data.forEach((event) {
               controller.eventItems.add(EventItem(
@@ -41,8 +38,6 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
               controller.eventItems
                   .sort((a, b) => a.data['date'].compareTo(b.data['date']));
 
-            RefreshController _refreshController =
-                RefreshController(initialRefresh: false);
             return Scaffold(
               backgroundColor: Colors.black,
               body: SafeArea(
@@ -50,8 +45,23 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                   child: Container(
                       child: Column(
                     children: [
+                      // Title field
                       Container(
-                        padding: EdgeInsets.only(left: 20),
+                        padding: EdgeInsets.only(left: 15, top: 15),
+                        margin: EdgeInsets.only(bottom: 10),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "On-Going Events",
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              fontSize: 30,
+                              color: Colors.white),
+                        ),
+                      ),
+
+                      // Sort menu
+                      Container(
+                        padding: EdgeInsets.only(left: 15),
                         margin: EdgeInsets.only(bottom: 10),
                         child: Row(
                           children: [
@@ -107,68 +117,83 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                           ],
                         ),
                       ),
+
                       Container(
-                        height: Get.height * 0.75,
-                        child: SmartRefresher(
-                          enablePullDown: true,
-                          controller: _refreshController,
-                          onRefresh: () async {
-                            // monitor network fetch
-                            await Future.delayed(Duration(milliseconds: 1000));
-                            // if failed,use refreshFailed()
-                            _refreshController.refreshCompleted();
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: controller.eventItems.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              child: controller.eventItems[index],
+                              onTap: () async {
+                                controller.navigateToEventDetailsPage(
+                                    context, controller.eventItems[index].data);
+                              },
+                            );
                           },
-                          child: ListView.builder(
-                            itemCount: controller.eventItems.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                child: controller.eventItems[index],
-                                onTap: () {
-                                  controller.navigateToEventDetailsPage(context,
-                                      controller.eventItems[index].data);
-                                },
-                              );
-                            },
-                          ),
                         ),
                       )
                     ],
                   )),
                 ),
               ),
+              floatingActionButton: FloatingActionButton(
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                backgroundColor: Colors.white10,
+                onPressed: () async {
+                  controller.navigateToAddEventForm(context);
+                },
+              ),
             );
-          } else {
-            RefreshController _refreshController =
-                RefreshController(initialRefresh: false);
+          } else
             return Scaffold(
               body: SafeArea(
-                child: SmartRefresher(
-                  enablePullDown: true,
-                  controller: _refreshController,
-                  onRefresh: () async {
-                    // monitor network fetch
-                    await Future.delayed(Duration(milliseconds: 1000));
-                    // if failed,use refreshFailed()
-                    _refreshController.refreshCompleted();
-                  },
-                  child: Center(
-                    child: Container(
-                      margin: EdgeInsets.all(30),
-                      child: Text(
-                        "You are not attending any events",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: globals.montserrat,
-                            fontWeight: globals.fontWeight,
-                            fontSize: 20,
-                            color: Colors.white),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 15, top: 15),
+                        margin: EdgeInsets.only(bottom: 10),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Current Events",
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              fontSize: 30,
+                              color: Colors.white),
+                        ),
                       ),
-                    ),
+                      Container(
+                        margin: EdgeInsets.all(30),
+                        child: Text(
+                          "You do not have any events in progress",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontFamily: globals.montserrat,
+                              fontWeight: globals.fontWeight,
+                              fontSize: 25,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+              floatingActionButton: FloatingActionButton(
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                backgroundColor: Colors.white10,
+                onPressed: () {
+                  controller.navigateToAddEventForm(context);
+                },
+              ),
             );
-          }
         });
   }
 }

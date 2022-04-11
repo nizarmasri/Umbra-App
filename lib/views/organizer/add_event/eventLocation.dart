@@ -1,13 +1,13 @@
 import 'dart:async';
 
+import 'package:events/controllers/organizer/location_controllers/blocs/application_bloc.dart';
+import 'package:events/controllers/organizer/location_controllers/models/place.dart';
+import 'package:events/controllers/organizer/location_controllers/services/places_service.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:getwidget/components/toast/gf_toast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:events/libOrg/blocs/application_bloc.dart';
-import 'package:events/libOrg/models/place.dart';
-import 'services/places_service.dart';
 
 class EventLocation extends StatefulWidget {
   @override

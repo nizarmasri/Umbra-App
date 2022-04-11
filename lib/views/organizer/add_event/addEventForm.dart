@@ -1,4 +1,4 @@
-import 'package:events/libOrg/eventLocation.dart';
+import 'package:events/views/organizer/add_event/eventLocation.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:flutter/services.dart';

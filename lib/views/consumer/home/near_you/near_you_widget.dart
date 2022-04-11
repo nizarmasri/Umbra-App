@@ -16,12 +16,12 @@ class NearYouWidget extends GetView<HomeController> {
               if (snapshot.data == null || snapshot.data.length <= 0) {
                 return Container();
               } else {
-                List<NearyouItem> events = [];
+                List<NearYouItem> events = [];
                 for (var i = 0; i < snapshot.data.length; i++) {
                   DateTime dateChecker =
                       snapshot.data[i]['date'].toDate();
                   if (dateChecker.isAfter(DateTime.now()))
-                    events.add(NearyouItem(data: snapshot.data[i]));
+                    events.add(NearYouItem(data: snapshot.data[i]));
                 }
                 return Column(
                   children: [

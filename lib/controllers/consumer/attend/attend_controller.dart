@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:events/libOrg/eventDetails.dart';
-import 'package:events/libOrg/eventItem.dart';
+import 'package:events/views/organizer/events/event_item.dart';
+import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';

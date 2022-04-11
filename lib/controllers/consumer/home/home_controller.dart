@@ -1,12 +1,14 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:string_similarity/string_similarity.dart';
 import 'package:events/views/consumer/search/search_result_item.dart';
+import 'package:flutter/material.dart';
 
 class HomeController extends GetxController {
   var currentPosition = Position().obs;
@@ -39,6 +41,15 @@ class HomeController extends GetxController {
     } finally {
       loading(true);
     }
+  }
+
+  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot data) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventDetails(
+              data: data,
+            )));
   }
 
   locationStream() => geo

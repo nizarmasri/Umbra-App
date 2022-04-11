@@ -3,12 +3,14 @@ import 'package:events/controllers/consumer/home/home_controller.dart';
 import 'package:events/controllers/consumer/profile/settings_controller.dart';
 import 'package:events/controllers/consumer/search/search_controller.dart';
 import 'package:events/controllers/entry/login_signup_controller.dart';
+import 'package:events/controllers/entry/new_user_form_controller.dart';
+import 'package:events/controllers/organizer/events_controllers/current_and_all_events_controller.dart';
+import 'package:events/navigator_organizer.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/views/entry/entry_screen.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:events/navigator.dart';
-import 'package:events/libOrg/navigator.dart';
+import 'package:events/navigator_consumer.dart';
 import 'package:events/views/entry/new_user_form.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,9 +34,11 @@ class AuthenticationWrapper extends StatelessWidget {
                 return globals.spinner;
               }
               if (snapshot.data["new"]) {
-                return NewUserForm(uid: firebaseUser.uid);
+                Get.put(NewUserFormController(uid: firebaseUser.uid));
+                return NewUserForm();
               } else {
                 if (snapshot.data["organizer"]) {
+                  Get.put(CurrentAndAllEventsController());
                   return NavigatorOrgPage(uid: firebaseUser.uid);
                 } else {
                   Get.put(HomeController());

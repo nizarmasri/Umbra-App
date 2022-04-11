@@ -1,7 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/home/home_controller.dart';
-import 'package:events/libOrg/eventDetails.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -9,15 +8,6 @@ import 'package:events/globals.dart' as globals;
 class FeaturedWidget extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
-    navigateToEventDetailsPage(QueryDocumentSnapshot data) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => EventDetails(
-                    data: data,
-                  )));
-    }
-
     return FutureBuilder<QuerySnapshot>(
       future: FirebaseFirestore.instance
           .collection("events")
@@ -37,8 +27,7 @@ class FeaturedWidget extends GetView<HomeController> {
             key: Key(doc['title'] + doc.id),
             child: GestureDetector(
               onTap: () {
-                Get.to(EventDetails(data: doc));
-                //navigateToEventDetailsPage(doc);
+                controller.navigateToEventDetailsPage(context, doc);
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),

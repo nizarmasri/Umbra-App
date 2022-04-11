@@ -1,85 +1,41 @@
-import 'dart:async';
-
-import 'package:events/libOrg/addEventForm.dart';
-import 'package:events/libOrg/eventItem.dart';
-import 'package:events/libOrg/eventDetails.dart';
+import 'package:events/controllers/organizer/events_controllers/current_and_all_events_controller.dart';
+import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 
-class CurrentEventsPage extends StatefulWidget {
+class AllEventsPage extends StatefulWidget {
   @override
-  _CurrentEventsPageState createState() => _CurrentEventsPageState();
+  _AllEventsPageState createState() => _AllEventsPageState();
 }
 
-class _CurrentEventsPageState extends State<CurrentEventsPage> {
-  navigateToAddEventForm() {
-    Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AddEventForm()))
-        .then((value) => setState(() {}));
-  }
-
-  navigateToEventDetailsPage(QueryDocumentSnapshot data) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => EventDetails(
-                  data: data,
-                )));
-  }
-
-  List<EventItem> eventItems = [];
-
-  String uid = FirebaseAuth.instance.currentUser.uid;
-  FirebaseFirestore fb = FirebaseFirestore.instance;
-
-  DateTime dateChecker;
-
-  Future<List<QueryDocumentSnapshot>> getEvents() async {
-    eventItems = [];
-    List<QueryDocumentSnapshot> events = [];
-    await fb
-        .collection("events")
-        .where('poster', isEqualTo: uid)
-        .get()
-        .then((value) {
-      value.docs.forEach((event) {
-        dateChecker = event.data()['date'].toDate();
-        if (dateChecker.isAfter(DateTime.now())) events.add(event);
-      });
-    });
-    events.sort((a, b) => a['date'].compareTo(b['date']));
-    return events;
-  }
-
-  String _sortBy = 'Ascending';
+class _AllEventsPageState extends State<AllEventsPage> {
+  final controller = Get.put(CurrentAndAllEventsController());
 
   @override
   Widget build(BuildContext context) {
-    eventItems = [];
-
+    controller.eventItems.value = [];
     return FutureBuilder(
-        future: getEvents(),
+        future: controller.fetchAllEvents(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: globals.spinner);
           }
 
           if (snapshot.data != null && snapshot.data.length != 0) {
-            eventItems = [];
+            controller.eventItems.value = [];
             snapshot.data.forEach((event) {
-              eventItems.add(EventItem(
+              controller.eventItems.add(EventItem(
                 data: event,
                 key: Key(event['title'] + event['date'].toString()),
               ));
             });
 
-            if (_sortBy == 'Descending')
-              eventItems
+            if (controller.sortBy.value == 'Descending')
+              controller.eventItems
                   .sort((a, b) => b.data['date'].compareTo(a.data['date']));
-            else if (_sortBy == 'Ascending')
-              eventItems
+            else if (controller.sortBy.value == 'Ascending')
+              controller.eventItems
                   .sort((a, b) => a.data['date'].compareTo(b.data['date']));
 
             return Scaffold(
@@ -89,21 +45,18 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                   child: Container(
                       child: Column(
                     children: [
-                      // Title field
                       Container(
                         padding: EdgeInsets.only(left: 15, top: 15),
                         margin: EdgeInsets.only(bottom: 10),
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "On-Going Events",
+                          "All Events",
                           style: TextStyle(
                               fontFamily: globals.montserrat,
                               fontSize: 30,
                               color: Colors.white),
                         ),
                       ),
-
-                      // Sort menu
                       Container(
                         padding: EdgeInsets.only(left: 15),
                         margin: EdgeInsets.only(bottom: 10),
@@ -126,7 +79,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
                                     dropdownColor: Colors.grey[900],
-                                    value: _sortBy,
+                                    value: controller.sortBy.value,
                                     style: TextStyle(
                                       fontFamily: globals.montserrat,
                                       fontSize: 15,
@@ -145,7 +98,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                                       );
                                     }).toList(),
                                     hint: Text(
-                                      _sortBy,
+                                      controller.sortBy.value,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,
@@ -154,7 +107,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                                     ),
                                     onChanged: (String value) {
                                       setState(() {
-                                        _sortBy = value;
+                                        controller.sortBy.value = value;
                                       });
                                     },
                                   ),
@@ -162,18 +115,17 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                           ],
                         ),
                       ),
-
                       Container(
                         child: ListView.builder(
                           shrinkWrap: true,
+                          itemCount: controller.eventItems.length,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: eventItems.length,
                           itemBuilder: (context, index) {
                             return GestureDetector(
-                              child: eventItems[index],
-                              onTap: () async {
-                                navigateToEventDetailsPage(
-                                    eventItems[index].data);
+                              child: controller.eventItems[index],
+                              onTap: () {
+                                controller.navigateToEventDetailsPage(
+                                    context, controller.eventItems[index].data);
                               },
                             );
                           },
@@ -182,16 +134,6 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                     ],
                   )),
                 ),
-              ),
-              floatingActionButton: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                backgroundColor: Colors.white10,
-                onPressed: () async {
-                  navigateToAddEventForm();
-                },
               ),
             );
           } else
@@ -227,16 +169,6 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                     ],
                   ),
                 ),
-              ),
-              floatingActionButton: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                backgroundColor: Colors.white10,
-                onPressed: () {
-                  navigateToAddEventForm();
-                },
               ),
             );
         });

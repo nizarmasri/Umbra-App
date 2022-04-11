@@ -1,5 +1,5 @@
 import 'package:events/controllers/consumer/profile/bookmarks_controller.dart';
-import 'package:events/libOrg/eventItem.dart';
+import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:get/get.dart';

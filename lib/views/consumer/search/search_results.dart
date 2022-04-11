@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:events/libOrg/eventDetails.dart';
+import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:firebase_auth/firebase_auth.dart';

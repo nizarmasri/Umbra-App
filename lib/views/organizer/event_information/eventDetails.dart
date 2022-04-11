@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:events/libOrg/addEventForm.dart';
+import 'package:events/views/organizer/add_event/addEventForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +8,11 @@ import 'package:getwidget/components/carousel/gf_carousel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
-import 'package:events/libOrg/organizeraccount.dart';
-import 'package:events/libOrg/eventStatistics.dart';
-import 'ticketAlert.dart';
-import 'TicketCancelAlert.dart';
+import 'package:events/views/organizer/profile/organizeraccount.dart';
+import 'package:events/views/ticketAlert.dart';
+import 'package:events/views/TicketCancelAlert.dart';
 import 'attendeeList.dart';
+import 'eventStatistics.dart';
 
 class EventDetails extends StatefulWidget {
   final QueryDocumentSnapshot data;

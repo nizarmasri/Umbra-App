@@ -1,4 +1,4 @@
-import 'package:events/navigator.dart';
+import 'package:events/navigator_consumer.dart';
 import 'package:events/views/consumer/home/for_you_widget.dart';
 import 'package:events/views/consumer/home/featured_widget.dart';
 import 'package:events/views/consumer/home/near_you/near_you_widget.dart';

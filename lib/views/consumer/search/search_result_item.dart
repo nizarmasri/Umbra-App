@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:events/libOrg/eventDetails.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:get/get.dart';
 
