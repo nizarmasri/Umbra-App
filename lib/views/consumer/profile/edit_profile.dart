@@ -20,11 +20,11 @@ class EditProfilePage extends GetView<EditProfileController> {
               if (!snapshot.hasData) {
                 return Center(child: globals.spinner);
               } else {
-                controller.nameController.text = snapshot.data["name"];
-                controller.numberController.text = snapshot.data["number"];
-                controller.twitterController.text = snapshot.data["twitter"];
-                controller.instagramController.text =
-                    snapshot.data["instagram"];
+                QueryDocumentSnapshot data = snapshot.data as QueryDocumentSnapshot;
+                controller.nameController.text = data["name"];
+                controller.numberController.text = data["number"];
+                controller.twitterController.text = data["twitter"];
+                controller.instagramController.text = data["instagram"];
                 return snapshot.data == null
                     ? globals.spinner
                     : Scaffold(
@@ -56,19 +56,18 @@ class EditProfilePage extends GetView<EditProfileController> {
                                                       height: 200,
                                                       quality: 100,
                                                     )
-                                                  : snapshot.data['dp']
+                                                  : data['dp']
                                                               .toString() !=
                                                           ''
-                                                      ? NetworkImage(snapshot
-                                                          .data['dp']
+                                                      ? NetworkImage(data['dp']
                                                           .toString())
-                                                      : '',
+                                                      : '' as ImageProvider<Object>?,
                                           child: Text(
                                             controller.images.isEmpty &&
-                                                    snapshot.data['dp']
+                                                    data['dp']
                                                             .toString() ==
                                                         ''
-                                                ? snapshot.data["name"][0]
+                                                ? data["name"][0]
                                                     .toString()
                                                     .toUpperCase()
                                                 : "",
@@ -141,11 +140,11 @@ class EditProfilePage extends GetView<EditProfileController> {
   }
 
   Container customTextField(
-      {String hint,
-      Icon icon,
-      TextEditingController textController,
-      MaskTextInputFormatter mask,
-      TextInputType type}) {
+      {String? hint,
+      Icon? icon,
+      TextEditingController? textController,
+      required MaskTextInputFormatter mask,
+      TextInputType? type}) {
     return Container(
       decoration: BoxDecoration(
           color: Colors.white12, borderRadius: BorderRadius.circular(10)),
@@ -180,7 +179,7 @@ class EditProfilePage extends GetView<EditProfileController> {
     );
   }
 
-  Container submitButton({BuildContext context, String uid}) {
+  Container submitButton({BuildContext? context, String? uid}) {
     return Container(
       child: InkWell(
         focusColor: Colors.white,
@@ -205,7 +204,7 @@ class EditProfilePage extends GetView<EditProfileController> {
                 'instagram': controller.instagramController.text,
                 'dp': url,
               }).then((value) {
-                Navigator.pop(context);
+                Navigator.pop(context!);
               });
             });
           } else {
@@ -218,7 +217,7 @@ class EditProfilePage extends GetView<EditProfileController> {
               'twitter': controller.twitterController.text,
               'instagram': controller.instagramController.text
             }).then((value) {
-              Navigator.pop(context);
+              Navigator.pop(context!);
             });
           }
         },

@@ -9,7 +9,7 @@ import '../../../Notifications.dart';
 class OrganizerPage extends StatefulWidget {
   final organizeruid;
 
-  const OrganizerPage({Key key, this.organizeruid}) : super(key: key);
+  const OrganizerPage({Key? key, this.organizeruid}) : super(key: key);
   @override
   _OrganizerPageState createState() => _OrganizerPageState(organizeruid);
 }
@@ -32,11 +32,13 @@ class _OrganizerPageState extends State<OrganizerPage> {
                   .doc(organizeruid)
                   .get(),
               builder: (context, snapshot) {
-                final url = snapshot.data.data()['dp'].toString();
+                QueryDocumentSnapshot data =
+                snapshot.data as QueryDocumentSnapshot;
+                final url = data['dp'].toString();
 
                 final Uri params = Uri(
                   scheme: 'mailto',
-                  path: snapshot.data.data()["email"],
+                  path: data["email"],
                   query: 'subject=&body=', //add subject and body here
                 );
                 return ListView(
@@ -57,8 +59,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                                 url != '' ? NetworkImage(url) : null,
                             child: Text(
                               url == ''
-                                  ? snapshot.data
-                                      .data()["name"][0]
+                                  ? data["name"][0]
                                       .toUpperCase()
                                   : '',
                               style: TextStyle(fontSize: 55),
@@ -67,7 +68,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                           Container(
                             margin: EdgeInsets.only(top: 10),
                             child: Text(
-                              snapshot.data.data()["name"],
+                              data["name"],
                               style:
                                   TextStyle(fontSize: 25, color: Colors.white),
                             ),
@@ -85,7 +86,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                                 ),
                               ),
                               Notifications(
-                                tokenlist: snapshot.data.data()["subscribers"],
+                                tokenlist: data["subscribers"],
                                 organizerUid: organizeruid,
                               )
                             ],
@@ -126,8 +127,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                                       Expanded(
                                         child: IconButton(
                                           onPressed: () {
-                                            launch(snapshot.data
-                                                .data()["twitter"]);
+                                            launch(data["twitter"]);
                                           },
                                           icon: FaIcon(
                                             FontAwesomeIcons.twitter,
@@ -138,8 +138,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                                       Expanded(
                                         child: IconButton(
                                           onPressed: () {
-                                            launch(snapshot.data
-                                                .data()["instagram"]);
+                                            launch(data["instagram"]);
                                           },
                                           icon: FaIcon(
                                             FontAwesomeIcons.instagram,
@@ -151,8 +150,7 @@ class _OrganizerPageState extends State<OrganizerPage> {
                                         child: IconButton(
                                             onPressed: () {
                                               launch("tel://" +
-                                                  snapshot.data
-                                                      .data()["number"]);
+                                                  data["number"]);
                                             },
                                             icon: Icon(
                                               Icons.phone,

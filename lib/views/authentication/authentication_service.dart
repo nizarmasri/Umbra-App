@@ -5,24 +5,24 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   GoogleSignIn _googleSignIn = GoogleSignIn();
-  GoogleSignInAccount googleUser;
+  GoogleSignInAccount? googleUser;
 
   AuthenticationService(this._firebaseAuth);
 
-  Stream<User> get authStateChanges => _firebaseAuth.authStateChanges();
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   Future<String> signInWithGoogle() async {
     googleUser = await GoogleSignIn().signIn();
     try {
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+          await googleUser!.authentication;
       final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
       await _firebaseAuth.signInWithCredential(credential).then((value) async {
-        String uid = value.user.uid;
-        String email = value.user.email;
-        bool isNewUser;
+        String uid = value.user!.uid;
+        String? email = value.user!.email;
+        bool? isNewUser;
         await FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
@@ -34,7 +34,7 @@ class AuthenticationService {
             isNewUser = true;
         });
 
-        if (isNewUser)
+        if (isNewUser!)
           await FirebaseFirestore.instance.collection('users').doc(uid).set({
             'email': email,
             'new': isNewUser,
@@ -55,7 +55,7 @@ class AuthenticationService {
     }
   }
 
-  Future<List<String>> signIn({String email, String password}) async {
+  Future<List<String?>> signIn({required String email, required String password}) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -65,12 +65,12 @@ class AuthenticationService {
     }
   }
 
-  Future<String> signUp({String email, String password, bool organizer}) async {
+  Future<String> signUp({required String email, required String password, bool? organizer}) async {
     try {
       print(organizer);
       UserCredential result = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-      String user = result.user.uid;
+      String user = result.user!.uid;
       await FirebaseFirestore.instance.collection('users').doc(user).set({
         'email': email,
         'new': true,

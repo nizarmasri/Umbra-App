@@ -1,3 +1,4 @@
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/add_event/eventLocation.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -10,18 +11,18 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 
 class AddEventForm extends StatefulWidget {
-  final QueryDocumentSnapshot data;
+  final Event event;
 
-  AddEventForm({Key key, this.data}) : super(key: key);
+  AddEventForm({Key? key, required this.event}) : super(key: key);
 
   @override
-  _AddEventFormState createState() => _AddEventFormState(data);
+  _AddEventFormState createState() => _AddEventFormState(event);
 }
 
 class _AddEventFormState extends State<AddEventForm> {
-  final QueryDocumentSnapshot data;
+  final Event event;
 
-  _AddEventFormState(this.data);
+  _AddEventFormState(this.event);
 
   bool hasData = false;
 
@@ -32,18 +33,18 @@ class _AddEventFormState extends State<AddEventForm> {
   double feeText = 14.5;
   Color boxesColor = Colors.black;
   Color dividerColor = Colors.white12;
-  String uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser!.uid;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descController = TextEditingController();
   final TextEditingController feeController = TextEditingController();
   final TextEditingController ticketsLeftController = TextEditingController();
 
-  List<Marker> location;
-  String locationName = "Choose event location";
+  List<Marker>? location;
+  String? locationName = "Choose event location";
   Color locationTextColor = Colors.white24;
 
-  String _age;
-  String _type;
+  String? _age;
+  String? _type;
 
   bool loading = false;
 
@@ -53,8 +54,8 @@ class _AddEventFormState extends State<AddEventForm> {
     setState(() {
       location = chosenLocation[0];
       locationName = chosenLocation[1];
-      if (location != null) print(location[0].position);
-      print(locationName.split(",")[0]);
+      if (location != null) print(location![0].position);
+      print(locationName!.split(",")[0]);
       locationTextColor = Colors.white;
     });
   }
@@ -90,7 +91,7 @@ class _AddEventFormState extends State<AddEventForm> {
   bool filledForm = true;
 
   bool checkSubmit() {
-    List<String> values = [
+    List<String?> values = [
       titleController.text,
       descController.text,
       _age,
@@ -144,8 +145,7 @@ class _AddEventFormState extends State<AddEventForm> {
     if (!needsReservation || ticketsLeftController.text == "") {
       reservations = -1;
       ticketsLeftController.text = " ";
-    }
-    else
+    } else
       reservations = int.parse(ticketsLeftController.text);
 
     if (checkSubmit()) {
@@ -155,13 +155,11 @@ class _AddEventFormState extends State<AddEventForm> {
       FirebaseFirestore fb = FirebaseFirestore.instance;
 
       GeoFirePoint myLocation = geo.point(
-          latitude: location[0].position.latitude,
-          longitude: location[0].position.longitude);
-
-
+          latitude: location![0].position.latitude,
+          longitude: location![0].position.longitude);
 
       if (hasData) {
-        await fb.collection('events').doc(data.id).update({
+        await fb.collection('events').doc(event.id).update({
           'title': titleController.text,
           'description': descController.text,
           'age': _age,
@@ -173,7 +171,7 @@ class _AddEventFormState extends State<AddEventForm> {
           'fee': feeController.text,
           'ticketsleft': reservations
         }).then((value) async {
-          final id = data.id;
+          final id = event.id;
           List<String> ids = [id];
           await fb
               .collection('users')
@@ -183,7 +181,7 @@ class _AddEventFormState extends State<AddEventForm> {
             int entryIndex = entry.key;
             final firebaseStorageRef =
                 FirebaseStorage.instance.ref().child('$id/$entryIndex');
-            final upload = await firebaseStorageRef
+            final dynamic upload = await firebaseStorageRef
                 .putData((await entry.value.getByteData(quality: 50))
                     .buffer
                     .asUint8List())
@@ -193,8 +191,8 @@ class _AddEventFormState extends State<AddEventForm> {
           }
           return {"urls": urls, "id": id};
         }).then((value) async {
-          await fb.collection('events').doc(data.id).update({
-            'urls': FieldValue.arrayUnion(value["urls"]),
+          await fb.collection('events').doc(event.id).update({
+            'urls': FieldValue.arrayUnion(value["urls"] as List<dynamic>),
           });
           return false;
         }).then((value) {
@@ -226,7 +224,7 @@ class _AddEventFormState extends State<AddEventForm> {
             int entryIndex = entry.key;
             final firebaseStorageRef =
                 FirebaseStorage.instance.ref().child('$id/$entryIndex');
-            final upload = await firebaseStorageRef
+            final dynamic upload = await firebaseStorageRef
                 .putData((await entry.value.getByteData(quality: 50))
                     .buffer
                     .asUint8List())
@@ -236,8 +234,8 @@ class _AddEventFormState extends State<AddEventForm> {
           }
           return {"urls": urls, "id": id};
         }).then((value) async {
-          await fb.collection('events').doc(value["id"]).update({
-            'urls': FieldValue.arrayUnion(value["urls"]),
+          await fb.collection('events').doc(value["id"] as String?).update({
+            'urls': FieldValue.arrayUnion(value["urls"] as List<dynamic>),
           });
           return false;
         }).then((value) {
@@ -286,7 +284,7 @@ class _AddEventFormState extends State<AddEventForm> {
     });
   }
 
-  DateTime selectedDate = DateTime.now();
+  DateTime? selectedDate = DateTime.now();
   DateTime dateLimit = DateTime.now();
   bool changedDate = false;
 
@@ -299,9 +297,9 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: selectedDate,
+        initialDate: selectedDate!,
         firstDate: DateTime.now(),
         lastDate: DateTime(2030));
     if (picked != null)
@@ -313,11 +311,11 @@ class _AddEventFormState extends State<AddEventForm> {
 
   TimeOfDay selectedTime = TimeOfDay.now();
   TimeOfDay timeNow = TimeOfDay.now();
-  String selectedTimeFormatted = "";
+  String? selectedTimeFormatted = "";
   bool changedTime = false;
 
   Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
     );
@@ -333,37 +331,37 @@ class _AddEventFormState extends State<AddEventForm> {
   bool needsReservation = true;
 
   void checkEdit() {
-    if (data != null)
+    if (event != null)
       hasData = true;
     else
       hasData = false;
 
     if (hasData) {
-      DateTime dateFormatted = data['date'].toDate();
+      DateTime? dateFormatted = DateTime.tryParse(event.date);
       changedDate = true;
       changedTime = true;
 
-      if (data['fee'] == 'Free')
+      if (event.fee == 'Free')
         isFree = true;
       else
         isFree = false;
 
       location = [];
 
-      titleController.text = data['title'];
-      descController.text = data['description'];
-      _age = data['age'];
-      _type = data['type'];
+      titleController.text = event.title;
+      descController.text = event.description;
+      _age = event.age;
+      _type = event.type;
       selectedDate = dateFormatted;
-      selectedTimeFormatted = data['time'];
-      location.add(Marker(
-          markerId: MarkerId(data['location']['geohash']),
-          position: LatLng(data['location']['geopoint'].latitude,
-              data['location']['geopoint'].longitude)));
-      locationName = data['locationName'];
-      feeController.text = data['fee'];
+      selectedTimeFormatted = event.time;
+      location!.add(Marker(
+          markerId: MarkerId(event.location),
+          position: LatLng(
+              event.locationPoint.latitude, event.locationPoint.longitude)));
+      locationName = event.location;
+      feeController.text = event.fee;
 
-      if (data['ticketsleft'] == -1) ticketsLeftController.text = "";
+      if (event.tickets == -1) ticketsLeftController.text = "";
     }
   }
 
@@ -573,7 +571,7 @@ class _AddEventFormState extends State<AddEventForm> {
                                       fontStyle: FontStyle.italic,
                                       fontFamily: globals.montserrat),
                                 ),
-                                onChanged: (String value) {
+                                onChanged: (String? value) {
                                   setState(() {
                                     _type = value;
                                   });
@@ -672,9 +670,9 @@ class _AddEventFormState extends State<AddEventForm> {
                                 margin: EdgeInsets.only(bottom: 15),
                                 child: Center(
                                     child: Icon(
-                                      Icons.access_time,
-                                      color: Colors.white70,
-                                    )),
+                                  Icons.access_time,
+                                  color: Colors.white70,
+                                )),
                               ),
                             ),
                           ),
@@ -692,16 +690,16 @@ class _AddEventFormState extends State<AddEventForm> {
                                   alignment: Alignment.centerLeft,
                                   child: !changedTime
                                       ? Text(
-                                    "Pick a time",
-                                    style: TextStyle(
-                                        fontFamily: globals.montserrat,
-                                        fontWeight: globals.fontWeight,
-                                        fontStyle: FontStyle.italic,
-                                        fontSize: italicTextSize,
-                                        color: Colors.white70),
-                                  )
+                                          "Pick a time",
+                                          style: TextStyle(
+                                              fontFamily: globals.montserrat,
+                                              fontWeight: globals.fontWeight,
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: italicTextSize,
+                                              color: Colors.white70),
+                                        )
                                       : Text(
-                                          selectedTimeFormatted,
+                                          selectedTimeFormatted!,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
                                               fontWeight: globals.fontWeight,
@@ -728,9 +726,9 @@ class _AddEventFormState extends State<AddEventForm> {
                             margin: EdgeInsets.only(bottom: 15),
                             child: Center(
                                 child: Icon(
-                                  Icons.security_outlined,
-                                  color: Colors.white70,
-                                )),
+                              Icons.security_outlined,
+                              color: Colors.white70,
+                            )),
                           ),
                           // Age picker
                           Container(
@@ -745,7 +743,11 @@ class _AddEventFormState extends State<AddEventForm> {
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
                                     dropdownColor: Colors.grey[900],
-                                    icon: Icon(Icons.arrow_downward, size: 0, color: Colors.transparent,),
+                                    icon: Icon(
+                                      Icons.arrow_downward,
+                                      size: 0,
+                                      color: Colors.transparent,
+                                    ),
                                     value: _age,
                                     style: TextStyle(
                                       fontFamily: globals.montserrat,
@@ -777,7 +779,7 @@ class _AddEventFormState extends State<AddEventForm> {
                                           fontStyle: FontStyle.italic,
                                           fontFamily: globals.montserrat),
                                     ),
-                                    onChanged: (String value) {
+                                    onChanged: (String? value) {
                                       setState(() {
                                         _age = value;
                                       });
@@ -801,14 +803,14 @@ class _AddEventFormState extends State<AddEventForm> {
                             color: Colors.black,
                             child: Center(
                                 child: Icon(
-                                  Icons.attach_money_outlined,
-                                  color: Colors.white70,
-                                )),
+                              Icons.attach_money_outlined,
+                              color: Colors.white70,
+                            )),
                           ),
                           Container(
                             height: btnsHeight,
                             width: btnsTextWidth,
-                            padding: EdgeInsets.only(right: width*0.11),
+                            padding: EdgeInsets.only(right: width * 0.11),
                             decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10)),
@@ -891,14 +893,14 @@ class _AddEventFormState extends State<AddEventForm> {
                             color: Colors.black,
                             child: Center(
                                 child: Icon(
-                                  Icons.event_seat_outlined,
-                                  color: Colors.white70,
-                                )),
+                              Icons.event_seat_outlined,
+                              color: Colors.white70,
+                            )),
                           ),
                           Container(
                             height: btnsHeight,
-                            width: btnsTextWidth*1.8,
-                            padding: EdgeInsets.only(right: width*0.11),
+                            width: btnsTextWidth * 1.8,
+                            padding: EdgeInsets.only(right: width * 0.11),
                             decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10)),
@@ -997,7 +999,7 @@ class _AddEventFormState extends State<AddEventForm> {
                                     size: 30,
                                   ),
                                   title: Text(
-                                    locationName,
+                                    locationName!,
                                     style: TextStyle(
                                         fontFamily: globals.montserrat,
                                         fontWeight: globals.fontWeight,
@@ -1069,8 +1071,8 @@ class DetailScreen extends StatelessWidget {
             tag: 'imageHero',
             child: AssetThumb(
               asset: asset,
-              width: asset.originalWidth,
-              height: asset.originalHeight,
+              width: asset.originalWidth!,
+              height: asset.originalHeight!,
             ),
           ),
         ),

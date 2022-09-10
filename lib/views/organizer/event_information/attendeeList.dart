@@ -8,7 +8,7 @@ class AttendeeList extends StatefulWidget {
   @override
   final id;
 
-  const AttendeeList({Key key, this.id}) : super(key: key);
+  const AttendeeList({Key? key, this.id}) : super(key: key);
 
   _AttendeeListState createState() => _AttendeeListState(id);
 }
@@ -52,11 +52,13 @@ class _AttendeeListState extends State<AttendeeList> {
                 )
               );
             }
+            List<QueryDocumentSnapshot> data =
+            snapshot.data as List<QueryDocumentSnapshot>;
             return ListView.builder(
-              itemCount: snapshot.data.docs.length,
+              itemCount: data.length,
               itemBuilder: (context, index) {
                 return Attendee(
-                  data: snapshot.data.docs[index],
+                  data: data[index],
                   width: MediaQuery.of(context).size.width,
                   id: id,
                 );

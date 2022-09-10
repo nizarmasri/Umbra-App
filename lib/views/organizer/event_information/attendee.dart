@@ -6,7 +6,7 @@ class Attendee extends StatefulWidget {
   final width;
   final data;
   final id;
-  const Attendee({Key key, this.width, this.data, this.id}) : super(key: key);
+  const Attendee({Key? key, this.width, this.data, this.id}) : super(key: key);
   @override
   _AttendeeState createState() =>
       _AttendeeState(this.width, this.data, this.id);
@@ -18,7 +18,7 @@ class _AttendeeState extends State<Attendee> {
   final data;
   final id;
   _AttendeeState(this.width, this.data, this.id);
-  int confirmed;
+  int? confirmed;
 
   void initState() {
     setState(() {

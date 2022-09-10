@@ -15,7 +15,7 @@ class HomePage extends GetView<HomeController> {
     RefreshController _refreshController =
         RefreshController(initialRefresh: false);
 
-    return Obx(() => (controller.currentPosition.value.longitude != null &&
+    return Obx(() => (controller.currentPosition != null && controller.currentPosition.value.longitude != null &&
             controller.currentPosition.value.latitude != null &&
             controller.loading.value)
         ? Scaffold(

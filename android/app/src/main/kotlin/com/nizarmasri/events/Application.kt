@@ -13,6 +13,6 @@ class Application : FlutterApplication(), PluginRegistrantCallback {
         FlutterMain.startInitialization(this)
     }
 
-    override fun registerWith(registry: PluginRegistry?) {
+    override fun registerWith(registry: PluginRegistry) {
     }
 }

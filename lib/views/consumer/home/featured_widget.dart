@@ -22,12 +22,12 @@ class FeaturedWidget extends GetView<HomeController> {
 
         List<Container> featuredEvents = [];
 
-        snapshot.data.docs.forEach((var doc) {
+        snapshot.data!.docs.forEach((var doc) {
           featuredEvents.add(Container(
             key: Key(doc['title'] + doc.id),
             child: GestureDetector(
               onTap: () {
-                controller.navigateToEventDetailsPage(context, doc);
+                //controller.navigateToEventDetailsPage(context, doc);
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),

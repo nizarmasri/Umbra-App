@@ -46,12 +46,12 @@ class LoginAndSignupController extends GetxController {
 
   login(BuildContext context) {
     loader.value = false;
-    Future<List<String>> temp = context.read<AuthenticationService>().signIn(
+    Future<List<String?>> temp = context.read<AuthenticationService>().signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim());
 
-    temp.then((List<String> result) {
-      msg.value = result[1];
+    temp.then((List<String?> result) {
+      msg.value = result[1]!;
 
       if (result[0] == "Signed in") {
         msg.value = " ";

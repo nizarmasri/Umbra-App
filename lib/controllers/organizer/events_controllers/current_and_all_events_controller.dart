@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/add_event/addEventForm.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
@@ -6,12 +7,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-class CurrentAndAllEventsController extends GetxController  {
-  var eventItems = <EventItem>[].obs;
+class CurrentAndAllEventsController extends GetxController {
+  RxList<EventItem> eventItems = <EventItem>[].obs;
 
-  String uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser!.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
-  DateTime dateChecker;
+  DateTime? dateChecker;
   var sortBy = 'Ascending'.obs;
 
   final loading = true.obs;
@@ -19,8 +20,7 @@ class CurrentAndAllEventsController extends GetxController  {
 
   @override
   onReady() async {
-    try{
-    } catch(e){
+    try {} catch (e) {
       throw Exception(e);
     } finally {
       loading(false);
@@ -43,7 +43,7 @@ class CurrentAndAllEventsController extends GetxController  {
         .then((value) {
       value.docs.forEach((event) {
         dateChecker = event.data()['date'].toDate();
-        if (dateChecker.isAfter(DateTime.now())) events.add(event);
+        if (dateChecker!.isAfter(DateTime.now())) events.add(event);
       });
     });
     events.sort((a, b) => a['date'].compareTo(b['date']));
@@ -66,18 +66,21 @@ class CurrentAndAllEventsController extends GetxController  {
     return events;
   }
 
-  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot data) {
+  navigateToEventDetailsPage(BuildContext context, Event event) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-              data: data,
-            )));
+                  event: event,
+                )));
   }
 
-  navigateToAddEventForm(BuildContext context) {
+  navigateToAddEventForm(BuildContext context, Event event) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddEventForm()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddEventForm(
+                  event: event,
+                )));
   }
-
 }

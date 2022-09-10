@@ -15,7 +15,7 @@ class PlaceService {
     return jsonResults.map((place) => PlaceSearch.fromJson(place)).toList();
   }
 
-  Future<Place> getPlace(String placeId) async {
+  Future<Place> getPlace(String? placeId) async {
     var url =
         'https://maps.googleapis.com/maps/api/place/details/json?key=$key&place_id=$placeId';
     var response = await http.get(Uri.parse(url));

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/profile/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_state_button/progress_button.dart';
@@ -16,6 +17,8 @@ class SettingsPage extends GetView<SettingsController> {
             if (!snapshot.hasData) {
               return Center(child: globals.spinner);
             }
+
+            final data = snapshot.data as DocumentSnapshot;
 
             return Scaffold(
               resizeToAvoidBottomInset: true,
@@ -47,12 +50,12 @@ class SettingsPage extends GetView<SettingsController> {
                                   child: CircleAvatar(
                                     radius: 40,
                                     backgroundColor: Colors.brown.shade800,
-                                    backgroundImage: snapshot.data['dp'] != ''
-                                        ? NetworkImage(snapshot.data['dp'])
+                                    backgroundImage: data['dp'] != ''
+                                        ? NetworkImage(data['dp'])
                                         : null,
                                     child: Text(
-                                      snapshot.data['dp'] == ''
-                                          ? snapshot.data["name"][0]
+                                      data['dp'] == ''
+                                          ? data["name"][0]
                                               .toString()
                                               .toUpperCase()
                                           : '',
@@ -64,12 +67,12 @@ class SettingsPage extends GetView<SettingsController> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      snapshot.data["name"],
+                                      data["name"],
                                       style: TextStyle(
                                           fontSize: 21, color: Colors.white),
                                     ),
                                     Text(
-                                      snapshot.data["email"],
+                                      data["email"],
                                       style: TextStyle(
                                           fontSize: 14, color: Colors.white),
                                     ),
@@ -182,7 +185,7 @@ class SettingsPage extends GetView<SettingsController> {
   }
 
   InkWell setting(
-      {String title, IconData icon, VoidCallback onTap}) {
+      {required String title, IconData? icon, VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       child: Container(

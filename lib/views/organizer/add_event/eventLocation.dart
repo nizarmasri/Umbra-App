@@ -15,11 +15,11 @@ class EventLocation extends StatefulWidget {
 }
 
 class _EventLocationState extends State<EventLocation> {
-  GoogleMapController mapController;
+  GoogleMapController? mapController;
   final placesService = PlaceService();
   List<Marker> location = [];
 
-  String locationName = "";
+  String? locationName = "";
 
   _updateLocation(LatLng chosenLoc) {
     setState(() {
@@ -37,14 +37,14 @@ class _EventLocationState extends State<EventLocation> {
   double inputSize = 17;
 
   Completer<GoogleMapController> _mapController = Completer();
-  StreamSubscription locationSubscription;
+  late StreamSubscription locationSubscription;
   StreamController<Place> controller = StreamController<Place>.broadcast();
 
   Future<void> _goToPlace(Place place) async {
     final GoogleMapController controller = await _mapController.future;
     controller.animateCamera((CameraUpdate.newCameraPosition(CameraPosition(
         target:
-            LatLng(place.geometry.location.lat, place.geometry.location.lng),
+            LatLng(place.geometry!.location!.lat!, place.geometry!.location!.lng!),
         zoom: 14))));
   }
 
@@ -175,14 +175,14 @@ class _EventLocationState extends State<EventLocation> {
                             markers: Set.from(location),
                             initialCameraPosition: CameraPosition(
                               target: LatLng(
-                                  applicationBloc.currentLocation.latitude,
-                                  applicationBloc.currentLocation.longitude),
+                                  applicationBloc.currentLocation!.latitude,
+                                  applicationBloc.currentLocation!.longitude),
                               zoom: 14.0,
                             )),
                       ),
                       // Darken result area
                       if (applicationBloc.searchResults != null &&
-                          applicationBloc.searchResults.length != 0)
+                          applicationBloc.searchResults!.length != 0)
                         Container(
                           height: mapHeight,
                           decoration: BoxDecoration(
@@ -191,16 +191,16 @@ class _EventLocationState extends State<EventLocation> {
                         ),
                       // List of results
                       if (applicationBloc.searchResults != null &&
-                          applicationBloc.searchResults.length != 0)
+                          applicationBloc.searchResults!.length != 0)
                         Container(
                           height: mapHeight,
                           child: ListView.builder(
-                            itemCount: applicationBloc.searchResults.length,
+                            itemCount: applicationBloc.searchResults!.length,
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text(
                                   applicationBloc
-                                      .searchResults[index].description,
+                                      .searchResults![index].description!,
                                   style: TextStyle(
                                       fontFamily: globals.montserrat,
                                       fontWeight: globals.fontWeight,
@@ -210,14 +210,14 @@ class _EventLocationState extends State<EventLocation> {
                                 onTap: () async {
                                   applicationBloc.setSeletedLocation(
                                       applicationBloc
-                                          .searchResults[index].placeId);
+                                          .searchResults![index].placeId);
                                   Place ll = await placesService.getPlace(
                                       applicationBloc
-                                          .searchResults[index].placeId);
+                                          .searchResults![index].placeId);
                                   _goToPlace(ll);
                                   _updateLocation(LatLng(
-                                      ll.geometry.location.lat,
-                                      ll.geometry.location.lng));
+                                      ll.geometry!.location!.lat!,
+                                      ll.geometry!.location!.lng!));
                                   setState(() {
                                     locationName = ll.name;
                                   });
@@ -237,10 +237,10 @@ class _EventLocationState extends State<EventLocation> {
 }
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback onTap;
-  final AppBar appBar;
+  final VoidCallback? onTap;
+  final AppBar? appBar;
 
-  const CustomAppBar({Key key, this.onTap, this.appBar}) : super(key: key);
+  const CustomAppBar({Key? key, this.onTap, this.appBar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

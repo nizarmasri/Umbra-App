@@ -9,9 +9,9 @@ import 'package:events/views/consumer/search/search_result_item.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class SearchResultsPage extends StatefulWidget {
-  final String searchString;
+  final String? searchString;
 
-  SearchResultsPage({Key key, this.searchString}) : super(key: key);
+  SearchResultsPage({Key? key, this.searchString}) : super(key: key);
 
   @override
   _SearchResultsPageState createState() =>
@@ -19,7 +19,7 @@ class SearchResultsPage extends StatefulWidget {
 }
 
 class _SearchResultsPageState extends State<SearchResultsPage> {
-  final String searchString;
+  final String? searchString;
 
   _SearchResultsPageState(this.searchString);
 
@@ -37,23 +37,23 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
   List<SearchResultItem> eventItems = [];
 
   void searchStringFormat() {
-    searchStringFormatted = searchString.trim().toUpperCase();
+    searchStringFormatted = searchString!.trim().toUpperCase();
   }
 
-  String uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser!.uid;
   FirebaseFirestore fb = FirebaseFirestore.instance;
-  DateTime dateChecker;
+  DateTime? dateChecker;
 
   Future<List<QueryDocumentSnapshot>> getEvents() async {
     eventItems = [];
     List<QueryDocumentSnapshot> events = [];
     searchStringFormat();
-    String descSearch = "";
-    String titleSearch = "";
-    String ageSearch = "";
-    String typeSearch = "";
-    String locationSearch = "";
-    String feeSearch = "";
+    String? descSearch = "";
+    String? titleSearch = "";
+    String? ageSearch = "";
+    String? typeSearch = "";
+    String? locationSearch = "";
+    String? feeSearch = "";
 
     await fb
         .collection("events")
@@ -69,19 +69,19 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
         feeSearch = event.data()['fee'].toUpperCase();
 
         if (event.data().containsValue(searchString) ||
-            descSearch.contains(searchStringFormatted) ||
-            titleSearch.contains(searchStringFormatted) ||
-            typeSearch.contains(searchStringFormatted) ||
-            locationSearch.contains(searchStringFormatted) ||
-            ageSearch.contains(searchStringFormatted) ||
-            feeSearch.contains(searchStringFormatted)) events.add(event);
+            descSearch!.contains(searchStringFormatted) ||
+            titleSearch!.contains(searchStringFormatted) ||
+            typeSearch!.contains(searchStringFormatted) ||
+            locationSearch!.contains(searchStringFormatted) ||
+            ageSearch!.contains(searchStringFormatted) ||
+            feeSearch!.contains(searchStringFormatted)) events.add(event);
       });
     });
     events.sort((a, b) => a['date'].compareTo(b['date']));
     return events;
   }
 
-  String _sortBy = 'Ascending';
+  String? _sortBy = 'Ascending';
 
   @override
   Widget build(BuildContext context) {
@@ -107,10 +107,12 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               )
             );
           }
+          List<QueryDocumentSnapshot> data =
+          snapshot.data as List<QueryDocumentSnapshot>;
 
-          if (snapshot.data != null && snapshot.data.length != 0) {
+          if (data != null && data.length != 0) {
             eventItems = [];
-            snapshot.data.forEach((event) {
+            data.forEach((event) {
               eventItems.add(SearchResultItem(
                 data: event,
                 key: Key(event['title'] + event['date'].toString()),
@@ -119,17 +121,17 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
             if (_sortBy == 'Descending')
               eventItems
-                  .sort((a, b) => b.data['date'].compareTo(a.data['date']));
+                  .sort((a, b) => b.data!['date'].compareTo(a.data!['date']));
             else if (_sortBy == 'Ascending')
               eventItems
-                  .sort((a, b) => a.data['date'].compareTo(b.data['date']));
+                  .sort((a, b) => a.data!['date'].compareTo(b.data!['date']));
 
             return Scaffold(
               backgroundColor: Colors.black,
               appBar: AppBar(
                 backgroundColor: Colors.black,
                 title: Text(
-                  searchString,
+                  searchString!,
                   style: TextStyle(
                       fontFamily: globals.montserrat,
                       fontSize: 25,
@@ -183,14 +185,14 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                                       );
                                     }).toList(),
                                     hint: Text(
-                                      _sortBy,
+                                      _sortBy!,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 14,
                                           fontWeight: globals.fontWeight,
                                           fontFamily: globals.montserrat),
                                     ),
-                                    onChanged: (String value) {
+                                    onChanged: (String? value) {
                                       setState(() {
                                         _sortBy = value;
                                       });
@@ -220,7 +222,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               appBar: AppBar(
                 backgroundColor: Colors.black,
                 title: Text(
-                  searchString,
+                  searchString!,
                   style: TextStyle(
                       fontFamily: globals.montserrat,
                       fontSize: 25,

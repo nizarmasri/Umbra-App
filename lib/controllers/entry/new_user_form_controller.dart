@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class NewUserFormController extends GetxController {
-  final String uid;
+  final String? uid;
 
   NewUserFormController({this.uid});
 
@@ -19,7 +19,7 @@ class NewUserFormController extends GetxController {
   final inputSize = 18.0;
   TextEditingController birthdayController = TextEditingController();
 
-  var selectedDate = DateTime.now().obs;
+  Rx<DateTime> selectedDate = DateTime.now().obs;
   var changed = false.obs;
 
   @override
@@ -33,7 +33,7 @@ class NewUserFormController extends GetxController {
   }
 
   Future<void> selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate.value,
         firstDate: DateTime(1970, 8),

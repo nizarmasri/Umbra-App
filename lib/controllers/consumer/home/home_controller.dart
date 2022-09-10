@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
@@ -11,10 +12,19 @@ import 'package:events/views/consumer/search/search_result_item.dart';
 import 'package:flutter/material.dart';
 
 class HomeController extends GetxController {
-  var currentPosition = Position().obs;
-  var forYouItems = <SearchResultItem>[].obs;
+  Rx<Position> currentPosition = Position(
+          longitude: 0,
+          latitude: 0,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          heading: 0,
+          speed: 0,
+          speedAccuracy: 0)
+      .obs;
+  RxList<SearchResultItem> forYouItems = <SearchResultItem>[].obs;
   FirebaseFirestore fb = FirebaseFirestore.instance;
-  String uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser!.uid;
   var items = 4.obs;
   var geo = Geoflutterfire();
 
@@ -27,11 +37,11 @@ class HomeController extends GetxController {
 
   @override
   onReady() async {
-    super.onReady();
     try {
       geo = Geoflutterfire();
       Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
           .then((Position position) {
+        currentPosition = position.obs;
         currentPosition.value = position;
       }).catchError((e) {
         print(e);
@@ -41,15 +51,16 @@ class HomeController extends GetxController {
     } finally {
       loading(true);
     }
+    super.onReady();
   }
 
-  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot data) {
+  navigateToEventDetailsPage(BuildContext context, Event event) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-              data: data,
-            )));
+              event: event,
+                )));
   }
 
   locationStream() => geo
@@ -130,11 +141,11 @@ class HomeController extends GetxController {
   bool forYouAlgorithm(
       List<QueryDocumentSnapshot> eventsA, QueryDocumentSnapshot eventB) {
     // Description of event to be analyzed
-    String eventBDesc = eventB['description'];
+    String? eventBDesc = eventB['description'];
 
     // List of descriptions of events to compare to
     // (events user attended)
-    List<String> eventsADesc = [];
+    List<String?> eventsADesc = [];
     eventsA.forEach((event) {
       eventsADesc.add(event['description']);
     });
@@ -149,8 +160,8 @@ class HomeController extends GetxController {
       eventBLocalCounter = 0;
 
       // Create list of individual words for each event description
-      List<String> eventAWords = eventA.split(" ");
-      List<String> eventBWords = eventBDesc.split(" ");
+      List<String> eventAWords = eventA!.split(" ");
+      List<String> eventBWords = eventBDesc!.split(" ");
 
       // Calculate 20% of the number of words in eventA
       int twentyPercent = (eventAWords.length * 0.2).toInt();
@@ -183,12 +194,12 @@ class HomeController extends GetxController {
     List<QueryDocumentSnapshot> forYouEvents = [];
 
     // Get the IDs of all events user is attending
-    List<dynamic> attendingEventsIds = [];
+    List<dynamic>? attendingEventsIds = [];
     await fb.collection("users").doc(uid).get().then((value) {
-      attendingEventsIds = value.data()['attending'];
+      attendingEventsIds = value.data()!['attending'];
     });
 
-    if (attendingEventsIds.length > 0) {
+    if (attendingEventsIds!.length > 0) {
       // Get all events user is not attending
       await fb
           .collection("events")

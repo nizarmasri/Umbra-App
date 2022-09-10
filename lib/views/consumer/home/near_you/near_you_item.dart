@@ -1,55 +1,55 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:events/globals.dart' as globals;
 
 class NearYouItem extends StatefulWidget {
-  final QueryDocumentSnapshot data;
+  final Event event;
 
-  NearYouItem(
-      {Key key,
-        this.data})
+  NearYouItem({Key? key,
+        required this.event})
       : super(key: key);
 
   @override
-  _NearYouItemState createState() => _NearYouItemState(data);
+  _NearYouItemState createState() => _NearYouItemState(event);
 }
 
 class _NearYouItemState extends State<NearYouItem> {
-  final QueryDocumentSnapshot data;
+  final Event event;
 
-  String title;
-  String description;
-  String type;
-  String fee;
-  String age;
+  String? title;
+  String? description;
+  String? type;
+  String? fee;
+  String? age;
   var date;
-  String time;
-  String location;
-  GeoPoint locationPoint;
-  List<dynamic> urls;
-  String id;
-  String posteruid;
+  String? time;
+  String? location;
+  GeoPoint? locationPoint;
+  List<dynamic>? urls;
+  String? id;
+  String? posteruid;
 
-  void getData() {
-    DateTime dateFormatted = data['date'].toDate();
+/*  void getData() {
+    DateTime dateFormatted = data!['date'].toDate();
 
-    title = data['title'];
-    description = data['description'];
-    type = data['type'];
-    fee = data['fee'];
-    age = data['age'];
+    title = data!['title'];
+    description = data!['description'];
+    type = data!['type'];
+    fee = data!['fee'];
+    age = data!['age'];
     date = DateFormat.MMMd().format(dateFormatted);
-    time = data['time'];
-    location = data['locationName'];
-    locationPoint = data['location']['geopoint'];
-    urls = data['urls'];
-    id = data.id;
-    posteruid = data['poster'];
-  }
+    time = data!['time'];
+    location = data!['locationName'];
+    locationPoint = data!['location']['geopoint'];
+    urls = data!['urls'];
+    id = data!.id;
+    posteruid = data!['poster'];
+  }*/
 
-  navigateToEventDetailsPage(QueryDocumentSnapshot data) {
+  navigateToEventDetailsPage(QueryDocumentSnapshot? data) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -81,8 +81,8 @@ class _NearYouItemState extends State<NearYouItem> {
               borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: NetworkImage((urls != null && urls.length != 0)
-                      ? urls[0]
+                  image: NetworkImage((urls != null && urls!.length != 0)
+                      ? urls![0]
                       : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'))),
           child: Align(
             alignment: Alignment.bottomLeft,
@@ -127,7 +127,7 @@ class _NearYouItemState extends State<NearYouItem> {
                                   color: Colors.black),
                             ),
                             TextSpan(
-                              text: "\n" + type + "  |  " + date,
+                              text: "\n" + type! + "  |  " + date,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,
@@ -158,7 +158,7 @@ class _NearYouItemState extends State<NearYouItem> {
                                   color: Colors.black87),
                             ),
                             TextSpan(
-                              text: "\n" + age,
+                              text: "\n" + age!,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,

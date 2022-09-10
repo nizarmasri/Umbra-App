@@ -6,7 +6,7 @@ class Notifications extends StatefulWidget {
   final tokenlist;
   final organizerUid;
 
-  const Notifications({Key key, this.tokenlist, this.organizerUid})
+  const Notifications({Key? key, this.tokenlist, this.organizerUid})
       : super(key: key);
 
   @override
@@ -23,10 +23,10 @@ class _NotificationsState extends State<Notifications> {
   FirebaseFirestore firebase = FirebaseFirestore.instance;
 
   bool subscribed = true;
-  String token;
+  String? token;
 
   void checkToken() async {
-    String newtoken = await FirebaseMessaging.instance.getToken();
+    String? newtoken = await FirebaseMessaging.instance.getToken();
     setState(() {
       token = newtoken;
       if (!widget.tokenlist.contains(newtoken)) {

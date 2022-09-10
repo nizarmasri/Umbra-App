@@ -6,7 +6,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 
 class EditProfileController extends GetxController {
-  final String uid = FirebaseAuth.instance.currentUser.uid;
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
   final double inputSize = 17;
 
   final loading = true.obs;

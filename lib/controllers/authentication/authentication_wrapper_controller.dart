@@ -6,14 +6,14 @@ import 'package:get/get.dart';
 
 class AuthenticationWrapperController extends GetxController {
   final loaded = false.obs;
-  final BuildContext context;
+  final BuildContext? context;
   var snapshot;
   AuthenticationWrapperController({this.context});
 
   @override
   onReady() async {
     try {
-      final firebaseUser = context.watch<User>();
+      final firebaseUser = context!.watch<User>();
       snapshot = await FirebaseFirestore.instance
           .collection("users")
           .doc(firebaseUser.uid)

@@ -191,7 +191,7 @@ class NewUserForm extends GetView<NewUserFormController> {
                                       value: controller.gender.value,
                                       dropdownColor: Colors.grey[900],
                                       onChanged: (newValue) {
-                                        controller.gender.value = newValue;
+                                        controller.gender.value = newValue!;
                                       },
                                       icon: Icon(
                                         Icons.arrow_downward,

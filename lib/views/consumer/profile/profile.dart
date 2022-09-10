@@ -6,11 +6,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatelessWidget {
-  final AsyncSnapshot snapshot;
+  final AsyncSnapshot? snapshot;
 
   ProfilePage({this.snapshot});
 
-  final String uid = FirebaseAuth.instance.currentUser.uid;
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +38,13 @@ class ProfilePage extends StatelessWidget {
                     CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.brown.shade800,
-                      backgroundImage: snapshot.data.data()['dp'].toString() !=
+                      backgroundImage: snapshot!.data.data()['dp'].toString() !=
                               ''
-                          ? NetworkImage(snapshot.data.data()['dp'].toString())
+                          ? NetworkImage(snapshot!.data.data()['dp'].toString())
                           : null,
                       child: Text(
-                        snapshot.data.data()['dp'].toString() == ''
-                            ? snapshot.data.data()["name"][0].toUpperCase()
+                        snapshot!.data.data()['dp'].toString() == ''
+                            ? snapshot!.data.data()["name"][0].toUpperCase()
                             : '',
                         style: TextStyle(fontSize: 55),
                       ),
@@ -52,7 +52,7 @@ class ProfilePage extends StatelessWidget {
                     Container(
                       margin: EdgeInsets.only(top: 10),
                       child: Text(
-                        snapshot.data.data()["name"],
+                        snapshot!.data.data()["name"],
                         style: TextStyle(fontSize: 25, color: Colors.white),
                       ),
                     ),
@@ -63,9 +63,9 @@ class ProfilePage extends StatelessWidget {
                 child: Container(
                   margin: EdgeInsets.only(top: 10, bottom: 10),
                   child: Text(
-                      snapshot.data.data()["name"].split(" ")[0] +
+                      snapshot!.data.data()["name"].split(" ")[0] +
                           " has attended " +
-                          snapshot.data.data()["attending"].length.toString() +
+                          snapshot!.data.data()["attending"].length.toString() +
                           " events.",
                       style: TextStyle(color: Colors.white, fontSize: 20)),
                 ),
@@ -94,7 +94,7 @@ class ProfilePage extends StatelessWidget {
                                     onPressed: () {
                                       final uri = Uri(
                                         scheme: 'mailto',
-                                        path: snapshot.data.data()["email"],
+                                        path: snapshot!.data.data()["email"],
                                         query:
                                             'subject=&body=', //add subject and body here
                                       );
@@ -109,7 +109,7 @@ class ProfilePage extends StatelessWidget {
                                 Expanded(
                                   child: IconButton(
                                     onPressed: () {
-                                      launch(snapshot.data.data()["twitter"]);
+                                      launch(snapshot!.data.data()["twitter"]);
                                     },
                                     icon: FaIcon(
                                       FontAwesomeIcons.twitter,
@@ -120,7 +120,7 @@ class ProfilePage extends StatelessWidget {
                                 Expanded(
                                   child: IconButton(
                                     onPressed: () {
-                                      launch(snapshot.data.data()["instagram"]);
+                                      launch(snapshot!.data.data()["instagram"]);
                                     },
                                     icon: FaIcon(
                                       FontAwesomeIcons.instagram,

@@ -6,7 +6,7 @@ import 'package:events/views/organizer/events/all_events.dart';
 class NavigatorOrgPage extends StatefulWidget {
   final uid;
 
-  NavigatorOrgPage({Key key, this.uid}) : super(key: key);
+  NavigatorOrgPage({Key? key, this.uid}) : super(key: key);
 
   @override
   _NavigatorOrgPageState createState() => _NavigatorOrgPageState(uid);

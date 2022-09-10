@@ -18,7 +18,7 @@ class AccountOrgPage extends StatefulWidget {
 class _AccountOrgPageState extends State<AccountOrgPage> {
   double btnHeight = 60;
 
-  Container NameAvatar({String name, String email}) {
+  Container NameAvatar({required String name, required String email}) {
     return Container(
       margin: EdgeInsets.only(top: 40, right: 10, bottom: 20),
       decoration: BoxDecoration(),
@@ -56,7 +56,7 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
     );
   }
 
-  Container LogoutButton({double width, double height}) {
+  Container LogoutButton({double? width, double? height}) {
     return Container(
         height: height,
         width: width,
@@ -118,10 +118,10 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
         .then((value) => setState(() {}));
   }
 
-  InkWell Setting({String title, IconData icon, Color color, Function page}) {
+  InkWell Setting({required String title, IconData? icon, Color? color, Function? page}) {
     return InkWell(
       onTap: () {
-        page();
+        page!();
       },
       child: Container(
         decoration: BoxDecoration(color: color),
@@ -144,7 +144,7 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
 
   @override
   Widget build(BuildContext context) {
-    String uid = FirebaseAuth.instance.currentUser.uid;
+    String uid = FirebaseAuth.instance.currentUser!.uid;
     double width = MediaQuery.of(context).size.width;
     double btnWidth = width * 0.85;
     return FutureBuilder<DocumentSnapshot>(
@@ -187,8 +187,8 @@ class _AccountOrgPageState extends State<AccountOrgPage> {
                       children: [
                         // Circle avatar
                         NameAvatar(
-                            name: snapshot.data["name"],
-                            email: snapshot.data["email"]),
+                            name: snapshot.data!["name"],
+                            email: snapshot.data!["email"]),
                         // Account info tile
                         Container(
                           child: Column(

@@ -6,11 +6,11 @@ import 'package:events/globals.dart' as globals;
 import 'package:get/get.dart';
 
 class SearchResultItem extends StatelessWidget {
-  final QueryDocumentSnapshot data;
+  final QueryDocumentSnapshot? data;
 
-  SearchResultItem({Key key, this.data}) : super(key: key);
+  SearchResultItem({Key? key, this.data}) : super(key: key);
 
-  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot data) {
+  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot? data) {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -21,12 +21,12 @@ class SearchResultItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime dateFormatted = data['date'].toDate();
-    final String title = data['title'];
-    final String type = data['type'];
+    DateTime dateFormatted = data!['date'].toDate();
+    final String? title = data!['title'];
+    final String type = data!['type'];
     final date = DateFormat.MMMd().format(dateFormatted);
-    final String location = data['locationName'];
-    final List<dynamic> urls = data['urls'];
+    final String location = data!['locationName'];
+    final List<dynamic>? urls = data!['urls'];
 
     return GestureDetector(
       onTap: () => navigateToEventDetailsPage(context, data),
@@ -49,14 +49,14 @@ class SearchResultItem extends StatelessWidget {
                       'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
                       filterQuality: FilterQuality.low,
                       fit: BoxFit.cover, loadingBuilder: (BuildContext context,
-                          Widget child, ImageChunkEvent loadingProgress) {
+                          Widget child, ImageChunkEvent? loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Center(
                       child: CircularProgressIndicator(
                         backgroundColor: Colors.white12,
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes
+                                loadingProgress.expectedTotalBytes!
                             : null,
                       ),
                     );
@@ -82,14 +82,14 @@ class SearchResultItem extends StatelessWidget {
                           filterQuality: FilterQuality.low,
                           fit: BoxFit.cover, loadingBuilder:
                               (BuildContext context, Widget child,
-                                  ImageChunkEvent loadingProgress) {
+                                  ImageChunkEvent? loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Center(
                           child: CircularProgressIndicator(
                             backgroundColor: Colors.white12,
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes
+                                    loadingProgress.expectedTotalBytes!
                                 : null,
                           ),
                         );
@@ -110,14 +110,14 @@ class SearchResultItem extends StatelessWidget {
                           filterQuality: FilterQuality.low,
                           fit: BoxFit.cover, loadingBuilder:
                               (BuildContext context, Widget child,
-                                  ImageChunkEvent loadingProgress) {
+                                  ImageChunkEvent? loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Center(
                           child: CircularProgressIndicator(
                             backgroundColor: Colors.white12,
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes
+                                    loadingProgress.expectedTotalBytes!
                                 : null,
                           ),
                         );
@@ -138,14 +138,14 @@ class SearchResultItem extends StatelessWidget {
                           filterQuality: FilterQuality.low,
                           fit: BoxFit.cover, loadingBuilder:
                               (BuildContext context, Widget child,
-                                  ImageChunkEvent loadingProgress) {
+                                  ImageChunkEvent? loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Center(
                           child: CircularProgressIndicator(
                             backgroundColor: Colors.white12,
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes
+                                    loadingProgress.expectedTotalBytes!
                                 : null,
                           ),
                         );

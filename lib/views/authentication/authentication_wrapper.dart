@@ -18,7 +18,7 @@ import 'package:get/get.dart';
 
 class AuthenticationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User>();
+    final firebaseUser = context.watch<User?>();
     if (firebaseUser != null) {
       if (globals.isOrg) {
         return NavigatorOrgPage(uid: firebaseUser.uid);
@@ -33,11 +33,11 @@ class AuthenticationWrapper extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return globals.spinner;
               }
-              if (snapshot.data["new"]) {
+              if (snapshot.data!["new"]) {
                 Get.put(NewUserFormController(uid: firebaseUser.uid));
                 return NewUserForm();
               } else {
-                if (snapshot.data["organizer"]) {
+                if (snapshot.data!["organizer"]) {
                   Get.put(CurrentAndAllEventsController());
                   return NavigatorOrgPage(uid: firebaseUser.uid);
                 } else {

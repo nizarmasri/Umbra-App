@@ -1,7 +1,7 @@
 import 'package:events/controllers/organizer/location_controllers/models/location.dart';
 
 class Geometry {
-  final Location location;
+  final Location? location;
 
   Geometry({this.location});
 

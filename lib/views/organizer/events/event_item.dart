@@ -4,46 +4,46 @@ import 'package:intl/intl.dart';
 import 'package:events/globals.dart' as globals;
 
 class EventItem extends StatefulWidget {
-  final QueryDocumentSnapshot data;
+  final QueryDocumentSnapshot? data;
 
-  EventItem({Key key, this.data}) : super(key: key);
+  EventItem({Key? key, this.data}) : super(key: key);
 
   @override
   _EventItemState createState() => _EventItemState(data);
 }
 
 class _EventItemState extends State<EventItem> {
-  String title;
-  String description;
-  String type;
-  String fee;
-  String age;
-  String date;
-  String time;
-  String location;
-  GeoPoint locationPoint;
-  List<dynamic> urls;
-  String id;
-  String posteruid;
+  String? title;
+  String? description;
+  String? type;
+  String? fee;
+  String? age;
+  late String date;
+  String? time;
+  String? location;
+  GeoPoint? locationPoint;
+  List<dynamic>? urls;
+  String? id;
+  String? posteruid;
 
-  final QueryDocumentSnapshot data;
+  final QueryDocumentSnapshot? data;
 
   _EventItemState(this.data);
 
   void getData() {
-    DateTime dateFormatted = data['date'].toDate();
+    DateTime dateFormatted = data!['date'].toDate();
 
-    title = data['title'];
-    description = data['description'];
-    type = data['type'];
-    fee = data['fee'];
-    age = data['age'];
+    title = data!['title'];
+    description = data!['description'];
+    type = data!['type'];
+    fee = data!['fee'];
+    age = data!['age'];
     date = DateFormat.MMMd().format(dateFormatted);
-    time = data['time'];
-    location = data['locationName'];
-    locationPoint = data['location']['geopoint'];
-    urls = data['urls'];
-    posteruid = data['poster'];
+    time = data!['time'];
+    location = data!['locationName'];
+    locationPoint = data!['location']['geopoint'];
+    urls = data!['urls'];
+    posteruid = data!['poster'];
   }
 
   @override
@@ -80,19 +80,19 @@ class _EventItemState extends State<EventItem> {
                     bottomRight: Radius.circular(0),
                     topRight: Radius.circular(0)),
                 child: Image.network(
-                    (urls != null && urls.length != 0)
-                        ? urls[0]
+                    (urls != null && urls!.length != 0)
+                        ? urls![0]
                         : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg',
                     filterQuality: FilterQuality.low,
                     fit: BoxFit.cover, loadingBuilder: (BuildContext context,
-                        Widget child, ImageChunkEvent loadingProgress) {
+                        Widget child, ImageChunkEvent? loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Center(
                     child: CircularProgressIndicator(
                       backgroundColor: Colors.white12,
                       value: loadingProgress.expectedTotalBytes != null
                           ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes
+                              loadingProgress.expectedTotalBytes!
                           : null,
                     ),
                   );
@@ -123,14 +123,14 @@ class _EventItemState extends State<EventItem> {
                             fontSize: 17,
                             color: Colors.white)),
                     TextSpan(
-                        text: "\n" + type + "	• " + date,
+                        text: "\n" + type! + "	• " + date,
                         style: TextStyle(
                             fontFamily: globals.montserrat,
                             fontSize: 13,
                             fontWeight: globals.fontWeight,
                             color: Colors.white)),
                     TextSpan(
-                        text: "\n" + location,
+                        text: "\n" + location!,
                         style: TextStyle(
                             fontFamily: globals.montserrat,
                             fontSize: 13,

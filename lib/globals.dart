@@ -26,7 +26,7 @@ TextStyle infoSectionStyle = TextStyle(
 
 bool isOrg = false;
 
-String uid;
+String? uid;
 
 SpinKitFoldingCube spinner = SpinKitFoldingCube(
   color: Colors.white,

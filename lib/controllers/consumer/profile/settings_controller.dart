@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 class SettingsController extends GetxController {
-  final String uid = FirebaseAuth.instance.currentUser.uid;
+  final String uid = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   onReady() async {

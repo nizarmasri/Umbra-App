@@ -6,7 +6,7 @@ import 'package:numberpicker/numberpicker.dart';
 class TicketAlert extends StatefulWidget {
   @override
   final limit;
-  const TicketAlert({Key key, this.limit}) : super(key: key);
+  const TicketAlert({Key? key, this.limit}) : super(key: key);
   _TicketAlertState createState() => _TicketAlertState(this.limit);
 }
 

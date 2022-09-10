@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:events/views/consumer/search/search_item.dart';
+import 'package:events/views/consumer/search/search_item_widget.dart';
 import 'package:events/views/consumer/search/search_results.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SearchController extends GetxController {
   final double inputSize = 17;
-  var searchItems = <SearchItem>[].obs;
+  RxList<SearchItemWidget> searchItems = <SearchItemWidget>[].obs;
   FirebaseFirestore fb = FirebaseFirestore.instance;
   final TextEditingController searchController = TextEditingController();
 

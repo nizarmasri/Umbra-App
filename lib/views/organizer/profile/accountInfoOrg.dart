@@ -25,12 +25,12 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
   var maskTextInputFormatter = MaskTextInputFormatter(
       mask: "## ### ###", filter: {"#": RegExp(r'[0-9]')});
   var maskTextInputFormatter2 = MaskTextInputFormatter();
-  TextEditingController _namecontroller;
-  TextEditingController _numbercontroller;
-  TextEditingController _twittercontroller;
-  TextEditingController _instagramcontroller;
+  TextEditingController? _namecontroller;
+  TextEditingController? _numbercontroller;
+  TextEditingController? _twittercontroller;
+  TextEditingController? _instagramcontroller;
 
-  String uid = FirebaseAuth.instance.currentUser.uid;
+  String uid = FirebaseAuth.instance.currentUser!.uid;
 
   String _error = 'No Error Dectected';
   List<Asset> images = <Asset>[];
@@ -68,7 +68,7 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
     });
   }
 
-  Container avatar({String letter, String existingPicture}) {
+  Container avatar({String? letter, String? existingPicture}) {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
       child: Column(
@@ -77,7 +77,7 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
             child: CircleAvatar(
               radius: 75,
               backgroundColor: Colors.brown.shade800,
-              backgroundImage: images.isNotEmpty
+              backgroundImage: (images.isNotEmpty
                   ? AssetThumbImageProvider(
                       images[0],
                       width: 200,
@@ -85,10 +85,10 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                       quality: 100,
                     )
                   : existingPicture != ''
-                      ? NetworkImage(existingPicture)
-                      : null,
+                      ? NetworkImage(existingPicture!)
+                      : null) as ImageProvider<Object>?,
               child: Text(
-                images.isEmpty && existingPicture == '' ? letter : "",
+                images.isEmpty && existingPicture == '' ? letter! : "",
                 style: TextStyle(fontSize: 80),
               ),
             ),
@@ -113,14 +113,14 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
   }
 
   Container newInput(
-      {String hint,
-      Icon icon,
-      String defvalue,
-      TextEditingController controller,
-      MaskTextInputFormatter mask,
-      TextInputType type,
-      double height,
-      double width}) {
+      {String? hint,
+      Icon? icon,
+      String? defvalue,
+      TextEditingController? controller,
+      required MaskTextInputFormatter mask,
+      TextInputType? type,
+      double? height,
+      double? width}) {
     return Container(
       height: height,
       width: width,
@@ -157,7 +157,7 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
     );
   }
 
-  Container button({String uid}) {
+  Container button({String? uid}) {
     return Container(
       child: InkWell(
         focusColor: Colors.white,
@@ -178,10 +178,10 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                   .collection('users')
                   .doc(uid)
                   .update({
-                'name': _namecontroller.text,
-                'number': _numbercontroller.text,
-                'twitter': _twittercontroller.text,
-                'instagram': _instagramcontroller.text,
+                'name': _namecontroller!.text,
+                'number': _numbercontroller!.text,
+                'twitter': _twittercontroller!.text,
+                'instagram': _instagramcontroller!.text,
                 'dp': url,
               }).then((value) {
                 Navigator.pop(context);
@@ -192,10 +192,10 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                 .collection('users')
                 .doc(uid)
                 .update({
-              'name': _namecontroller.text,
-              'number': _numbercontroller.text,
-              'twitter': _twittercontroller.text,
-              'instagram': _instagramcontroller.text
+              'name': _namecontroller!.text,
+              'number': _numbercontroller!.text,
+              'twitter': _twittercontroller!.text,
+              'instagram': _instagramcontroller!.text
             }).then((value) {
               Navigator.pop(context);
             });
@@ -225,13 +225,13 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               _namecontroller =
-                  new TextEditingController(text: snapshot.data["name"]);
+                  new TextEditingController(text: snapshot.data!["name"]);
               _numbercontroller = new TextEditingController(
-                  text: snapshot.data["number"]);
+                  text: snapshot.data!["number"]);
               _twittercontroller = new TextEditingController(
-                  text: snapshot.data["twitter"]);
+                  text: snapshot.data!["twitter"]);
               _instagramcontroller = new TextEditingController(
-                  text: snapshot.data["instagram"]);
+                  text: snapshot.data!["instagram"]);
               return Scaffold(
                 backgroundColor: Colors.black,
                 appBar: AppBar(
@@ -247,11 +247,11 @@ class _AccountInfoOrgState extends State<AccountInfoOrg> {
                     child: Column(
                       children: [
                         avatar(
-                            letter: snapshot.data["name"][0]
+                            letter: snapshot.data!["name"][0]
                                 .toString()
                                 .toUpperCase(),
                             existingPicture:
-                                snapshot.data['dp'].toString()),
+                                snapshot.data!['dp'].toString()),
                         newInput(
                           hint: "Name",
                           icon: Icon(

@@ -1,13 +1,14 @@
 import 'package:events/views/consumer/attend/attend_navigator.dart';
 import 'package:events/views/consumer/search/search.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'views/consumer/profile/settings.dart';
 import 'package:events/views/consumer/home/home.dart';
 
 class NavigatorPage extends StatefulWidget {
   final uid;
 
-  NavigatorPage({Key key, this.uid}) : super(key: key);
+  NavigatorPage({Key? key, this.uid}) : super(key: key);
 
   @override
   _NavigatorPageState createState() => _NavigatorPageState(uid);
@@ -49,7 +50,7 @@ class _NavigatorPageState extends State<NavigatorPage> {
     saveTokenToDatabase(token);*/
   }
 
-  Widget currentScreen;
+  Widget? currentScreen;
 
   @override
   Widget build(BuildContext context) {

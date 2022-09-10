@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/organizer/events_controllers/current_and_all_events_controller.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
@@ -22,9 +23,12 @@ class _AllEventsPageState extends State<AllEventsPage> {
             return Center(child: globals.spinner);
           }
 
-          if (snapshot.data != null && snapshot.data.length != 0) {
+          List<QueryDocumentSnapshot> data =
+          snapshot.data as List<QueryDocumentSnapshot>;
+
+          if (data != null && data.length != 0) {
             controller.eventItems.value = [];
-            snapshot.data.forEach((event) {
+            data.forEach((event) {
               controller.eventItems.add(EventItem(
                 data: event,
                 key: Key(event['title'] + event['date'].toString()),
@@ -33,10 +37,10 @@ class _AllEventsPageState extends State<AllEventsPage> {
 
             if (controller.sortBy.value == 'Descending')
               controller.eventItems
-                  .sort((a, b) => b.data['date'].compareTo(a.data['date']));
+                  .sort((a, b) => b.data!['date'].compareTo(a.data!['date']));
             else if (controller.sortBy.value == 'Ascending')
               controller.eventItems
-                  .sort((a, b) => a.data['date'].compareTo(b.data['date']));
+                  .sort((a, b) => a.data!['date'].compareTo(b.data!['date']));
 
             return Scaffold(
               backgroundColor: Colors.black,
@@ -105,9 +109,9 @@ class _AllEventsPageState extends State<AllEventsPage> {
                                           fontWeight: globals.fontWeight,
                                           fontFamily: globals.montserrat),
                                     ),
-                                    onChanged: (String value) {
+                                    onChanged: (String? value) {
                                       setState(() {
-                                        controller.sortBy.value = value;
+                                        controller.sortBy.value = value!;
                                       });
                                     },
                                   ),

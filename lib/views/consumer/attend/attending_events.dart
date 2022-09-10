@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/attend/attend_controller.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +27,11 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                 child: globals.spinner,
               );
             }
+            List<QueryDocumentSnapshot> data =
+            snapshot.data as List<QueryDocumentSnapshot>;
+
             controller.eventItems.value = [];
-            snapshot.data.forEach((event) {
+            data.forEach((event) {
               controller.eventItems.add(EventItem(
                 data: event,
                 key: Key(event['title'] + event['date'].toString()),
@@ -36,10 +40,10 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
 
             if (controller.sortBy.value == 'Descending')
               controller.eventItems
-                  .sort((a, b) => b.data['date'].compareTo(a.data['date']));
+                  .sort((a, b) => b.data!['date'].compareTo(a.data!['date']));
             else if (controller.sortBy.value == 'Ascending')
               controller.eventItems
-                  .sort((a, b) => a.data['date'].compareTo(b.data['date']));
+                  .sort((a, b) => a.data!['date'].compareTo(b.data!['date']));
 
             RefreshController _refreshController =
                 RefreshController(initialRefresh: false);
@@ -96,9 +100,9 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                                             fontWeight: globals.fontWeight,
                                             fontFamily: globals.montserrat),
                                       ),
-                                      onChanged: (String value) {
+                                      onChanged: (String? value) {
                                         setState(() {
-                                          controller.sortBy.value = value;
+                                          controller.sortBy.value = value!;
                                         });
                                       },
                                     ),
@@ -124,8 +128,8 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                               return GestureDetector(
                                 child: controller.eventItems[index],
                                 onTap: () {
-                                  controller.navigateToEventDetailsPage(context,
-                                      controller.eventItems[index].data);
+                                  /*controller.navigateToEventDetailsPage(context,
+                                      controller.eventItems[index].data);*/
                                 },
                               );
                             },

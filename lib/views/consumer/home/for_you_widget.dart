@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/home/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,11 @@ class ForYouWidget extends StatelessWidget {
           return Container();
         }
 
-        if (snapshot.data != null && snapshot.data.length != 0) {
-          snapshot.data.forEach((event) {
+        List<QueryDocumentSnapshot> data =
+        snapshot.data as List<QueryDocumentSnapshot>;
+
+        if (data != null && data.length != 0) {
+          data.forEach((event) {
             controller.forYouItems.add(SearchResultItem(
               data: event,
               key: Key(event['title'] + event.id),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/attend/attend_controller.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,10 @@ class _AttendedEventsPageState extends State<AttendedEventsPage> {
               );
             }
             controller.eventItems.value = [];
-            snapshot.data.forEach((event) {
+            List<QueryDocumentSnapshot> data =
+            snapshot.data as List<QueryDocumentSnapshot>;
+
+            data.forEach((event) {
               controller.eventItems.add(EventItem(
                 data: event,
                 key: Key(event['title'] + event['date'].toString()),
@@ -36,112 +40,112 @@ class _AttendedEventsPageState extends State<AttendedEventsPage> {
 
             if (controller.sortBy.value == 'Descending')
               controller.eventItems
-                  .sort((a, b) => b.data['date'].compareTo(a.data['date']));
+                  .sort((a, b) => b.data!['date'].compareTo(a.data!['date']));
             else if (controller.sortBy.value == 'Ascending')
               controller.eventItems
-                  .sort((a, b) => a.data['date'].compareTo(b.data['date']));
+                  .sort((a, b) => a.data!['date'].compareTo(b.data!['date']));
 
             RefreshController _refreshController =
-            RefreshController(initialRefresh: false);
+                RefreshController(initialRefresh: false);
             return Scaffold(
               backgroundColor: Colors.black,
               body: SafeArea(
                 child: SingleChildScrollView(
                   child: Container(
                       child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 20),
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Sort by ",
-                                  style: TextStyle(
-                                      fontFamily: globals.montserrat,
-                                      fontWeight: globals.fontWeight,
-                                      fontSize: 15,
-                                      color: Colors.white),
-                                ),
-                                Obx(
-                                      () => Container(
-                                      padding: EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        //color: Colors.white12,
-                                          borderRadius: BorderRadius.circular(10)),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton<String>(
-                                          dropdownColor: Colors.grey[900],
-                                          value: controller.sortBy.value,
-                                          style: TextStyle(
-                                            fontFamily: globals.montserrat,
-                                            fontSize: 15,
-                                            fontWeight: globals.fontWeight,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 20),
+                        margin: EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Sort by ",
+                              style: TextStyle(
+                                  fontFamily: globals.montserrat,
+                                  fontWeight: globals.fontWeight,
+                                  fontSize: 15,
+                                  color: Colors.white),
+                            ),
+                            Obx(
+                              () => Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      //color: Colors.white12,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      dropdownColor: Colors.grey[900],
+                                      value: controller.sortBy.value,
+                                      style: TextStyle(
+                                        fontFamily: globals.montserrat,
+                                        fontSize: 15,
+                                        fontWeight: globals.fontWeight,
+                                        color: Colors.white,
+                                      ),
+                                      //elevation: 5,
+                                      items: <String>[
+                                        'Ascending',
+                                        'Descending',
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String sorting) {
+                                        return DropdownMenuItem<String>(
+                                          value: sorting,
+                                          child: Text(sorting),
+                                        );
+                                      }).toList(),
+                                      hint: Text(
+                                        controller.sortBy.value,
+                                        style: TextStyle(
                                             color: Colors.white,
-                                          ),
-                                          //elevation: 5,
-                                          items: <String>[
-                                            'Ascending',
-                                            'Descending',
-                                          ].map<DropdownMenuItem<String>>(
-                                                  (String sorting) {
-                                                return DropdownMenuItem<String>(
-                                                  value: sorting,
-                                                  child: Text(sorting),
-                                                );
-                                              }).toList(),
-                                          hint: Text(
-                                            controller.sortBy.value,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontWeight: globals.fontWeight,
-                                                fontFamily: globals.montserrat),
-                                          ),
-                                          onChanged: (String value) {
-                                            setState(() {
-                                              controller.sortBy.value = value;
-                                            });
-                                          },
-                                        ),
-                                      )),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: Get.height * 0.75,
-                            child: SmartRefresher(
-                              enablePullDown: true,
-                              controller: _refreshController,
-                              onRefresh: () async {
-                                // monitor network fetch
-                                await Future.delayed(Duration(milliseconds: 1000));
-                                // if failed,use refreshFailed()
-                                _refreshController.refreshCompleted();
-                              },
-                              child: ListView.builder(
-                                itemCount: controller.eventItems.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    child: controller.eventItems[index],
-                                    onTap: () {
-                                      controller.navigateToEventDetailsPage(context,
-                                          controller.eventItems[index].data);
-                                    },
-                                  );
+                                            fontSize: 14,
+                                            fontWeight: globals.fontWeight,
+                                            fontFamily: globals.montserrat),
+                                      ),
+                                      onChanged: (String? value) {
+                                        setState(() {
+                                          controller.sortBy.value = value!;
+                                        });
+                                      },
+                                    ),
+                                  )),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: Get.height * 0.75,
+                        child: SmartRefresher(
+                          enablePullDown: true,
+                          controller: _refreshController,
+                          onRefresh: () async {
+                            // monitor network fetch
+                            await Future.delayed(Duration(milliseconds: 1000));
+                            // if failed,use refreshFailed()
+                            _refreshController.refreshCompleted();
+                          },
+                          child: ListView.builder(
+                            itemCount: controller.eventItems.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                child: controller.eventItems[index],
+                                onTap: () {
+                                  /*controller.navigateToEventDetailsPage(context,
+                                      controller.eventItems[index].data);*/
                                 },
-                              ),
-                            ),
-                          )
-                        ],
-                      )),
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                    ],
+                  )),
                 ),
               ),
             );
           } else {
             RefreshController _refreshController =
-            RefreshController(initialRefresh: false);
+                RefreshController(initialRefresh: false);
             return Scaffold(
               body: SafeArea(
                 child: SmartRefresher(

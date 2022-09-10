@@ -1,31 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/domains/event.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:events/globals.dart' as globals;
 
 class EventStatistics extends StatefulWidget {
-  final QueryDocumentSnapshot data;
-  EventStatistics({Key key, this.data}) : super(key: key);
+  final Event event;
+
+  EventStatistics({Key? key, required this.event}) : super(key: key);
 
   @override
-  _EventStatisticsState createState() => _EventStatisticsState(data);
+  _EventStatisticsState createState() => _EventStatisticsState(event);
 }
 
 class _EventStatisticsState extends State<EventStatistics> {
-  final QueryDocumentSnapshot data;
-  _EventStatisticsState(this.data);
+  final Event event;
+
+  _EventStatisticsState(this.event);
 
   FirebaseFirestore fb = FirebaseFirestore.instance;
 
-  Future<List<DocumentSnapshot>> getStatistics() async{
-    List<dynamic> attending = data['attending'];
-
+  Future<List<DocumentSnapshot>> getStatistics() async {
     List<DocumentSnapshot> attendees = [];
-      await fb.collection("users").where('__name__', whereIn: attending).get().then((value){
-        value.docs.forEach((attendee) {
-          attendees.add(attendee);
-        });
+    await fb
+        .collection("users")
+        .where('__name__', whereIn: event.attendees)
+        .get()
+        .then((value) {
+      value.docs.forEach((attendee) {
+        attendees.add(attendee);
       });
+    });
 
     return attendees;
   }
@@ -36,59 +41,54 @@ class _EventStatisticsState extends State<EventStatistics> {
     int totalOthers = 0;
 
     attendees.forEach((attendee) {
-      if(attendee['gender'] == 'Male')
+      if (attendee['gender'] == 'Male')
         totalMales++;
       else if (attendee['gender'] == 'Female')
         totalFemales++;
-      else if (attendee['gender'] == 'Other')
-        totalOthers++;
+      else if (attendee['gender'] == 'Other') totalOthers++;
     });
 
     return [totalMales, totalFemales, totalOthers];
   }
 
-  int calculateAvgAge(List<DocumentSnapshot> attendees){
+  int calculateAvgAge(List<DocumentSnapshot> attendees) {
     int avgAge = 0;
     attendees.forEach((attendee) {
       DateTime birthday = attendee['birthday'].toDate();
       avgAge += calculateAge(birthday);
     });
-    if (avgAge == 0 || attendees.length == 0)
-      return 0;
+    if (avgAge == 0 || attendees.length == 0) return 0;
     return avgAge ~/ attendees.length;
   }
 
-  List<int> calculatePercentages (List<DocumentSnapshot> attendees) {
+  List<int> calculatePercentages(List<DocumentSnapshot> attendees) {
     int malePercentage = 0;
     int femalePercentage = 0;
     int otherPercentage = 0;
 
     attendees.forEach((attendee) {
-      if(attendee['gender'] == 'Male')
+      if (attendee['gender'] == 'Male')
         malePercentage++;
       else if (attendee['gender'] == 'Female')
         femalePercentage++;
-      else if (attendee['gender'] == 'Other')
-        otherPercentage++;
+      else if (attendee['gender'] == 'Other') otherPercentage++;
     });
 
-    if(attendees.length == 0) {
+    if (attendees.length == 0) {
       malePercentage = 0;
       femalePercentage = 0;
       otherPercentage = 0;
-    }
-    else {
+    } else {
       print([malePercentage, femalePercentage, otherPercentage]);
       malePercentage = ((malePercentage / attendees.length) * 100).toInt();
       femalePercentage = ((femalePercentage / attendees.length) * 100).toInt();
       otherPercentage = ((otherPercentage / attendees.length) * 100).toInt();
     }
 
-
     return [malePercentage, femalePercentage, otherPercentage];
   }
 
-  List<int> calculateAvgAgeByGender (List<DocumentSnapshot> attendees) {
+  List<int> calculateAvgAgeByGender(List<DocumentSnapshot> attendees) {
     int avgMaleAge = 0;
     int avgFemaleAge = 0;
     int avgOtherAge = 0;
@@ -97,23 +97,20 @@ class _EventStatisticsState extends State<EventStatistics> {
     int totalFemale = 0;
     int totalOther = 0;
 
-
     attendees.forEach((attendee) {
-      if(attendee['gender'] == 'Male') {
+      if (attendee['gender'] == 'Male') {
         totalMale++;
         avgMaleAge += calculateAge(attendee['birthday'].toDate());
-      }
-      else if (attendee['gender'] == 'Female') {
+      } else if (attendee['gender'] == 'Female') {
         totalFemale++;
         avgFemaleAge += calculateAge(attendee['birthday'].toDate());
-      }
-      else if (attendee['gender'] == 'Other') {
+      } else if (attendee['gender'] == 'Other') {
         totalOther++;
         avgOtherAge += calculateAge(attendee['birthday'].toDate());
       }
     });
 
-    if(totalMale == 0)
+    if (totalMale == 0)
       avgMaleAge = 0;
     else
       avgMaleAge = avgMaleAge ~/ totalMale;
@@ -157,7 +154,6 @@ class _EventStatisticsState extends State<EventStatistics> {
   double attendingTextSize = 23;
   double totalTextSize = 15;
 
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -179,12 +175,9 @@ class _EventStatisticsState extends State<EventStatistics> {
       body: SafeArea(
         child: FutureBuilder(
           future: getStatistics(),
-          builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot){
-
-            List<dynamic> numAttendees = data['attending'];
+          builder: (context, AsyncSnapshot<List<DocumentSnapshot>> snapshot) {
             bool isEmpty = false;
-            if(numAttendees.length == 0)
-              isEmpty = true;
+            if (event.attendees.length == 0) isEmpty = true;
 
             List<int> avgGenderAges;
             int avgAge;
@@ -192,21 +185,17 @@ class _EventStatisticsState extends State<EventStatistics> {
             List<int> totalGenders;
             List<int> genderPercentages;
 
-            if(!isEmpty){
+            if (!isEmpty) {
               if (!snapshot.hasData) {
-                return Center(
-                  child: globals.spinner
-                );
+                return Center(child: globals.spinner);
               }
-              avgGenderAges = calculateAvgAgeByGender(snapshot.data);
-              avgAge = calculateAvgAge(snapshot.data);
-              totalAttendees = snapshot.data.length;
-              totalGenders = calculateTotalByGender(snapshot.data);
-              genderPercentages = calculatePercentages(snapshot.data);
+              avgGenderAges = calculateAvgAgeByGender(snapshot.data!);
+              avgAge = calculateAvgAge(snapshot.data!);
+              totalAttendees = snapshot.data!.length;
+              totalGenders = calculateTotalByGender(snapshot.data!);
+              genderPercentages = calculatePercentages(snapshot.data!);
               print(genderPercentages.toString());
-            }
-
-            else{
+            } else {
               avgGenderAges = [0, 0, 0];
               avgAge = 0;
               totalAttendees = 0;
@@ -260,26 +249,26 @@ class _EventStatisticsState extends State<EventStatistics> {
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Center(
                                     child: RichText(
-                                      textAlign: TextAlign.center,
-                                      text: TextSpan(children: <TextSpan>[
-                                        TextSpan(
-                                          text: totalAttendees.toString(),
-                                          style: TextStyle(
-                                              fontFamily: globals.montserrat,
-                                              fontWeight: globals.fontWeight,
-                                              fontSize: attendingTextSize,
-                                              color: Colors.white),
-                                        ),
-                                        TextSpan(
-                                          text: "\ntotal",
-                                          style: TextStyle(
-                                              fontFamily: globals.montserrat,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: totalTextSize,
-                                              color: Colors.white),
-                                        ),
-                                      ]),
-                                    )),
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(children: <TextSpan>[
+                                    TextSpan(
+                                      text: totalAttendees.toString(),
+                                      style: TextStyle(
+                                          fontFamily: globals.montserrat,
+                                          fontWeight: globals.fontWeight,
+                                          fontSize: attendingTextSize,
+                                          color: Colors.white),
+                                    ),
+                                    TextSpan(
+                                      text: "\ntotal",
+                                      style: TextStyle(
+                                          fontFamily: globals.montserrat,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: totalTextSize,
+                                          color: Colors.white),
+                                    ),
+                                  ]),
+                                )),
                               ),
                             ),
                           ),
@@ -295,26 +284,26 @@ class _EventStatisticsState extends State<EventStatistics> {
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Center(
                                     child: RichText(
-                                      textAlign: TextAlign.center,
-                                      text: TextSpan(children: <TextSpan>[
-                                        TextSpan(
-                                          text: avgAge.toString(),
-                                          style: TextStyle(
-                                              fontFamily: globals.montserrat,
-                                              fontWeight: globals.fontWeight,
-                                              fontSize: attendingTextSize,
-                                              color: Colors.white),
-                                        ),
-                                        TextSpan(
-                                          text: "\navg age",
-                                          style: TextStyle(
-                                              fontFamily: globals.montserrat,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: totalTextSize,
-                                              color: Colors.white),
-                                        ),
-                                      ]),
-                                    )),
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(children: <TextSpan>[
+                                    TextSpan(
+                                      text: avgAge.toString(),
+                                      style: TextStyle(
+                                          fontFamily: globals.montserrat,
+                                          fontWeight: globals.fontWeight,
+                                          fontSize: attendingTextSize,
+                                          color: Colors.white),
+                                    ),
+                                    TextSpan(
+                                      text: "\navg age",
+                                      style: TextStyle(
+                                          fontFamily: globals.montserrat,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: totalTextSize,
+                                          color: Colors.white),
+                                    ),
+                                  ]),
+                                )),
                               ),
                             ),
                           ),
@@ -341,8 +330,7 @@ class _EventStatisticsState extends State<EventStatistics> {
                                 style: TextStyle(
                                     fontFamily: globals.montserrat,
                                     fontSize: 20,
-                                    color: Colors.white
-                                ),
+                                    color: Colors.white),
                               ),
                             ),
                             center: Text(
@@ -350,8 +338,7 @@ class _EventStatisticsState extends State<EventStatistics> {
                               style: TextStyle(
                                   fontFamily: globals.montserrat,
                                   fontSize: 20,
-                                  color: Colors.white
-                              ),
+                                  color: Colors.white),
                             ),
                             progressColor: Colors.blueAccent,
                           ),
@@ -362,22 +349,20 @@ class _EventStatisticsState extends State<EventStatistics> {
                           padding: EdgeInsets.only(top: 30),
                           child: RichText(
                             textAlign: TextAlign.start,
-                            text: TextSpan(children: <
-                                TextSpan>[
+                            text: TextSpan(children: <TextSpan>[
                               TextSpan(
                                 text: " - Total: " + totalMales.toString(),
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontFamily: globals
-                                        .montserrat,
+                                    fontFamily: globals.montserrat,
                                     fontSize: 16),
                               ),
                               TextSpan(
-                                  text: '\n - Avg age: ' + avgMaleAge.toString(),
+                                  text:
+                                      '\n - Avg age: ' + avgMaleAge.toString(),
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontFamily: globals
-                                          .montserrat,
+                                      fontFamily: globals.montserrat,
                                       fontSize: 16)),
                             ]),
                           ),
@@ -406,8 +391,7 @@ class _EventStatisticsState extends State<EventStatistics> {
                                 style: TextStyle(
                                     fontFamily: globals.montserrat,
                                     fontSize: 20,
-                                    color: Colors.white
-                                ),
+                                    color: Colors.white),
                               ),
                             ),
                             center: Text(
@@ -415,8 +399,7 @@ class _EventStatisticsState extends State<EventStatistics> {
                               style: TextStyle(
                                   fontFamily: globals.montserrat,
                                   fontSize: 20,
-                                  color: Colors.white
-                              ),
+                                  color: Colors.white),
                             ),
                             progressColor: Colors.blueAccent,
                           ),
@@ -427,22 +410,20 @@ class _EventStatisticsState extends State<EventStatistics> {
                           padding: EdgeInsets.only(top: 30),
                           child: RichText(
                             textAlign: TextAlign.start,
-                            text: TextSpan(children: <
-                                TextSpan>[
+                            text: TextSpan(children: <TextSpan>[
                               TextSpan(
                                 text: " - Total: " + totalFemales.toString(),
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontFamily: globals
-                                        .montserrat,
+                                    fontFamily: globals.montserrat,
                                     fontSize: 16),
                               ),
                               TextSpan(
-                                  text: '\n - Avg age: ' + avgFemaleAge.toString(),
+                                  text: '\n - Avg age: ' +
+                                      avgFemaleAge.toString(),
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontFamily: globals
-                                          .montserrat,
+                                      fontFamily: globals.montserrat,
                                       fontSize: 16)),
                             ]),
                           ),
@@ -471,8 +452,7 @@ class _EventStatisticsState extends State<EventStatistics> {
                                 style: TextStyle(
                                     fontFamily: globals.montserrat,
                                     fontSize: 20,
-                                    color: Colors.white
-                                ),
+                                    color: Colors.white),
                               ),
                             ),
                             center: Text(
@@ -480,8 +460,7 @@ class _EventStatisticsState extends State<EventStatistics> {
                               style: TextStyle(
                                   fontFamily: globals.montserrat,
                                   fontSize: 20,
-                                  color: Colors.white
-                              ),
+                                  color: Colors.white),
                             ),
                             progressColor: Colors.blueAccent,
                           ),
@@ -492,22 +471,20 @@ class _EventStatisticsState extends State<EventStatistics> {
                           padding: EdgeInsets.only(top: 30),
                           child: RichText(
                             textAlign: TextAlign.start,
-                            text: TextSpan(children: <
-                                TextSpan>[
+                            text: TextSpan(children: <TextSpan>[
                               TextSpan(
                                 text: " - Total: " + totalOthers.toString(),
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontFamily: globals
-                                        .montserrat,
+                                    fontFamily: globals.montserrat,
                                     fontSize: 16),
                               ),
                               TextSpan(
-                                  text: '\n - Avg age: ' + avgOtherAge.toString(),
+                                  text:
+                                      '\n - Avg age: ' + avgOtherAge.toString(),
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontFamily: globals
-                                          .montserrat,
+                                      fontFamily: globals.montserrat,
                                       fontSize: 16)),
                             ]),
                           ),

@@ -1,66 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:events/views/organizer/add_event/addEventForm.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:events/controllers/organizer/events_controllers/event_details_controller.dart';
+import 'package:events/domains/event.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
 import 'package:getwidget/components/carousel/gf_carousel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart';
-import 'package:events/views/organizer/profile/organizeraccount.dart';
 import 'package:events/views/ticketAlert.dart';
 import 'package:events/views/TicketCancelAlert.dart';
-import 'attendeeList.dart';
-import 'eventStatistics.dart';
+import 'package:get/get.dart';
 
 class EventDetails extends StatefulWidget {
-  final QueryDocumentSnapshot data;
+  final Event event;
 
-  EventDetails({Key key, this.data}) : super(key: key);
+  EventDetails({Key? key, required this.event}) : super(key: key);
 
   @override
-  _EventDetailsState createState() => _EventDetailsState(data);
+  _EventDetailsState createState() => _EventDetailsState(event);
 }
 
 class _EventDetailsState extends State<EventDetails> {
-  String title;
-  String description;
-  String type;
-  String fee;
-  String age;
-  String date;
-  String time;
-  String location;
-  GeoPoint locationPoint;
-  List<dynamic> urls;
-  String id;
-  String posteruid;
-  int tickets;
-  List<dynamic> attendees = [];
+  final Event event;
 
-  final QueryDocumentSnapshot data;
+  _EventDetailsState(this.event);
 
-  _EventDetailsState(this.data);
-
-  void getData() {
-    DateTime dateFormatted = data['date'].toDate();
-
-    title = data['title'];
-    description = data['description'];
-    type = data['type'];
-    fee = data['fee'];
-    age = data['age'];
-    date = DateFormat.MMMd().format(dateFormatted);
-    time = data['time'];
-    location = data['locationName'];
-    locationPoint = data['location']['geopoint'];
-    urls = data['urls'];
-    id = data.id;
-    posteruid = data['poster'];
-    tickets = data['ticketsleft'];
-    attendees = data['attending'];
-  }
+  EventDetailsController controller =
+      EventDetailsController(event: Event.initialize());
 
   double titleTextSize = 25;
   double descTextSize = 16;
@@ -71,112 +36,10 @@ class _EventDetailsState extends State<EventDetails> {
   double dateTextSize = 17;
   double timeTextSize = 19.5;
 
-  LatLng markerPos;
-  Marker marker;
-  List<Marker> setMarker = [];
-
-  void setMarkerPos() {
-    markerPos = LatLng(locationPoint.latitude, locationPoint.longitude);
-    marker =
-        Marker(markerId: MarkerId(markerPos.toString()), position: markerPos);
-    setMarker = [];
-    setMarker.add(marker);
-  }
-
-  List<Container> images = [];
-
-  String uid = FirebaseAuth.instance.currentUser.uid;
-  FirebaseFirestore fb = FirebaseFirestore.instance;
-
-  bool isOrg = false;
-
-  Future<bool> checkIsOrg() async {
-    await fb.collection("users").doc(uid).get().then((value) {
-      if (value.data()["organizer"] == true)
-        setState(() {
-          isOrg = true;
-        });
-    });
-    return isOrg;
-  }
-
-  List<dynamic> tokens;
-
-  Future<void> checkIsAttendOrBooked() async {
-    await fb.collection("users").doc(uid).get().then((value) {
-      setState(() {
-        if (value.data()['attending'].contains(id)) isAttend = true;
-        if (value.data()['booked'].contains(id)) isBooked = true;
-        tokens = value.data()['tokens'];
-      });
-    });
-  }
-
-  Icon notAttendIcon = Icon(
-    Icons.add_circle_outline_rounded,
-    color: Colors.green,
-    size: 20,
-  );
-  Icon isAttendIcon = Icon(
-    Icons.add_circle_rounded,
-    color: Colors.green,
-    size: 20,
-  );
-  bool isAttend = false;
-
-  Icon notBookedIcon = Icon(
-    Icons.bookmark_border,
-    color: Colors.blue,
-    size: 20,
-  );
-
-  Icon isBookedIcon = Icon(
-    Icons.bookmark,
-    color: Colors.blue,
-    size: 20,
-  );
-
-  bool isBooked = false;
-
   @override
   void initState() {
-    getData();
-    checkIsAttendOrBooked();
-    setMarkerPos();
-    checkIsOrg();
+    controller = Get.put(EventDetailsController(event: event));
     super.initState();
-  }
-
-  navigateToOrganizerPage(String organizeruid) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => OrganizerPage(
-                  organizeruid: organizeruid,
-                )));
-  }
-
-  navigateToEventStatistics(QueryDocumentSnapshot data) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => EventStatistics(data: data)));
-  }
-
-  navigateToEdit(QueryDocumentSnapshot data) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => AddEventForm(
-                  data: data,
-                )));
-  }
-
-  navigateToAttendees(var id) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => AttendeeList(
-                  id: id,
-                )));
   }
 
   @override
@@ -191,35 +54,35 @@ class _EventDetailsState extends State<EventDetails> {
     double btnsHeight = height * 0.057;
     double btnsWidth = height * 0.171;
 
-    String feeCheck = "";
-    if (fee == "" || fee == "Free")
+    String? feeCheck = "";
+    if (controller.event.fee == "" || controller.event.fee == "Free")
       feeCheck = "-";
     else
-      feeCheck = fee;
+      feeCheck = controller.event.fee;
 
-    String ageCheck = age;
-    if (age == "All ages") {
+    String? ageCheck = controller.event.age;
+    if (controller.event.age == "All ages") {
       ageCheck = "All\nages";
       ageTextSize = 18;
     }
-    String typeCheck = type;
-    if (type.contains(' ')) {
+    String? typeCheck = controller.event.type;
+    if (controller.event.type.contains(' ')) {
       typeCheck = typeCheck.replaceAll(' ', '\n');
     }
 
-    urls.forEach((url) {
-      images.add(Container(
+    controller.event.urls.forEach((url) {
+      controller.images.add(Container(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
           child: Image.network(url,
               filterQuality: FilterQuality.low,
               fit: BoxFit.cover, loadingBuilder: (BuildContext context,
-                  Widget child, ImageChunkEvent loadingProgress) {
+                  Widget child, ImageChunkEvent? loadingProgress) {
             if (loadingProgress == null) return child;
             return Center(
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes
+                        loadingProgress.expectedTotalBytes!
                     : null,
               ),
             );
@@ -230,29 +93,31 @@ class _EventDetailsState extends State<EventDetails> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         actions: <Widget>[
-          if (isOrg)
+          if (controller.isOrg.value)
             IconButton(
                 icon: Icon(Icons.group_outlined, color: Colors.white),
                 onPressed: () {
-                  navigateToAttendees(data.id);
+                  controller.navigateToAttendees(controller.event, context);
                 }),
-          if (isOrg)
+          if (controller.isOrg.value)
             IconButton(
                 icon: Icon(Icons.equalizer, color: Colors.white),
                 onPressed: () {
-                  navigateToEventStatistics(data);
+                  controller.navigateToEventStatistics(
+                      controller.event, context);
                 }),
-          if (isOrg)
+          if (controller.isOrg.value)
             IconButton(
                 icon: Icon(Icons.edit_outlined, color: Colors.white),
                 onPressed: () {
-                  navigateToEdit(data);
+                  controller.navigateToEdit(controller.event, context);
                 }),
-          if (isOrg)
+          if (controller.isOrg.value)
             IconButton(
                 icon: Icon(Icons.delete_outline, color: Colors.white),
                 onPressed: () {
-                  navigateToEventStatistics(data);
+                  controller.navigateToEventStatistics(
+                      controller.event, context);
                 }),
         ],
         leading: GestureDetector(
@@ -280,11 +145,15 @@ class _EventDetailsState extends State<EventDetails> {
                       bottomRight: Radius.circular(10),
                       topRight: Radius.circular(10))),
               child: StreamBuilder(
-                  stream: fb.collection("events").doc(id).snapshots(),
+                  stream: controller.fb
+                      .collection("events")
+                      .doc(controller.event.id)
+                      .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return Center(child: globals.spinner);
                     }
+                    final result = snapshot.data as DocumentSnapshot;
                     return Column(
                       children: [
                         // Title Text
@@ -295,22 +164,20 @@ class _EventDetailsState extends State<EventDetails> {
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
                               width: width,
                               child: Text(
-                                title,
+                                controller.event.title!,
                                 style: TextStyle(
                                     fontFamily: globals.montserrat,
                                     fontSize: titleTextSize,
                                     color: Colors.white),
                               ),
                             ),
-                            if (snapshot.data.data()["ticketsleft"] != -1)
+                            if (result["ticketsleft"] != -1)
                               Container(
                                 margin: EdgeInsets.only(
                                     left: 20, right: 20, bottom: 0),
                                 width: width,
                                 child: Text(
-                                  snapshot.data
-                                          .data()["ticketsleft"]
-                                          .toString() +
+                                  (result["ticketsleft"]?.toString())! +
                                       " tickets left",
                                   style: TextStyle(
                                       fontFamily: globals.montserrat,
@@ -320,11 +187,11 @@ class _EventDetailsState extends State<EventDetails> {
                               ),
                           ],
                         ),
-                        if (!isOrg)
+                        if (!controller.isOrg.value)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              snapshot.data.data()["ticketsleft"] == 0
+                              result["ticketsleft"] == 0
                                   ? Align(
                                       alignment: Alignment.centerLeft,
                                       child: Container(
@@ -360,37 +227,40 @@ class _EventDetailsState extends State<EventDetails> {
                                       ),
                                     )
                                   : GestureDetector(
-                                      onTap: () {
+                                      onTap: () async {
                                         TicketAlert alert = TicketAlert(
-                                            limit: snapshot.data
-                                                .data()["ticketsleft"]);
+                                            limit: result["ticketsleft"]);
                                         TicketCancelAlert cancelAlert =
                                             TicketCancelAlert();
-                                        if (!isAttend &&
-                                            snapshot.data
-                                                    .data()["ticketsleft"] !=
-                                                -1) {
-                                          return showDialog(
+                                        if (!controller.isAttend.value &&
+                                            result["ticketsleft"] != -1) {
+                                          return await showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
                                                 return alert;
                                               }).then((value) async {
                                             if (value != null) {
                                               setState(() {
-                                                isAttend = !isAttend;
+                                                controller.isAttend(
+                                                    !controller.isAttend.value);
                                               });
-                                              List<String> ids = [id];
-                                              List<String> uids = [uid];
-                                              DocumentSnapshot user = await fb
-                                                  .collection("users")
-                                                  .doc(uid)
-                                                  .get();
+                                              List<String?> ids = [
+                                                controller.event.id
+                                              ];
+                                              List<String> uids = [
+                                                controller.uid
+                                              ];
+                                              DocumentSnapshot user =
+                                                  await controller.fb
+                                                      .collection("users")
+                                                      .doc(controller.uid)
+                                                      .get();
 
-                                              fb
+                                              controller.fb
                                                   .collection("reservations")
-                                                  .doc(id)
+                                                  .doc(controller.event.id)
                                                   .collection("attendees")
-                                                  .doc(uid)
+                                                  .doc(controller.uid)
                                                   .set({
                                                 'amount': value,
                                                 'name': user['name'],
@@ -398,16 +268,16 @@ class _EventDetailsState extends State<EventDetails> {
                                                 'confirmed': 0
                                               });
 
-                                              fb
+                                              controller.fb
                                                   .collection("users")
-                                                  .doc(uid)
+                                                  .doc(controller.uid)
                                                   .update({
                                                 'attending':
                                                     FieldValue.arrayUnion(ids)
                                               });
-                                              fb
+                                              controller.fb
                                                   .collection("events")
-                                                  .doc(id)
+                                                  .doc(controller.event.id)
                                                   .update({
                                                 'attending':
                                                     FieldValue.arrayUnion(uids),
@@ -415,14 +285,12 @@ class _EventDetailsState extends State<EventDetails> {
                                                     FieldValue.increment(
                                                         -value),
                                                 'tokens': FieldValue.arrayUnion(
-                                                    tokens)
+                                                    controller.tokens)
                                               });
                                             }
                                           });
-                                        } else if (isAttend &&
-                                            snapshot.data
-                                                    .data()["ticketsleft"] !=
-                                                -1) {
+                                        } else if (controller.isAttend.value &&
+                                            result["ticketsleft"] != -1) {
                                           return showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
@@ -430,28 +298,35 @@ class _EventDetailsState extends State<EventDetails> {
                                               }).then((value) async {
                                             if (value == true) {
                                               setState(() {
-                                                isAttend = !isAttend;
+                                                controller.isAttend(
+                                                    !controller.isAttend.value);
                                               });
-                                              List<String> ids = [id];
-                                              List<String> uids = [uid];
+                                              List<String?> ids = [
+                                                controller.event.id
+                                              ];
+                                              List<String> uids = [
+                                                controller.uid
+                                              ];
 
-                                              dynamic reservation = await fb
-                                                  .collection("reservations")
-                                                  .doc(id)
-                                                  .collection("attendees")
-                                                  .doc(uid)
-                                                  .get();
+                                              dynamic reservation =
+                                                  await controller.fb
+                                                      .collection(
+                                                          "reservations")
+                                                      .doc(controller.event.id)
+                                                      .collection("attendees")
+                                                      .doc(controller.uid)
+                                                      .get();
 
-                                              fb
+                                              controller.fb
                                                   .collection("users")
-                                                  .doc(uid)
+                                                  .doc(controller.uid)
                                                   .update({
                                                 'attending':
                                                     FieldValue.arrayRemove(ids)
                                               });
-                                              fb
+                                              controller.fb
                                                   .collection("events")
-                                                  .doc(id)
+                                                  .doc(controller.event.id)
                                                   .update({
                                                 'attending':
                                                     FieldValue.arrayRemove(
@@ -461,60 +336,62 @@ class _EventDetailsState extends State<EventDetails> {
                                                         reservation['amount']),
                                                 'tokens':
                                                     FieldValue.arrayRemove(
-                                                        tokens)
+                                                        controller.tokens!)
                                               });
 
-                                              fb
+                                              controller.fb
                                                   .collection("reservations")
-                                                  .doc(id)
+                                                  .doc(controller.event.id)
                                                   .collection("attendees")
-                                                  .doc(uid)
+                                                  .doc(controller.uid)
                                                   .delete();
                                             }
                                           });
-                                        } else if (!isAttend &&
-                                            snapshot.data
-                                                    .data()["ticketsleft"] ==
-                                                -1) {
+                                        } else if (!controller.isAttend.value &&
+                                            result["ticketsleft"] == -1) {
                                           setState(() {
-                                            isAttend = !isAttend;
+                                            controller.isAttend(
+                                                !controller.isAttend.value);
                                           });
-                                          List<String> ids = [id];
-                                          List<String> uids = [uid];
-                                          fb
+                                          List<String?> ids = [
+                                            controller.event.id
+                                          ];
+                                          List<String> uids = [controller.uid];
+                                          controller.fb
                                               .collection("users")
-                                              .doc(uid)
+                                              .doc(controller.uid)
                                               .update({
                                             'attending':
                                                 FieldValue.arrayUnion(ids)
                                           });
-                                          fb
+                                          controller.fb
                                               .collection("events")
-                                              .doc(id)
+                                              .doc(controller.event.id)
                                               .update({
                                             'attending':
                                                 FieldValue.arrayUnion(uids),
                                           });
-                                        } else if (isAttend &&
-                                            snapshot.data
-                                                    .data()["ticketsleft"] ==
-                                                -1) {
+                                        } else if (controller.isAttend.value &&
+                                            result["ticketsleft"] == -1) {
                                           setState(() {
-                                            isAttend = !isAttend;
+                                            controller.isAttend(
+                                                !controller.isAttend.value);
                                           });
-                                          List<String> ids = [id];
-                                          List<String> uids = [uid];
+                                          List<String?> ids = [
+                                            controller.event.id
+                                          ];
+                                          List<String> uids = [controller.uid];
 
-                                          fb
+                                          controller.fb
                                               .collection("users")
-                                              .doc(uid)
+                                              .doc(controller.uid)
                                               .update({
                                             'attending':
                                                 FieldValue.arrayRemove(ids)
                                           });
-                                          fb
+                                          controller.fb
                                               .collection("events")
-                                              .doc(id)
+                                              .doc(controller.event.id)
                                               .update({
                                             'attending':
                                                 FieldValue.arrayRemove(uids)
@@ -541,7 +418,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                    (isAttend)
+                                                    (controller.isAttend.value)
                                                         ? "Attending "
                                                         : "Attend ",
                                                     style: TextStyle(
@@ -549,9 +426,9 @@ class _EventDetailsState extends State<EventDetails> {
                                                             globals.montserrat,
                                                         fontSize: 15,
                                                         color: Colors.green)),
-                                                (isAttend)
-                                                    ? isAttendIcon
-                                                    : notAttendIcon
+                                                (controller.isAttend.value)
+                                                    ? controller.isAttendIcon
+                                                    : controller.notAttendIcon
                                               ],
                                             ),
                                           ),
@@ -561,14 +438,21 @@ class _EventDetailsState extends State<EventDetails> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    isBooked = !isBooked;
-                                    List<String> ids = [id];
-                                    if (isBooked)
-                                      fb.collection("users").doc(uid).update({
+                                    controller
+                                        .isBooked(!controller.isBooked.value);
+                                    List<String?> ids = [controller.event.id];
+                                    if (controller.isBooked.value)
+                                      controller.fb
+                                          .collection("users")
+                                          .doc(controller.uid)
+                                          .update({
                                         'booked': FieldValue.arrayUnion(ids)
                                       });
                                     else
-                                      fb.collection("users").doc(uid).update({
+                                      controller.fb
+                                          .collection("users")
+                                          .doc(controller.uid)
+                                          .update({
                                         'booked': FieldValue.arrayRemove(ids)
                                       });
                                   });
@@ -591,15 +475,18 @@ class _EventDetailsState extends State<EventDetails> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Text((isBooked) ? "Saved " : "Save ",
+                                          Text(
+                                              (controller.isBooked.value)
+                                                  ? "Saved "
+                                                  : "Save ",
                                               style: TextStyle(
                                                   fontFamily:
                                                       globals.montserrat,
                                                   fontSize: 15,
                                                   color: Colors.blue)),
-                                          (isBooked)
-                                              ? isBookedIcon
-                                              : notBookedIcon
+                                          (controller.isBooked.value)
+                                              ? controller.isBookedIcon
+                                              : controller.notBookedIcon
                                         ],
                                       ),
                                     ),
@@ -613,7 +500,7 @@ class _EventDetailsState extends State<EventDetails> {
                           margin: EdgeInsets.only(left: 20, right: 20),
                           width: width,
                           child: Text(
-                            description,
+                            controller.event.description!,
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight,
@@ -642,7 +529,7 @@ class _EventDetailsState extends State<EventDetails> {
                                               BorderRadius.circular(10)),
                                       child: Center(
                                         child: Text(
-                                          ageCheck,
+                                          ageCheck!,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
@@ -667,7 +554,7 @@ class _EventDetailsState extends State<EventDetails> {
                                               BorderRadius.circular(10)),
                                       child: Center(
                                         child: Text(
-                                          typeCheck,
+                                          typeCheck!,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
@@ -738,7 +625,7 @@ class _EventDetailsState extends State<EventDetails> {
                                               BorderRadius.circular(10)),
                                       child: Center(
                                         child: Text(
-                                          date,
+                                          controller.event.date,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
                                               fontWeight: globals.fontWeight,
@@ -762,7 +649,7 @@ class _EventDetailsState extends State<EventDetails> {
                                               BorderRadius.circular(10)),
                                       child: Center(
                                         child: Text(
-                                          time,
+                                          controller.event.time,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               fontFamily: globals.montserrat,
@@ -805,10 +692,11 @@ class _EventDetailsState extends State<EventDetails> {
                       child: GoogleMap(
                         zoomControlsEnabled: false,
                         zoomGesturesEnabled: false,
-                        markers: Set.from(setMarker),
+                        markers: Set.from(controller.setMarker),
                         initialCameraPosition: CameraPosition(
-                            target: LatLng(locationPoint.latitude,
-                                locationPoint.longitude),
+                            target: LatLng(
+                                controller.event.locationPoint.latitude,
+                                controller.event.locationPoint.longitude),
                             zoom: 15.3),
                       ),
                     ),
@@ -817,7 +705,8 @@ class _EventDetailsState extends State<EventDetails> {
               ),
             ),
             // Images
-            if (urls != null && urls.length != 0)
+            if (controller.event.urls != null &&
+                controller.event.urls.length != 0)
               Container(
                 width: width,
                 margin: EdgeInsets.only(top: 20, bottom: 10),
@@ -827,7 +716,7 @@ class _EventDetailsState extends State<EventDetails> {
                   viewportFraction: 0.8,
                   activeIndicator: Colors.white,
                   //aspectRatio: 1,
-                  items: images.map(
+                  items: controller.images.map(
                     (con) {
                       return Container(
                         margin: EdgeInsets.all(8.0),
@@ -869,12 +758,15 @@ class _EventDetailsState extends State<EventDetails> {
                   FutureBuilder(
                     future: FirebaseFirestore.instance
                         .collection("users")
-                        .doc(posteruid)
+                        .doc(controller.event.posterUid)
                         .get(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(child: globals.spinner);
                       }
+
+                      final QueryDocumentSnapshot data =
+                          snapshot.data as QueryDocumentSnapshot;
 
                       return Container(
                           margin: EdgeInsets.only(
@@ -889,14 +781,17 @@ class _EventDetailsState extends State<EventDetails> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    navigateToOrganizerPage(posteruid);
+                                    controller.navigateToOrganizerPage(
+                                        controller.event.posterUid, context);
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(right: 20),
                                     child: CircleAvatar(
                                       radius: 25,
                                       child: Text(
-                                        snapshot.data.data()["name"][0],
+                                        snapshot.data != null
+                                            ? data["name"][0]
+                                            : "",
                                         style: TextStyle(
                                             fontFamily: globals.montserrat,
                                             fontWeight: globals.fontWeight,
@@ -909,11 +804,12 @@ class _EventDetailsState extends State<EventDetails> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
-                                      navigateToOrganizerPage(posteruid);
+                                      controller.navigateToOrganizerPage(
+                                          controller.event.posterUid, context);
                                     },
                                     child: Expanded(
                                       child: Text(
-                                        snapshot.data.data()["name"],
+                                        data["name"],
                                         style: TextStyle(
                                             fontFamily: globals.montserrat,
                                             fontWeight: globals.fontWeight,
@@ -925,8 +821,7 @@ class _EventDetailsState extends State<EventDetails> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    launch("tel://" +
-                                        snapshot.data.data()["number"]);
+                                    launch("tel://" + data["number"]);
                                   },
                                   child: Align(
                                       child: Icon(Icons.phone,

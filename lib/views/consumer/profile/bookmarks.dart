@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/profile/bookmarks_controller.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,11 @@ class Bookmarks extends GetView<BookmarksController> {
             return Center(child: globals.spinner);
           }
 
-          if (snapshot.data != null && snapshot.data.length != 0) {
-            snapshot.data.forEach((event) {
+          List<QueryDocumentSnapshot> data =
+              snapshot.data as List<QueryDocumentSnapshot>;
+
+          if (data != null && data.length != 0) {
+            data.forEach((event) {
               controller.eventItems.add(EventItem(
                 data: event,
               ));

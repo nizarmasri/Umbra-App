@@ -7,7 +7,7 @@ import 'package:events/views/consumer/attend/attending_events.dart';
 
 class AttendNavigatorPage extends GetView<AttendController> {
   final uid;
-  AttendNavigatorPage({Key key, this.uid}) : super(key: key);
+  AttendNavigatorPage({Key? key, this.uid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

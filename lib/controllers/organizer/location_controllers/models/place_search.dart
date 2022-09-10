@@ -1,6 +1,6 @@
 class PlaceSearch {
-  final String description;
-  final String placeId;
+  final String? description;
+  final String? placeId;
 
   PlaceSearch({this.description, this.placeId});
 
