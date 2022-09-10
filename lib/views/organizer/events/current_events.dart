@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/organizer/events_controllers/current_and_all_events_controller.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -131,7 +132,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                               child: controller.eventItems[index],
                               onTap: () async {
                                 controller.navigateToEventDetailsPage(
-                                    context, controller.eventItems[index].data);
+                                    context, Event.fromSnapshot(controller.eventItems[index].data!));
                               },
                             );
                           },
@@ -148,7 +149,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 ),
                 backgroundColor: Colors.white10,
                 onPressed: () async {
-                  controller.navigateToAddEventForm(context);
+                  controller.navigateToAddEventForm(context, controller.events);
                 },
               ),
             );
@@ -193,7 +194,7 @@ class _CurrentEventsPageState extends State<CurrentEventsPage> {
                 ),
                 backgroundColor: Colors.white10,
                 onPressed: () {
-                  controller.navigateToAddEventForm(context);
+                  controller.navigateToAddEventForm(context, controller.events);
                 },
               ),
             );

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/search/search_controller.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/consumer/search/search_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,11 +17,13 @@ class SearchPage extends GetView<SearchController> {
             return Center(child: globals.spinner);
           }
 
-          List<QueryDocumentSnapshot> data = snapshot.data as List<QueryDocumentSnapshot>;
+          List<QueryDocumentSnapshot> data =
+              snapshot.data as List<QueryDocumentSnapshot>;
 
           if (data != null && data.length != 0) {
             data.forEach((event) {
-              controller.searchItems.add(SearchItemWidget(data: event));
+              controller.searchItems
+                  .add(SearchItemWidget(event: Event.fromSnapshot(event)));
             });
           }
 

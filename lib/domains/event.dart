@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class Event {
   final String id;
@@ -18,20 +19,20 @@ class Event {
 
   factory Event.initialize() {
     return Event(
-      id: 'not-initialized',
-      title: '',
-      description: '',
-      type: '',
-      fee: '',
-      age: '',
-      date: '',
-      time: '',
-      location: '',
-      locationPoint: GeoPoint(0,0),
-      urls: [],
-      posterUid: '',
-      tickets: 0,
-      attendees: []
+        id: 'not-initialized',
+        title: '',
+        description: '',
+        type: '',
+        fee: '',
+        age: '',
+        date: '',
+        time: '',
+        location: '',
+        locationPoint: GeoPoint(0, 0),
+        urls: [],
+        posterUid: '',
+        tickets: 0,
+        attendees: []
     );
   }
 
@@ -50,6 +51,41 @@ class Event {
     required this.posterUid,
     required this.tickets,
     required this.attendees});
+
+  factory Event.fromSnapshot(QueryDocumentSnapshot data) {
+    return Event(
+        id: data.id,
+        title: data['title'],
+        description: data['description'],
+        type: data['type'],
+        fee: data['fee'],
+        age: data['age'],
+        date: DateFormat.MMMd().format(data['date'].toDate()),
+        time: data['time'],
+        location: data['locationName'],
+        locationPoint: data['location']['geopoint'],
+        urls: data['urls'],
+        posterUid: data['poster'],
+        tickets: 10,
+        attendees: []);
+  }
+
+  /*
+  DateTime dateFormatted = data!['date'].toDate();
+
+    title = data!['title'];
+    description = data!['description'];
+    type = data!['type'];
+    fee = data!['fee'];
+    age = data!['age'];
+    date = DateFormat.MMMd().format(dateFormatted);
+    time = data!['time'];
+    location = data!['locationName'];
+    locationPoint = data!['location']['geopoint'];
+    urls = data!['urls'];
+    id = data!.id;
+    posteruid = data!['poster'];
+  */
 
 
 }

@@ -10,12 +10,12 @@ class SearchItemWidget extends StatelessWidget {
 
   SearchItemWidget({Key? key, required this.event}) : super(key: key);
 
-  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot? data) {
+  navigateToEventDetailsPage(BuildContext context, Event event) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-                  data: data,
+                  event: event,
                 )));
   }
 
@@ -23,7 +23,7 @@ class SearchItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return GestureDetector(
-      onTap: () => navigateToEventDetailsPage(context, data),
+      onTap: () => navigateToEventDetailsPage(context, event),
       child: Container(
           height: Get.height * 0.337,
           width: Get.width * 0.466,

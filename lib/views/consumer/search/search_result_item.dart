@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,36 +7,29 @@ import 'package:events/globals.dart' as globals;
 import 'package:get/get.dart';
 
 class SearchResultItem extends StatelessWidget {
-  final QueryDocumentSnapshot? data;
+  final Event event;
 
-  SearchResultItem({Key? key, this.data}) : super(key: key);
+  SearchResultItem({Key? key, required this.event}) : super(key: key);
 
-  navigateToEventDetailsPage(BuildContext context, QueryDocumentSnapshot? data) {
+  navigateToEventDetailsPage(BuildContext context, Event event) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-                  data: data,
+                  event: event,
                 )));
   }
 
   @override
   Widget build(BuildContext context) {
-    DateTime dateFormatted = data!['date'].toDate();
-    final String? title = data!['title'];
-    final String type = data!['type'];
-    final date = DateFormat.MMMd().format(dateFormatted);
-    final String location = data!['locationName'];
-    final List<dynamic>? urls = data!['urls'];
-
     return GestureDetector(
-      onTap: () => navigateToEventDetailsPage(context, data),
+      onTap: () => navigateToEventDetailsPage(context, event),
       child: Container(
         width: Get.width,
         margin: EdgeInsets.only(left: 20, right: 20, bottom: 30),
         child: Column(
           children: [
-            if (urls == null || urls.length == 0)
+            if (event.urls == null || event.urls.length == 0)
               Container(
                 height: Get.height * 0.13,
                 width: Get.width,
@@ -63,7 +57,7 @@ class SearchResultItem extends StatelessWidget {
                   }),
                 ),
               ),
-            if (urls != null && urls.length != 0)
+            if (event.urls != null && event.urls.length != 0)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -78,7 +72,7 @@ class SearchResultItem extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.network(
-                          (urls != null && urls.length != 0) ? urls[0] : '',
+                          (event.urls != null && event.urls.length != 0) ? event.urls[0] : '',
                           filterQuality: FilterQuality.low,
                           fit: BoxFit.cover, loadingBuilder:
                               (BuildContext context, Widget child,
@@ -106,7 +100,7 @@ class SearchResultItem extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.network(
-                          (urls != null && urls.length > 1) ? urls[1] : '',
+                          (event.urls != null && event.urls.length > 1) ? event.urls[1] : '',
                           filterQuality: FilterQuality.low,
                           fit: BoxFit.cover, loadingBuilder:
                               (BuildContext context, Widget child,
@@ -134,7 +128,7 @@ class SearchResultItem extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.network(
-                          (urls != null && urls.length > 2) ? urls[2] : '',
+                          (event.urls != null && event.urls.length > 2) ? event.urls[2] : '',
                           filterQuality: FilterQuality.low,
                           fit: BoxFit.cover, loadingBuilder:
                               (BuildContext context, Widget child,
@@ -167,7 +161,7 @@ class SearchResultItem extends StatelessWidget {
                         textAlign: TextAlign.start,
                         text: TextSpan(children: <TextSpan>[
                           TextSpan(
-                            text: title,
+                            text: event.title,
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: FontWeight.bold,
@@ -175,7 +169,7 @@ class SearchResultItem extends StatelessWidget {
                                 color: Colors.white),
                           ),
                           TextSpan(
-                            text: "\n" + type + "  |  " + date,
+                            text: "\n" + event.type + "  |  " + event.date,
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight,
@@ -183,7 +177,7 @@ class SearchResultItem extends StatelessWidget {
                                 color: Colors.white54),
                           ),
                           TextSpan(
-                            text: "\n" + location,
+                            text: "\n" + event.location,
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight,

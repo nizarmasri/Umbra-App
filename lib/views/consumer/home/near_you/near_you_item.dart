@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:events/globals.dart' as globals;
 
 class NearYouItem extends StatefulWidget {
@@ -32,31 +31,14 @@ class _NearYouItemState extends State<NearYouItem> {
   String? id;
   String? posteruid;
 
-/*  void getData() {
-    DateTime dateFormatted = data!['date'].toDate();
-
-    title = data!['title'];
-    description = data!['description'];
-    type = data!['type'];
-    fee = data!['fee'];
-    age = data!['age'];
-    date = DateFormat.MMMd().format(dateFormatted);
-    time = data!['time'];
-    location = data!['locationName'];
-    locationPoint = data!['location']['geopoint'];
-    urls = data!['urls'];
-    id = data!.id;
-    posteruid = data!['poster'];
-  }*/
-
-  navigateToEventDetailsPage(QueryDocumentSnapshot? data) {
+  navigateToEventDetailsPage(Event event) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => EventDetails(data: data,)));
+            builder: (context) => EventDetails(event: event)));
   }
 
-  _NearYouItemState(this.data);
+  _NearYouItemState(this.event);
 
   @override
   Widget build(BuildContext context) {
@@ -66,11 +48,9 @@ class _NearYouItemState extends State<NearYouItem> {
     double itemWidth = width * 0.8;
     double shadedHeight = height * 0.075;
 
-    getData();
-
     return GestureDetector(
       onTap: () {
-        navigateToEventDetailsPage(data);
+        navigateToEventDetailsPage(event);
       },
       child: Container(
           height: itemHeight,

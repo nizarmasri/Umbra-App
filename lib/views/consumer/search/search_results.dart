@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -25,12 +26,12 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
 
   String searchStringFormatted = '';
 
-  navigateToEventDetailsPage(QueryDocumentSnapshot data) {
+  navigateToEventDetailsPage(Event event) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EventDetails(
-                  data: data,
+                  event: event,
                 ))).then((value) => setState(() {}));
   }
 
@@ -114,17 +115,17 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
             eventItems = [];
             data.forEach((event) {
               eventItems.add(SearchResultItem(
-                data: event,
+                event: Event.fromSnapshot(event),
                 key: Key(event['title'] + event['date'].toString()),
               ));
             });
 
             if (_sortBy == 'Descending')
               eventItems
-                  .sort((a, b) => b.data!['date'].compareTo(a.data!['date']));
+                  .sort((a, b) => b.event.date.compareTo(a.event.date));
             else if (_sortBy == 'Ascending')
               eventItems
-                  .sort((a, b) => a.data!['date'].compareTo(b.data!['date']));
+                  .sort((a, b) => a.event.date.compareTo(b.event.date));
 
             return Scaffold(
               backgroundColor: Colors.black,

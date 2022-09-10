@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/organizer/events_controllers/current_and_all_events_controller.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -129,7 +130,7 @@ class _AllEventsPageState extends State<AllEventsPage> {
                               child: controller.eventItems[index],
                               onTap: () {
                                 controller.navigateToEventDetailsPage(
-                                    context, controller.eventItems[index].data);
+                                    context, Event.fromSnapshot(controller.eventItems[index].data!));
                               },
                             );
                           },

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/attend/attend_controller.dart';
+import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/events/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -128,8 +129,8 @@ class _AttendingEventsPageState extends State<AttendingEventsPage> {
                               return GestureDetector(
                                 child: controller.eventItems[index],
                                 onTap: () {
-                                  /*controller.navigateToEventDetailsPage(context,
-                                      controller.eventItems[index].data);*/
+                                  controller.navigateToEventDetailsPage(context,
+                                      Event.fromSnapshot(controller.eventItems[index].data!));
                                 },
                               );
                             },

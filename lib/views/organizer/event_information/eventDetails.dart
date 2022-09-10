@@ -164,7 +164,7 @@ class _EventDetailsState extends State<EventDetails> {
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
                               width: width,
                               child: Text(
-                                controller.event.title!,
+                                controller.event.title,
                                 style: TextStyle(
                                     fontFamily: globals.montserrat,
                                     fontSize: titleTextSize,
@@ -336,7 +336,7 @@ class _EventDetailsState extends State<EventDetails> {
                                                         reservation['amount']),
                                                 'tokens':
                                                     FieldValue.arrayRemove(
-                                                        controller.tokens!)
+                                                        controller.tokens)
                                               });
 
                                               controller.fb
@@ -500,7 +500,7 @@ class _EventDetailsState extends State<EventDetails> {
                           margin: EdgeInsets.only(left: 20, right: 20),
                           width: width,
                           child: Text(
-                            controller.event.description!,
+                            controller.event.description,
                             style: TextStyle(
                                 fontFamily: globals.montserrat,
                                 fontWeight: globals.fontWeight,
@@ -765,8 +765,8 @@ class _EventDetailsState extends State<EventDetails> {
                         return Center(child: globals.spinner);
                       }
 
-                      final QueryDocumentSnapshot data =
-                          snapshot.data as QueryDocumentSnapshot;
+                      final DocumentSnapshot data =
+                          snapshot.data as DocumentSnapshot;
 
                       return Container(
                           margin: EdgeInsets.only(

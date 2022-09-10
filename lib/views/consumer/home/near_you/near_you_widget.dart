@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/controllers/consumer/home/home_controller.dart';
+import 'package:events/domains/event.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:events/globals.dart' as globals;
@@ -21,7 +23,7 @@ class NearYouWidget extends GetView<HomeController> {
                   DateTime dateChecker =
                       snapshot.data[i]['date'].toDate();
                   if (dateChecker.isAfter(DateTime.now()))
-                    events.add(NearYouItem(data: snapshot.data[i]));
+                    events.add(NearYouItem(event: Event.fromSnapshot(snapshot as QueryDocumentSnapshot)));
                 }
                 return Column(
                   children: [
