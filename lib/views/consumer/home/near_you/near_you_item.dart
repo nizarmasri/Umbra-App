@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events/domains/event.dart';
 import 'package:events/views/organizer/event_information/eventDetails.dart';
 import 'package:flutter/material.dart';
@@ -17,19 +16,6 @@ class NearYouItem extends StatefulWidget {
 
 class _NearYouItemState extends State<NearYouItem> {
   final Event event;
-
-  String? title;
-  String? description;
-  String? type;
-  String? fee;
-  String? age;
-  var date;
-  String? time;
-  String? location;
-  GeoPoint? locationPoint;
-  List<dynamic>? urls;
-  String? id;
-  String? posteruid;
 
   navigateToEventDetailsPage(Event event) {
     Navigator.push(
@@ -61,8 +47,8 @@ class _NearYouItemState extends State<NearYouItem> {
               borderRadius: BorderRadius.circular(20),
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: NetworkImage((urls != null && urls!.length != 0)
-                      ? urls![0]
+                  image: NetworkImage((event.urls.length != 0)
+                      ? event.urls[0]
                       : 'https://i.pinimg.com/originals/85/6f/31/856f31d9f475501c7552c97dbe727319.jpg'))),
           child: Align(
             alignment: Alignment.bottomLeft,
@@ -98,7 +84,7 @@ class _NearYouItemState extends State<NearYouItem> {
                           textAlign: TextAlign.start,
                           text: TextSpan(children: <TextSpan>[
                             TextSpan(
-                              text: title,
+                              text: event.title,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,
@@ -107,7 +93,7 @@ class _NearYouItemState extends State<NearYouItem> {
                                   color: Colors.black),
                             ),
                             TextSpan(
-                              text: "\n" + type! + "  |  " + date,
+                              text: "\n" + event.type + "  |  " + event.date,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,
@@ -129,7 +115,7 @@ class _NearYouItemState extends State<NearYouItem> {
                           textAlign: TextAlign.end,
                           text: TextSpan(children: <TextSpan>[
                             TextSpan(
-                              text: date,
+                              text: event.date,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,
@@ -138,7 +124,7 @@ class _NearYouItemState extends State<NearYouItem> {
                                   color: Colors.black87),
                             ),
                             TextSpan(
-                              text: "\n" + age!,
+                              text: "\n" + event.age,
                               style: TextStyle(
                                   fontFamily: globals
                                       .montserrat,
